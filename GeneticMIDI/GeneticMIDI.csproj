@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8F0794A6-48B2-404A-A36F-451CB0E91C96}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GeneticMIDI</RootNamespace>
+    <AssemblyName>GeneticMIDI</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Accord">
+      <HintPath>..\packages\Accord.2.15.0\lib\net45\Accord.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.MachineLearning">
+      <HintPath>..\packages\Accord.MachineLearning.2.15.0\lib\net45\Accord.MachineLearning.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Math">
+      <HintPath>..\packages\Accord.Math.2.15.0\lib\net45\Accord.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Statistics">
+      <HintPath>..\packages\Accord.Statistics.2.15.0\lib\net45\Accord.Statistics.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge">
+      <HintPath>..\packages\AForge.2.2.5\lib\AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Genetic">
+      <HintPath>..\packages\AForge.Genetic.2.2.5\lib\AForge.Genetic.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Math">
+      <HintPath>..\packages\AForge.Math.2.2.5\lib\AForge.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio">
+      <HintPath>..\packages\NAudio.1.7.3\lib\net35\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="alglib\alglibinternal.cs" />
+    <Compile Include="alglib\alglibmisc.cs" />
+    <Compile Include="alglib\ap.cs" />
+    <Compile Include="alglib\dataanalysis.cs" />
+    <Compile Include="alglib\diffequations.cs" />
+    <Compile Include="alglib\fasttransforms.cs" />
+    <Compile Include="alglib\integration.cs" />
+    <Compile Include="alglib\interpolation.cs" />
+    <Compile Include="alglib\linalg.cs" />
+    <Compile Include="alglib\optimization.cs" />
+    <Compile Include="alglib\solvers.cs" />
+    <Compile Include="alglib\specialfunctions.cs" />
+    <Compile Include="alglib\statistics.cs" />
+    <Compile Include="FitnessFunctions\CosineSimiliarity.cs" />
+    <Compile Include="FitnessFunctions\CrossCorrelation.cs" />
+    <Compile Include="Generators\IGenerator.cs" />
+    <Compile Include="Generators\GeneticGenerator.cs" />
+    <Compile Include="FitnessFunctions\NCD.cs" />
+    <Compile Include="Generators\MarkovGenerator.cs" />
+    <Compile Include="Genetic\GPCustomTree.cs" />
+    <Compile Include="Genetic\GPCustomTreeNode.cs" />
+    <Compile Include="Metrics\IMetricFreq.cs" />
+    <Compile Include="Metrics\MetricFrequency.cs" />
+    <Compile Include="Metrics\Pair.cs" />
+    <Compile Include="Metrics\Types\ChromaticTone.cs" />
+    <Compile Include="Metrics\Types\MelodicBigram.cs" />
+    <Compile Include="Metrics\Types\MelodicInterval.cs" />
+    <Compile Include="Metrics\Types\PitchDistance.cs" />
+    <Compile Include="Metrics\Types\ChromaticToneDuration.cs" />
+    <Compile Include="Metrics\Types\Pitch.cs" />
+    <Compile Include="Metrics\Types\ChromaticToneDistance.cs" />
+    <Compile Include="Metrics\Types\Rhythm.cs" />
+    <Compile Include="Metrics\Types\RhythmicBigram.cs" />
+    <Compile Include="Metrics\Types\RhythmicInterval.cs" />
+    <Compile Include="Representation\Note.cs" />
+    <Compile Include="Genetic\NoteGene.cs" />
+    <Compile Include="Genetic\NoteTree.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
