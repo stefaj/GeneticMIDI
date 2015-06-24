@@ -1,5 +1,6 @@
 ﻿using AForge.Genetic;
 using GeneticMIDI.Metrics;
+using GeneticMIDI.Representation;
 using System;
 using System.Collections.Generic;
 using System.Linq;

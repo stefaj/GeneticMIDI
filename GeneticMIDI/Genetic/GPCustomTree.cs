@@ -13,6 +13,7 @@ namespace AForge.Genetic
     using System.Collections.Generic;
     using AForge;
     using GeneticMIDI;
+    using GeneticMIDI.Representation;
 
     /// <summary>
     /// Tree chromosome represents a tree of genes, which is is used for

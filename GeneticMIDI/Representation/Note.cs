@@ -6,13 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeneticMIDI
+namespace GeneticMIDI.Representation
 {
+    public enum NoteNames { C, Cs, D, Ds, E, F, Fs, G, GS, A, As, B };
+
+    public enum Durations { tn=1, sn=2, en=4, qn=8, hn=16, wn=32, bn=64};
     public class Note 
     {
         public int Pitch { get; set; }
-        public int Volume { get; set; }
-        public int Duration { get; set; } // 1/8 th note
+        public int Velocity { get; set; }
+        public int Duration { get; set; } // wn = 16; bn 32; hn 8;
 
         public int Octave { get { return Pitch / 12; }
             set
@@ -40,12 +43,24 @@ namespace GeneticMIDI
         {
             this.Pitch = pitch;
             this.Duration = duration;
-            this.Volume = volume;
+            this.Velocity = volume;
+        }
+
+        public Note(NoteNames chromatic_tone, int octave, int duration, int volume=127)
+        {
+            this.Pitch = (int)chromatic_tone + 12 * octave;
+            this.Duration = duration;
+            this.Velocity = volume;
         }
 
         public override string ToString()
         {
             return "(" + NoteNames[this.NotePitch] + this.Octave + "-" + (int)(this.Duration / 100.0f * 8.0f) + ")";
+        }
+
+        public static float ToRealDuration(int note_duration, int bpm=120)
+        {
+            return note_duration * 60.0f * 4.0f / 32.0f / bpm;
         }
 
         public static string GetNoteStr(IEnumerable<Note> notes)
@@ -60,14 +75,15 @@ namespace GeneticMIDI
 
         private static readonly string[] NoteNames = new string[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 
-        public static Note[] LoadFromFile(string filename)
+        public static Note[] LoadFromFile(string filename, int track=0)
         {
             List<Note> notes = new List<Note>();
 
             NAudio.Midi.MidiFile f = new MidiFile(filename);
-            f.Events.MidiFileType = 0;
+            //f.Events.MidiFileType = 0;
             TempoEvent lastTempo = new TempoEvent(f.DeltaTicksPerQuarterNote, 0);
-            foreach (var e in f.Events[0])
+            lastTempo.Tempo = 90;
+            foreach (var e in f.Events[track])
             {
                 if (e as TempoEvent != null)
                     lastTempo = (TempoEvent)e;
@@ -87,7 +103,7 @@ namespace GeneticMIDI
             Note p = obj as Note;
             if (p == null)
                 return false;
-            return p.Duration == this.Duration && p.Volume == this.Volume && p.Pitch == this.Pitch;
+            return p.Duration == this.Duration && p.Velocity == this.Velocity && p.Pitch == this.Pitch;
         }
 
         public static bool operator == (Note n1, Note n2)
@@ -176,7 +192,7 @@ namespace GeneticMIDI
 
         public override int GetHashCode()
         {
-            return 3571 * this.Duration + 2903 * this.Pitch + 2129 * this.Volume;
+            return 3571 * this.Duration + 2903 * this.Pitch + 2129 * this.Velocity;
         }
     }
 

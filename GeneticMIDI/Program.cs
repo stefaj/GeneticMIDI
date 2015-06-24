@@ -3,6 +3,7 @@ using AForge.Genetic;
 using GeneticMIDI.FitnessFunctions;
 using GeneticMIDI.Generators;
 using GeneticMIDI.Metrics.Types;
+using GeneticMIDI.Representation;
 using NAudio.Midi;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,38 @@ namespace GeneticMIDI
     {
         static void Main(string[] args)
         {
+
+
+
+
+            Chord dminor = new Chord(new NoteNames[] { NoteNames.D, NoteNames.F, NoteNames.A }, 4, Durations.wn);
+            Chord dmajor = new Chord(new NoteNames[] { NoteNames.G, NoteNames.B, NoteNames.B }, 4, Durations.wn);
+            Chord cmajor = new Chord(new NoteNames[] { NoteNames.C, NoteNames.E, NoteNames.G }, 4, Durations.bn);
+            MusicPlayer player = new MusicPlayer();
+
+
+            HarmonySequence seq = new HarmonySequence();
+            seq.AddChord(dminor); seq.AddChord(dmajor); seq.AddChord(cmajor); seq.AddChord(dminor); seq.AddChord(cmajor); seq.AddChord(dminor); seq.AddChord(dmajor);
+            player.Play(seq);
+
+            //player.PlayChords(new Chord[] { dminor, dmajor, cmajor });
+
+            Console.ReadLine();
+            return;
+
+
+
+
+
+
+
+
+
+
             if(args.Length == 0)
             {
                 Test1();
-                Test3();
+               // Test4();
                 return;
             }
 
@@ -73,7 +102,7 @@ namespace GeneticMIDI
         {
             Console.WriteLine("Chromatic Tone and Duration");
             //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
-            CosineSimiliarity cosine = new CosineSimiliarity(@"test\frere.mid", new ChromaticToneDuration());
+            CosineSimiliarity cosine = new CosineSimiliarity(@"test\harry.mid", new ChromaticToneDuration());
             GeneticGenerator evolver = new GeneticGenerator(cosine);
             var notes = evolver.Generate();
             Play(notes);
@@ -85,7 +114,7 @@ namespace GeneticMIDI
         {
             Console.WriteLine("Melodic Bigram");
             //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
-            CosineSimiliarity cosine = new CosineSimiliarity(@"test\frere.mid", new MelodicBigram());
+            CosineSimiliarity cosine = new CosineSimiliarity(@"test\harry.mid", new MelodicBigram());
             GeneticGenerator evolver = new GeneticGenerator(cosine);
             var notes = evolver.Generate();
             Play(notes);
@@ -95,27 +124,18 @@ namespace GeneticMIDI
         static void Test5()
         {
             Console.WriteLine("Cross Correlation");
-            CrossCorrelation corr = new CrossCorrelation(@"test\frere.mid");
+            CrossCorrelation corr = new CrossCorrelation(@"test\harry.mid");
             GeneticGenerator evolver = new GeneticGenerator(corr);
             var notes = evolver.Generate();
             Play(notes);
-
         }
 
-        static void Play(IEnumerable<Note> notes, int octave=4)
+        static void Play(IEnumerable<Note> notes)
         {
-            MidiOut midiOut = new MidiOut(0);
-            midiOut.Send(MidiMessage.ChangePatch(2, 1).RawData);
-            foreach (Note n in notes)
-            {
-            
-                midiOut.Send(MidiMessage.StartNote(n.Pitch, n.Volume, 1).RawData);
-                Thread.Sleep(n.Duration*4*15);
-                midiOut.Send(MidiMessage.StopNote(n.Pitch, 0, 1).RawData);
-
-            }
-            midiOut.Close();
-            midiOut.Dispose();
+            MusicPlayer player = new MusicPlayer();
+            player.SetPatch(0, 1);
+            player.PlayNotes(notes);
+            player.Close();
         }
         
     }

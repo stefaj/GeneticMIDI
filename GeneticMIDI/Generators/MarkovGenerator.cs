@@ -1,6 +1,7 @@
 ﻿using Accord.MachineLearning.Bayes;
 using Accord.Statistics.Models.Markov;
 using Accord.Statistics.Models.Markov.Learning;
+using GeneticMIDI.Representation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +28,7 @@ namespace GeneticMIDI.Generators
             List<int[]> bayesInputs = new List<int[]>();
             List<int> bayesOutputs = new List<int>();
 
-            if(File.Exists(path + "\\" + "pitch_model.dat"))
+            if (File.Exists(path + "\\" + "duration_bayes.dat"))
             {
                 Console.WriteLine("Loading from file");
                 pitch_hmm = HiddenMarkovModel.Load(path + "\\" + "pitch_model.dat");
@@ -56,13 +57,22 @@ namespace GeneticMIDI.Generators
                 for(int i = 0; i < song.Length; i++)
                 {
                     _pitches[i] = song[i].Pitch;
+                    int dur = song[i].Duration;
+                    if (dur > 31)
+                        dur = 31;
                     if(i<20)
-                        _durations[i] = song[i].Duration;
+                        _durations[i] = dur;
 
                     if(i>3)
                     {
-                        bayesInputs.Add(new int[]{_pitches[i-2],song[i-2].Duration,_pitches[i-1],song[i-1].Duration,_pitches[i]});
-                        bayesOutputs.Add(song[i].Duration);
+                        int dur2 = song[i - 2].Duration;
+                        int dur1 = song[i - 1].Duration;
+                        if (dur2 > 31)
+                            dur2 = 31;
+                        if (dur1 > 31)
+                            dur1 = 31;
+                        bayesInputs.Add(new int[]{_pitches[i-2],dur2,_pitches[i-1],dur1,_pitches[i]});
+                        bayesOutputs.Add(dur);
                     }
                 }
                 pitches.Add(_pitches);
@@ -72,14 +82,14 @@ namespace GeneticMIDI.Generators
             }
             Console.WriteLine("Training Pitches");
             pitch_hmm = new HiddenMarkovModel(max_notes, 128);
-            var teacher = new BaumWelchLearning(pitch_hmm) { Tolerance = 0.0001, Iterations = 0 };
+            var teacher = new BaumWelchLearning(pitch_hmm) { Tolerance = 0.001, Iterations = 0 };
             var __pitches = pitches.ToArray();
             teacher.Run(__pitches);
             pitch_hmm.Save(path + "\\" + "pitch_model.dat");
 
             Console.WriteLine("Training Durations");
             duration_hmm = new HiddenMarkovModel(20, 32);
-            teacher = new BaumWelchLearning(duration_hmm) { Tolerance = 0.0001, Iterations = 0 };
+            teacher = new BaumWelchLearning(duration_hmm) { Tolerance = 0.001, Iterations = 0 };
             var __durations = durations.ToArray();
             teacher.Run(__durations);
             duration_hmm.Save(path + "\\" + "duration_model.dat");

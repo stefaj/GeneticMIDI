@@ -9,10 +9,11 @@
 namespace AForge.Genetic
 {
     using GeneticMIDI;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
+    using GeneticMIDI.Representation;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Text;
 
     /// <summary>
     /// Represents tree node of genetic programming tree.
