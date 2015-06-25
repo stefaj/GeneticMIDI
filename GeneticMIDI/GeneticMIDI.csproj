@@ -103,16 +103,18 @@
     <Compile Include="Metrics\Types\RhythmicBigram.cs" />
     <Compile Include="Metrics\Types\RhythmicInterval.cs" />
     <Compile Include="Representation\Chord.cs" />
+    <Compile Include="Representation\Composition.cs" />
     <Compile Include="Representation\HarmonySequence.cs" />
     <Compile Include="Representation\ISequence.cs" />
     <Compile Include="Representation\LFO.cs" />
-    <Compile Include="Representation\MusicPlayer.cs" />
+    <Compile Include="Output\MusicPlayer.cs" />
     <Compile Include="Representation\Note.cs" />
     <Compile Include="Genetic\NoteGene.cs" />
     <Compile Include="Genetic\NoteTree.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Representation\MelodySequence.cs" />
+    <Compile Include="Representation\PlaybackInfo.cs" />
     <Compile Include="Representation\PlaybackMessage.cs" />
     <Compile Include="Representation\Track.cs" />
   </ItemGroup>

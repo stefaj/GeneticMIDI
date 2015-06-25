@@ -23,13 +23,25 @@ namespace GeneticMIDI.Representation
         public MelodySequence()
         {
             sequence = new List<Note>();
-            Duration = 0;
         }
 
-        public void AddNote(int pitch, int d)
+        public void AddNote(NoteNames name, int octave, Durations d)
         {
-            sequence.Add(new Note(pitch, d));
-            Duration += d;
+            AddNote(new Note(name, octave, d));
+        }
+
+        public void AddNote(Note n)
+        {
+            sequence.Add(n);
+            Duration += n.Duration;
+        }
+
+        public void AddNotes(IEnumerable<Note> notes)
+        {
+            foreach(Note n in notes)
+            {
+                AddNote(n);
+            }
         }
 
         public void AddPause(int d)
@@ -44,22 +56,21 @@ namespace GeneticMIDI.Representation
                 n.Pitch++;
         }
 
-        public SortedDictionary<int, IEnumerable<PlaybackMessage>> GeneratePlaybackData(byte channel, int time = 0)
+        public PlaybackInfo GeneratePlaybackInfo(byte channel, int time = 0)
         {
-            SortedDictionary<int, IEnumerable<PlaybackMessage>> messages = new SortedDictionary<int, IEnumerable<PlaybackMessage>>();
+            PlaybackInfo info = new PlaybackInfo();
             foreach (Note n in sequence)
             {
                 if (n.Pitch < 0 || n.Velocity == 0)
                     continue;
-                PlaybackMessage[] m = new PlaybackMessage[]{new PlaybackMessage(PlaybackMessage.PlaybackMessageType.Start, channel, (byte)n.Velocity, (byte)n.Pitch)};
-
-                messages.Add(time, m);
+                PlaybackMessage m = new PlaybackMessage(PlaybackMessage.PlaybackMessageType.Start, channel, (byte)n.Velocity, (byte)n.Pitch);
+                info.Add(time, m);
                 time += (int)(1000 * Note.ToRealDuration(n.Duration));
-                m = new PlaybackMessage[]{new PlaybackMessage(PlaybackMessage.PlaybackMessageType.Stop, channel, (byte)n.Velocity, (byte)n.Pitch)};
-                messages.Add(time, m);
+                m = new PlaybackMessage(PlaybackMessage.PlaybackMessageType.Stop, channel, (byte)n.Velocity, (byte)n.Pitch);
+                info.Add(time, m);
                 time += 1;
             }
-            return messages;
+            return info;
         }
 
     }

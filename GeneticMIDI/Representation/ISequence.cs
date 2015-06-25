@@ -8,11 +8,10 @@ namespace GeneticMIDI.Representation
 {
     public interface ISequence
     {
-        
         int Duration { get; }
 
         int Length { get; }
 
-        SortedDictionary<int, IEnumerable<PlaybackMessage>> GeneratePlaybackData(byte channel, int time = 0);
+        PlaybackInfo GeneratePlaybackInfo(byte channel, int time = 0);
     }
 }

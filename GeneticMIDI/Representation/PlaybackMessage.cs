@@ -8,29 +8,54 @@ using System.Threading.Tasks;
 namespace GeneticMIDI.Representation
 {
 
-    public class PlaybackMessage
+    public struct PlaybackMessage
     {
-        public enum PlaybackMessageType { Start, Stop };
+        public enum PlaybackMessageType { Start, Stop, Patch, Control };
 
-        public PlaybackMessageType Message { get; private set; }
-        public byte Channel { get; private set; }
-        public byte Velocity { get; private set; }
-        public byte Pitch { get; private set; }
+        PlaybackMessageType message;
+        public PlaybackMessageType Message { get {return message;} }
 
-        public PlaybackMessage(PlaybackMessageType message, byte channel, byte velocity, byte pitch)
+        byte channel;
+        public byte Channel { get { return channel; } }
+
+        byte velocity;
+        public byte Velocity { get { return velocity; } }
+
+        byte pitch;
+        public byte Pitch { get { return pitch; } }
+
+        public PlaybackMessage(PlaybackMessageType message_, byte channel_, byte velocity_, byte pitch_)
         {
-            this.Message = message;
-            this.Channel = channel;
-            this.Velocity = velocity;
-            this.Pitch = pitch;
+            message = message_;
+            channel = channel_;
+            velocity = velocity_;
+            pitch = pitch_;
+        }
+
+        public PlaybackMessage(PatchNames patch, byte channel_)
+        {
+            message = PlaybackMessageType.Patch;
+            velocity = (byte)patch;
+            channel = channel_;
+            pitch = 0;
+
         }
 
         public MidiMessage GenerateMidiMessage()
         {
-            if (Message == PlaybackMessageType.Start)
-                return MidiMessage.StartNote(Pitch, Velocity, Channel);
-            else
-                return MidiMessage.StopNote(Pitch, 0, Channel);
+            switch (Message)
+            {
+                case PlaybackMessageType.Start:
+                    return MidiMessage.StartNote(Pitch, Velocity, Channel);
+                case PlaybackMessageType.Stop:
+                    return MidiMessage.StopNote(Pitch, 0, Channel);
+                case PlaybackMessageType.Patch:
+                    return MidiMessage.ChangePatch(Velocity, Channel);
+                case PlaybackMessageType.Control:
+                    return MidiMessage.ChangeControl(0,0,0);
+            }
+            throw new Exception("Not a valid message");
+
         }
     }
 }

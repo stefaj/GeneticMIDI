@@ -46,10 +46,10 @@ namespace GeneticMIDI.Representation
             this.Velocity = volume;
         }
 
-        public Note(NoteNames chromatic_tone, int octave, int duration, int volume=127)
+        public Note(NoteNames chromatic_tone, int octave, Durations duration, int volume=127)
         {
-            this.Pitch = (int)chromatic_tone + 12 * octave;
-            this.Duration = duration;
+            this.Pitch = (int)(chromatic_tone + 12 * octave);
+            this.Duration = (int)duration;
             this.Velocity = volume;
         }
 
@@ -61,6 +61,11 @@ namespace GeneticMIDI.Representation
         public static float ToRealDuration(int note_duration, int bpm=120)
         {
             return note_duration * 60.0f * 4.0f / 32.0f / bpm;
+        }
+
+        public static int ToNoteLength(int note_length, int delta_ticks_qn, double tempo)
+        {
+            return (int)((double)note_length / (double)delta_ticks_qn * (int)Durations.qn * (60 / tempo));
         }
 
         public static string GetNoteStr(IEnumerable<Note> notes)
@@ -82,7 +87,7 @@ namespace GeneticMIDI.Representation
             NAudio.Midi.MidiFile f = new MidiFile(filename);
             //f.Events.MidiFileType = 0;
             TempoEvent lastTempo = new TempoEvent(f.DeltaTicksPerQuarterNote, 0);
-            lastTempo.Tempo = 90;
+            lastTempo.Tempo = 60;
             foreach (var e in f.Events[track])
             {
                 if (e as TempoEvent != null)
@@ -91,7 +96,8 @@ namespace GeneticMIDI.Representation
                 NoteOnEvent on = e as NoteOnEvent;
                 if (on != null && on.OffEvent != null)
                 {
-                    double duration = (on.NoteLength / (lastTempo.Tempo)) * 8;
+
+                    double duration = ToNoteLength(on.NoteLength, f.DeltaTicksPerQuarterNote, lastTempo.Tempo);
                     notes.Add(new Note(on.NoteNumber, (int)duration));
                 }
             }

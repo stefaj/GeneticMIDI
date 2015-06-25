@@ -29,26 +29,35 @@ namespace GeneticMIDI.Representation
 
     public class Track
     {
-        List<MelodySequence> sequences;
-        public PatchNames Instrument{get; private set;}
+        List<ISequence> sequences;
+        public PatchNames Instrument{get; set;}
 
-        public int Channel { get; private set; }
+        public byte Channel { get; set; }
 
         public int Length { get { return sequences.Count; } }
 
-        public IEnumerable<MelodySequence> Sequences { get { return sequences; } }
+        public IEnumerable<ISequence> Sequences { get { return sequences; } }
 
-        public Track(PatchNames instrument, int channel)
+        public Track(PatchNames instrument, byte channel)
         {
             this.Instrument = instrument;
             this.Channel = channel;
-            sequences = new List<MelodySequence>();
+            sequences = new List<ISequence>();
         }
 
-        public void Transpose(int ht)
+        public void AddSequence(ISequence seq)
         {
-            foreach (MelodySequence seq in sequences)
-                seq.Transpose(ht);
+            this.sequences.Add(seq);
         }
+
+        public PlaybackInfo GeneratePlaybackData(int time = 0)
+        {
+            PlaybackInfo info = new PlaybackInfo();
+            info.Add(time, new PlaybackMessage(Instrument, Channel));
+            foreach (var s in sequences)
+                info += s.GeneratePlaybackInfo(Channel, time);
+            return info;
+        }
+
     }
 }

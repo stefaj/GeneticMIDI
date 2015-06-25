@@ -20,21 +20,27 @@ namespace GeneticMIDI.Representation
         
         public void Play(ISequence seq)
         {
-            var msgs = seq.GeneratePlaybackData(1,0);
-            Play(msgs, 0);
+            var msgs = seq.GeneratePlaybackInfo(1,0);
+            Play(msgs);
         }
 
-        private void Play(SortedDictionary<int, IEnumerable<PlaybackMessage>> messages, int t0=0)
+        public void Play(Composition comp)
         {
-            var keys = new int[messages.Keys.Count];
+            var info = comp.GeneratePlaybackInfo();
+            Play(info);
+        }
+
+        private void Play(PlaybackInfo info)
+        {
+            var keys = new int[info.Messages.Keys.Count];
             int i = 0;
-            foreach(var k in messages.Keys)
+            foreach(var k in info.Messages.Keys)
             {
                 keys[i++] = k;
             }
             for(i = 0; i < keys.Length - 1; i++)
             {
-                foreach(PlaybackMessage message in messages[keys[i]])
+                foreach(PlaybackMessage message in info.Messages[keys[i]])
                 {
                     midiOut.Send(message.GenerateMidiMessage().RawData);
                 }
@@ -42,32 +48,6 @@ namespace GeneticMIDI.Representation
                 Thread.Sleep(sleep_dur);
             }
 
-        }
-
-        private SortedDictionary<int, IEnumerable<PlaybackMessage>> Merge(SortedDictionary<int, IEnumerable<PlaybackMessage>>[] messages)
-        {
-            SortedDictionary<int, IEnumerable<PlaybackMessage>> main_dic = new SortedDictionary<int, IEnumerable<PlaybackMessage>>();
-            foreach(var d in messages)
-            {
-                foreach(int k in d.Keys)
-                {
-                    if(!main_dic.ContainsKey(k))
-                    {
-                        main_dic[k] = d[k];
-                    }
-                    else
-                    {
-                        int j = 0;
-                        PlaybackMessage[] msgs = new PlaybackMessage[main_dic[k].Count() +d[k].Count()];
-                        foreach(PlaybackMessage m in main_dic[k])
-                            msgs[j++] = m;
-                        foreach(PlaybackMessage m in d[k])
-                            msgs[j++] = m;
-                        main_dic[k] = msgs;
-                    }
-                }
-            }
-            return main_dic;
         }
 
 

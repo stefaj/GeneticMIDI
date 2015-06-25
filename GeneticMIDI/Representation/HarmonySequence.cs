@@ -45,9 +45,9 @@ namespace GeneticMIDI.Representation
                 c.Transpose(ht);
         }
 
-        public SortedDictionary<int, IEnumerable<PlaybackMessage>> GeneratePlaybackData(byte channel, int time=0)
+        public PlaybackInfo GeneratePlaybackInfo(byte channel, int time = 0)
         {
-            SortedDictionary<int, IEnumerable<PlaybackMessage>> messages = new SortedDictionary<int, IEnumerable<PlaybackMessage>>();
+            PlaybackInfo info = new PlaybackInfo();
             foreach(Chord c in sequence)
             {
                 if(c.Length == 0 || c.Velocity == 0)
@@ -58,7 +58,7 @@ namespace GeneticMIDI.Representation
                     var note = c.Notes[i];
                     m[i] = new PlaybackMessage(PlaybackMessage.PlaybackMessageType.Start, channel, (byte)c.Velocity, (byte)note.Pitch);
                 }
-                messages.Add(time, m);
+                info.Add(time, m);
                 time += (int)(1000 * Note.ToRealDuration(c.Duration));
                 m = new PlaybackMessage[c.Length];
                 for (int i = 0; i < c.Notes.Length; i++)
@@ -66,10 +66,10 @@ namespace GeneticMIDI.Representation
                     var note = c.Notes[i];
                     m[i] = new PlaybackMessage(PlaybackMessage.PlaybackMessageType.Stop, channel, (byte)c.Velocity, (byte)note.Pitch);
                 }
-                messages.Add(time, m);
+                info.Add(time, m);
                 time += 1;
             }
-            return messages;
+            return info;
         }
     }
 }

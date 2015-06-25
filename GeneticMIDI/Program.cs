@@ -20,22 +20,45 @@ namespace GeneticMIDI
         {
 
 
-
-
-            Chord dminor = new Chord(new NoteNames[] { NoteNames.D, NoteNames.F, NoteNames.A }, 4, Durations.wn);
-            Chord dmajor = new Chord(new NoteNames[] { NoteNames.G, NoteNames.B, NoteNames.B }, 4, Durations.wn);
-            Chord cmajor = new Chord(new NoteNames[] { NoteNames.C, NoteNames.E, NoteNames.G }, 4, Durations.bn);
             MusicPlayer player = new MusicPlayer();
 
+            MelodySequence seq = new MelodySequence();
+            for (int i = 0; i < 100; i++)
+            {
+                double s = Math.Sin(4 * Math.PI / 100 * (double)i);
+                int pitch = 12 * 4 + (int)(s * 24);
+                seq.AddNote(new Note(pitch, (int)Durations.en));
+            }
 
-            HarmonySequence seq = new HarmonySequence();
-            seq.AddChord(dminor); seq.AddChord(dmajor); seq.AddChord(cmajor); seq.AddChord(dminor); seq.AddChord(cmajor); seq.AddChord(dminor); seq.AddChord(dmajor);
+            Composition comp = new Composition();
+            comp.LoadFromMIDI(@"test\other\frere.mid");
+
+            player.Play(comp);
+            Console.ReadLine();
+
+
+           
             player.Play(seq);
+
+
+            return;
+
+
+
+
+
+
+
+
+
+
+
+            //Chord Test
+
 
             //player.PlayChords(new Chord[] { dminor, dmajor, cmajor });
 
-            Console.ReadLine();
-            return;
+       
 
 
 
@@ -130,6 +153,19 @@ namespace GeneticMIDI
             Play(notes);
         }
 
+        static void ChordTest()
+        {
+            MusicPlayer player = new MusicPlayer();
+            Chord dminor = new Chord(new NoteNames[] { NoteNames.D, NoteNames.F, NoteNames.A }, 4, Durations.wn);
+            Chord dmajor = new Chord(new NoteNames[] { NoteNames.G, NoteNames.B, NoteNames.B }, 4, Durations.wn);
+            Chord cmajor = new Chord(new NoteNames[] { NoteNames.C, NoteNames.E, NoteNames.G }, 4, Durations.bn);
+
+            HarmonySequence seq = new HarmonySequence();
+            seq.AddChord(dminor); seq.AddChord(dmajor); seq.AddChord(cmajor); seq.AddChord(dminor); seq.AddChord(cmajor); seq.AddChord(dminor); seq.AddChord(dmajor); seq.AddChord(cmajor);
+            player.Play(seq);
+            player.Close();
+        }
+
         static void Play(IEnumerable<Note> notes)
         {
             MusicPlayer player = new MusicPlayer();
@@ -137,6 +173,8 @@ namespace GeneticMIDI
             player.PlayNotes(notes);
             player.Close();
         }
+
+       
         
     }
 }

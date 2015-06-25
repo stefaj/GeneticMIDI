@@ -32,7 +32,7 @@ namespace GeneticMIDI.Representation
             this.Notes = new Note[notes.Length];
             for (int i = 0; i < notes.Length; i++)
             {
-                Notes[i] = new Note(notes[i], octave, Duration, velocity);
+                Notes[i] = new Note(notes[i], octave, duration, velocity);
             }
         }
 
