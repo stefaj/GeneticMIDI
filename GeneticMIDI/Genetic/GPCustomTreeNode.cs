@@ -113,6 +113,72 @@ namespace AForge.Genetic
             return clone;
         }
 
+        public void ShiftPitch(int val)
+        {
+            var root_gene = this.Gene as NoteGene;
+            root_gene.ShiftPitch(val);
+            if(this.Children != null)
+            {
+                foreach(var c in this.Children)
+                {
+                    if (c == null)
+                        continue;
+                    c.ShiftPitch(val);
+                }
+            }
+        }
+
+        public void ShiftDuration(int val)
+        {
+            var root_gene = this.Gene as NoteGene;
+            root_gene.ShiftDuration(val);
+            if (this.Children != null)
+            {
+                foreach (var c in this.Children)
+                {
+                    if (c == null)
+                        continue;
+                    c.ShiftDuration(val);
+                }
+            }
+        }
+
+        public void Swap()
+        {
+            var root_gene = this.Gene as NoteGene;
+            if (this.Children != null)
+            {
+                if (this.Children.Count > 1)
+                {
+                    var child1 = this.Children[0];
+                    var child2 = this.Children[1];
+                    var temp = child2;
+                    child2 = child1;
+                    child1 = temp;
+
+                    if (child2 != null)
+                        child2.Swap();
+                    if (child1 != null)
+                        child1.Swap();
+                }
+            }
+        }
+
+        public GPCustomTreeNode Repeat(int n)
+        {
+            GPCustomTreeNode t = this.Clone() as GPCustomTreeNode;
+            GPCustomTreeNode root = new GPCustomTreeNode(new NoteGene(0, 0, 0, NoteGene.FunctionTypes.Concatenation, GPGeneType.Function));
+            while(n>0)
+            {
+                root.Children = new List<GPCustomTreeNode>();
+                root.Children.Add(this.Clone() as GPCustomTreeNode);
+                root.Children.Add(new GPCustomTreeNode(new NoteGene(0, 0, 0, NoteGene.FunctionTypes.Concatenation, GPGeneType.Function)));
+                root = root.Children[1];
+                n--;
+            }
+            return root;
+        }
+
         public List<Note> GenerateNotes()
         {
             
@@ -129,28 +195,22 @@ namespace AForge.Genetic
             {
                 switch (g.Function)
                 {
-                    case NoteGene.FunctionTypes.Series:
+                    case NoteGene.FunctionTypes.Concatenation:
                         var childnotes = this.Children[0].GenerateNotes();
                         childnotes.AddRange(this.Children[1].GenerateNotes());
                         return childnotes;
-                    /*case NoteGene.FunctionTypes.LengthScale:
-                        var notes1 = this.Children[0].GenerateNotes(); //Note to be modified
-                        foreach(Note note in notes1)
-                        {
-                            float arg = (this.Children[1].Gene as NoteGene).Pitch; //Argument
-                            arg -= 6; arg /= 6;
-                            note.Duration = (int)(note.Duration * (1+arg));
-                        }
-                        return notes1;*/
-                    case NoteGene.FunctionTypes.PitchScale:
-                        var notes2 = this.Children[0].GenerateNotes();
-                        float arg2 = (this.Children[1].Gene as NoteGene).Pitch; //Argument
-                        foreach (Note note in notes2)
-                        {
-                            arg2 -= 6; arg2 /= 6;
-                            note.Duration = (int)(note.Duration * (1 + arg2));
-                        }
-                        return notes2;
+                    case NoteGene.FunctionTypes.DurationShift:
+                        this.ShiftDuration(g.FuncArg);
+                        return this.Children[0].GenerateNotes();
+                    case NoteGene.FunctionTypes.PitchShift:
+                        this.ShiftPitch(g.FuncArg);
+                        return this.Children[0].GenerateNotes();
+                    case NoteGene.FunctionTypes.Repeat:
+                        this.Repeat(g.FuncArg);
+                        return this.Children[0].GenerateNotes();
+                    case NoteGene.FunctionTypes.Swap:
+                        this.Swap();
+                        return this.Children[0].GenerateNotes();
                     default:
                         throw new Exception("Eh wena");
                 }

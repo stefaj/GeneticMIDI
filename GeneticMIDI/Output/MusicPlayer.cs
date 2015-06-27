@@ -30,6 +30,12 @@ namespace GeneticMIDI.Representation
             Play(info);
         }
 
+        public void Play(Track track)
+        {
+            var info = track.GeneratePlaybackInfo();
+            Play(info);
+        }
+
         private void Play(PlaybackInfo info)
         {
             var keys = new int[info.Messages.Keys.Count];
@@ -53,6 +59,7 @@ namespace GeneticMIDI.Representation
 
         public void PlayChord(Chord c)
         {
+            midiOut.Send(MidiMessage.ChangePatch((int)PatchNames.Electric_Piano_2, 1).RawData);
             foreach (Note n in c.Notes)
             {
                 midiOut.Send(MidiMessage.StartNote(n.Pitch, c.Velocity, 1).RawData);

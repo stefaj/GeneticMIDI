@@ -11,7 +11,7 @@ namespace GeneticMIDI.Representation
     public enum NoteNames { C, Cs, D, Ds, E, F, Fs, G, GS, A, As, B };
 
     public enum Durations { tn=1, sn=2, en=4, qn=8, hn=16, wn=32, bn=64};
-    public class Note 
+    public class Note : ICloneable
     {
         public int Pitch { get; set; }
         public int Velocity { get; set; }
@@ -66,16 +66,6 @@ namespace GeneticMIDI.Representation
         public static int ToNoteLength(int note_length, int delta_ticks_qn, double tempo)
         {
             return (int)((double)note_length / (double)delta_ticks_qn * (int)Durations.qn * (60 / tempo));
-        }
-
-        public static string GetNoteStr(IEnumerable<Note> notes)
-        {
-            string noteStr = "";
-            foreach (Note n in notes)
-            {
-                noteStr += n.ToString();
-            }
-            return noteStr;
         }
 
         private static readonly string[] NoteNames = new string[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
@@ -199,6 +189,11 @@ namespace GeneticMIDI.Representation
         public override int GetHashCode()
         {
             return 3571 * this.Duration + 2903 * this.Pitch + 2129 * this.Velocity;
+        }
+
+        public object Clone()
+        {
+            return new Note(this.Pitch, this.Duration, this.Velocity);
         }
     }
 

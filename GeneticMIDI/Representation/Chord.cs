@@ -8,9 +8,9 @@ namespace GeneticMIDI.Representation
 {
     public class Chord
     {
-        public int Duration { get; private set; }
-        public int Velocity { get; private set; }
-        public Note[] Notes { get; private set; }
+        public int Duration { get; set; }
+        public int Velocity { get; set; }
+        public Note[] Notes { get; set; }
 
         public int Length { get { return Notes.Length; } }
 

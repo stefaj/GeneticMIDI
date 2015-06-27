@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Representation
 {
-    public class MelodySequence : ISequence
+    public class MelodySequence : ISequence, ICloneable
     {
         List<Note> sequence;
 
@@ -25,6 +25,13 @@ namespace GeneticMIDI.Representation
             sequence = new List<Note>();
         }
 
+        public MelodySequence(IEnumerable<Note> notes)
+        {
+            sequence = new List<Note>();
+            foreach (Note n in notes)
+                AddNote(n);
+        }
+
         public void AddNote(NoteNames name, int octave, Durations d)
         {
             AddNote(new Note(name, octave, d));
@@ -38,7 +45,7 @@ namespace GeneticMIDI.Representation
 
         public void AddNotes(IEnumerable<Note> notes)
         {
-            foreach(Note n in notes)
+            foreach (Note n in notes)
             {
                 AddNote(n);
             }
@@ -50,10 +57,35 @@ namespace GeneticMIDI.Representation
             Duration += d;
         }
 
+        public Note[] ToArray()
+        {
+            return sequence.ToArray();
+        }
+
         public void Transpose(int ht)
         {
             foreach (Note n in sequence)
-                n.Pitch++;
+                n.Pitch+=ht;
+        }
+
+        public string GetNoteStr()
+        {
+            string noteStr = "";
+            foreach (Note n in sequence)
+            {
+                noteStr += n.ToString();
+            }
+            return noteStr;
+        }
+
+        public static string GetNoteStr(IEnumerable<Note> notes)
+        {
+            string noteStr = "";
+            foreach (Note n in notes)
+            {
+                noteStr += n.ToString();
+            }
+            return noteStr;
         }
 
         public PlaybackInfo GeneratePlaybackInfo(byte channel, int time = 0)
@@ -62,7 +94,10 @@ namespace GeneticMIDI.Representation
             foreach (Note n in sequence)
             {
                 if (n.Pitch < 0 || n.Velocity == 0)
+                {
+                    time += (int)(1000 * Note.ToRealDuration(n.Duration));
                     continue;
+                }
                 PlaybackMessage m = new PlaybackMessage(PlaybackMessage.PlaybackMessageType.Start, channel, (byte)n.Velocity, (byte)n.Pitch);
                 info.Add(time, m);
                 time += (int)(1000 * Note.ToRealDuration(n.Duration));
@@ -73,5 +108,13 @@ namespace GeneticMIDI.Representation
             return info;
         }
 
+
+        public object Clone()
+        {
+            MelodySequence seq = new MelodySequence();
+            foreach (Note n in sequence)
+                seq.AddNote(n.Clone() as Note);
+            return seq;
+        }
     }
 }

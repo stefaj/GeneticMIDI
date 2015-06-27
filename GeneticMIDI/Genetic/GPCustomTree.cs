@@ -15,32 +15,18 @@ namespace AForge.Genetic
     using GeneticMIDI;
     using GeneticMIDI.Representation;
 
-    /// <summary>
-    /// Tree chromosome represents a tree of genes, which is is used for
-    /// different tasks of Genetic Programming (GP).
-    /// </summary>
-    /// 
-    /// <remarks><para>This type of chromosome represents a tree, where each node
-    /// is represented by <see cref="GPTreeNode"/> containing <see cref="IGPGene"/>.
-    /// Depending on type of genes used to build the tree, it may represent different
-    /// types of expressions aimed to solve different type of tasks. For example, a
-    /// particular implementation of <see cref="IGPGene"/> interface may represent
-    /// simple algebraic operations and their arguments.
-    /// </para>
-    /// 
-    /// <para>See documentation to <see cref="IGPGene"/> implementations for additional
-    /// information about possible Genetic Programming trees.</para>
-    /// </remarks>
-    /// 
+/// <summary>
+/// Reimplementation of GPCustomTree from Aforge for simple series monophonic note sequences
+/// </summary>
     public class GPCustomTree : ChromosomeBase
     {
         // tree root
         protected GPCustomTreeNode root = new GPCustomTreeNode();
 
         // maximum initial level of the tree
-        private static int maxInitialLevel = 5;
+        private static int maxInitialLevel = 6;
         // maximum level of the tree
-        private static int maxLevel = 10;
+        private static int maxLevel = 12;
 
         /// <summary>
         /// Random generator used for chromosoms' generation.
@@ -92,13 +78,14 @@ namespace AForge.Genetic
         /// which has all genes of the same type and properties as the specified <paramref name="ancestor"/>.
         /// </para></remarks>
         /// 
-        public GPCustomTree(IGPGene ancestor)
+        public GPCustomTree(NoteGene ancestor)
         {
             // make the ancestor gene to be as temporary root of the tree
             root.Gene = ancestor.Clone();
             // call tree regeneration function
             Generate();
         }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GPTreeChromosome"/> class.
@@ -128,6 +115,23 @@ namespace AForge.Genetic
         public override string ToString()
         {
             return root.ToString();
+        }
+
+
+
+        public void Generate(IEnumerable <Note> notes)
+        {
+            
+            var node = root;
+            foreach(Note n in notes)
+            {
+                node.Gene = new NoteGene(0, 0, 0, NoteGene.FunctionTypes.Concatenation, GPGeneType.Function);
+                node.Children = new List<GPCustomTreeNode>(2);
+                node.Children.Add(new GPCustomTreeNode(new NoteGene(n.NotePitch, (Durations)n.Duration, n.Octave, NoteGene.FunctionTypes.Concatenation, GPGeneType.Argument)));
+                node.Children.Add(new GPCustomTreeNode(new NoteGene(0, 0, 0, NoteGene.FunctionTypes.Concatenation, GPGeneType.Function)));
+                node = node.Children[1];
+            }
+
         }
 
         /// <summary>
@@ -203,7 +207,7 @@ namespace AForge.Genetic
         /// 
         public override IChromosome CreateNew()
         {
-            return new GPCustomTree(root.Gene.Clone());
+            return new GPCustomTree(root.Gene.Clone() as NoteGene);
         }
 
         /// <summary>

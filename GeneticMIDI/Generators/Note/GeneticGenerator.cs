@@ -11,22 +11,35 @@ namespace GeneticMIDI.Generators
     class GeneticGenerator : IGenerator
     {
         IFitnessFunction fitnessFunction;
-        public GeneticGenerator(IFitnessFunction fitnessFunction)
+        MelodySequence base_seq = null;
+        public GeneticGenerator(IFitnessFunction fitnessFunction, MelodySequence base_seq = null)
         {
             this.fitnessFunction = fitnessFunction;
+            this.base_seq = base_seq;
         }
 
         public IEnumerable<Note> Generate()
         {
             NoteGene baseGene = new NoteGene(GPGeneType.Function);
-            baseGene.Function = NoteGene.FunctionTypes.Series;
-            NoteTree tree = new NoteTree(baseGene);
+            baseGene.Function = NoteGene.FunctionTypes.Concatenation;
+            GPCustomTree tree = new GPCustomTree(baseGene);
+            if (base_seq != null)
+            {
+                tree.Generate(base_seq.ToArray());
+                tree.Mutate();
+                tree.Crossover(tree);
+       
+                int length = base_seq.Length;
+                int depth = (int)Math.Ceiling(Math.Log(length, 2));
+                GPCustomTree.MaxInitialLevel = depth - 2;
+                GPCustomTree.MaxLevel = depth + 5;
+            }
             var selection = new EliteSelection();
             Population pop = new Population(30, tree, fitnessFunction, selection);
             
             pop.AutoShuffling = true;
-            pop.CrossoverRate = 0.8;
-            pop.MutationRate = 0.2;
+            pop.CrossoverRate = 0.9;
+            pop.MutationRate = 0.1;
 
             const int MAX = 2000;
             for (int i = 0; i < MAX; i++)

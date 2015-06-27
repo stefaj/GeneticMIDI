@@ -25,8 +25,24 @@ namespace GeneticMIDI.Representation
         {
             PlaybackInfo info = new PlaybackInfo();
             foreach (Track t in Tracks)
-                info += t.GeneratePlaybackData(0);
+                info += t.GeneratePlaybackInfo(0);
             return info;
+        }
+
+        public Track GetLongestTrack()
+        {
+            int max_dur = 0;
+            int id = 0;
+            for (int i = 0; i < Tracks.Count; i++)
+            {
+                var t = Tracks[i];
+                if (t.Duration > max_dur)
+                {
+                    max_dur = t.Duration;
+                    id = i;
+                }
+            }
+            return Tracks[id];
         }
 
         public void LoadFromMIDI(string filename)

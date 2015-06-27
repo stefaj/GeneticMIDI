@@ -4,18 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-namespace GeneticMIDI.Metrics.Types
+namespace GeneticMIDI.Metrics.Frequency
 {
-    class ChromaticTone : MetricFrequency
+    public class RhythmicInterval : MetricFrequency
     {
-
         public override void GenerateFrequencies(Note[] notes)
         {
-            foreach (Note n in notes)
+            for (int i = 0; i < notes.Length - 1; i++)
             {
-                int tone = n.NotePitch;
-                Add(new Pair(tone));
+                int interval = Math.Abs(notes[i].Duration - notes[i + 1].Duration);
+                Add(new Pair(interval));
             }
         }
     }

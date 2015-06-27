@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeneticMIDI.Metrics.Types
+namespace GeneticMIDI.Metrics.Frequency
 {
     public class RhythmicBigram : MetricFrequency
     {

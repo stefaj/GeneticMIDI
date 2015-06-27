@@ -9,6 +9,7 @@ namespace GeneticMIDI.Metrics
 {
     interface IMetric
     {
-        Dictionary<Pair, int> Generate(Note[] notes);
+        //Vector
+        Dictionary<object, float> Generate(Note[] notes);
     }
 }

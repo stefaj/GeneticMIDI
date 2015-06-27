@@ -9,21 +9,21 @@ namespace GeneticMIDI.Metrics
 {
     public abstract class MetricFrequency : IMetric
     {
-        private Dictionary<Pair, int> frequencies;
+        private Dictionary<object, float> frequencies;
         protected const float p = 0.02f;
 
         public MetricFrequency()
         {
-            frequencies = new Dictionary<Pair, int>();
+            frequencies = new Dictionary<object, float>();
         }
-        public Dictionary<Pair, int> Frequencies
+        public Dictionary<object, float> Frequencies
         {
             get { return frequencies; }
         }
 
-        public Dictionary<Pair, int> Generate(Note[] notes)
+        public Dictionary<object, float> Generate(Note[] notes)
         {
-            frequencies = new Dictionary<Pair, int>();
+            frequencies = new Dictionary<object, float>();
             frequencies.Clear();
             GenerateFrequencies(notes);
             Filter();

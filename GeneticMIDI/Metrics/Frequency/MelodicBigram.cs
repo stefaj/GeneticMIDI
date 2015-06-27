@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeneticMIDI.Metrics.Types
+namespace GeneticMIDI.Metrics.Frequency
 {
     public class MelodicBigram : MetricFrequency
     {
@@ -15,7 +15,8 @@ namespace GeneticMIDI.Metrics.Types
             for (int i = 0; i < notes.Length - 1; i++)
             {
                 int interval = Math.Abs(notes[i].Pitch - notes[i + 1].Pitch);
-                intervals.Add(interval);
+                if(notes[i].Velocity > 0 && notes[i].Pitch >= 0)
+                    intervals.Add(interval);
             }
             for(int i = 0; i < intervals.Count-2; i+=2)
             {

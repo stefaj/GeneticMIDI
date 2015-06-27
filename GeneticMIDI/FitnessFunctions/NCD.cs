@@ -7,6 +7,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,59 +15,43 @@ namespace GeneticMIDI.FitnessFunctions
 {
     public class NCD : IFitnessFunction
     {
-        string lib_path;
-
         string[] songs;
-        const string DEF_SAVE = "ncd.dat";
 
-        public int AverageOctave { get; private set; }
-        public NCD(string lib_path)
+        
+        public NCD(IEnumerable<MelodySequence> seqs)
         {
-            this.lib_path = lib_path;
+            string notes = "";
+            foreach (var m in seqs)
+                notes += m.GetNoteStr();
+            string hash = MD5Hash(notes);
 
-            string savepath = lib_path + "\\" + DEF_SAVE;
+            string savepath =  "ncd_" + hash + ".dat";
             if(File.Exists(savepath))
             {
                 Deserialize(savepath);
                 return;
             }
 
-            string[] files = System.IO.Directory.GetFiles(lib_path);
-            int count = files.Count();
 
-            songs = new string[count];
+            songs = new string[seqs.Count()];
             
             int i = 0;
             int j = 0;
-            foreach (string file in files)
+            foreach (MelodySequence m in seqs)
             {
-                if (System.IO.Path.GetExtension(file).ToLower() != ".mid")
-                    continue;
-                Console.WriteLine("Adding " + Path.GetFileName(file));
                 Note[] song;
-                try
-                {
-                    song = Note.LoadFromFileSampled(file);
-                }
-                catch
-                {
-                    continue;
-                }
-                int avs = 0;
-                foreach (Note n in song)
-                {
-                    avs += n.Octave;
-                }
-                AverageOctave += avs / song.Length;
-                songs[i++] = Note.GetNoteStr(song);
+
+                song = m.ToArray();
+
+                songs[i++] = m.GetNoteStr();
             }
-            AverageOctave /= i;
+
             Serialize(savepath);
         }
 
         public float ComputeFitness(IEnumerable<Note> individual)
         {
-            string indi2str = Note.GetNoteStr(individual);
+            string indi2str = MelodySequence.GetNoteStr(individual);
             float sum = 0;
             foreach(string str in songs)
             {
@@ -96,13 +81,13 @@ namespace GeneticMIDI.FitnessFunctions
 
         static float ComputeNCD(string indi1str, IEnumerable<Note> indi2)
         {
-            string indi2str = Note.GetNoteStr(indi2);
+            string indi2str = MelodySequence.GetNoteStr(indi2);
             return ComputeNCD(indi1str, indi2str);
         }
 
         static float ComputeNCD(IEnumerable<Note> indi1, IEnumerable<Note> indi2)
         {
-            string indi1str = Note.GetNoteStr(indi1);
+            string indi1str = MelodySequence.GetNoteStr(indi1);
             return ComputeNCD(indi1str, indi2);
 
         }
@@ -166,8 +151,7 @@ namespace GeneticMIDI.FitnessFunctions
             BinaryFormatter formatter = new BinaryFormatter();
             try
             {
-                Tuple<string[], int> serializeData = new Tuple<string[], int>(songs, AverageOctave);
-                formatter.Serialize(fs, serializeData);
+                formatter.Serialize(fs, songs);
             }
             catch (SerializationException e)
             {
@@ -186,9 +170,7 @@ namespace GeneticMIDI.FitnessFunctions
             try
             {
                 BinaryFormatter formatter = new BinaryFormatter();
-                Tuple<string[], int> serializeData = (Tuple<string[], int>)formatter.Deserialize(fs);
-                songs = serializeData.Item1;
-                AverageOctave = serializeData.Item2;
+                string[] songs = (string[])formatter.Deserialize(fs);
                 
             }
             catch (SerializationException e)
@@ -200,6 +182,22 @@ namespace GeneticMIDI.FitnessFunctions
             {
                 fs.Close();
             }
+
+        }
+
+        private string MD5Hash(string str)
+        {
+            byte[] encodedPassword = new UTF8Encoding().GetBytes(str);
+
+            byte[] hash = ((HashAlgorithm)CryptoConfig.CreateFromName("MD5")).ComputeHash(encodedPassword);
+
+            // string representation (similar to UNIX format)
+            string encoded = BitConverter.ToString(hash)
+                // without dashes
+               .Replace("-", string.Empty)
+                // make lowercase
+               .ToLower();
+            return encoded;
 
         }
     }

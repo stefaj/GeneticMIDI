@@ -36,6 +36,8 @@ namespace GeneticMIDI.Representation
 
         public int Length { get { return sequences.Count; } }
 
+        public int Duration { get; private set; }
+
         public IEnumerable<ISequence> Sequences { get { return sequences; } }
 
         public Track(PatchNames instrument, byte channel)
@@ -48,14 +50,23 @@ namespace GeneticMIDI.Representation
         public void AddSequence(ISequence seq)
         {
             this.sequences.Add(seq);
+            Duration += seq.Duration;
         }
 
-        public PlaybackInfo GeneratePlaybackData(int time = 0)
+        public ISequence GetMainSequence()
+        {
+            return sequences[0];
+        }
+
+        public PlaybackInfo GeneratePlaybackInfo(int time = 0)
         {
             PlaybackInfo info = new PlaybackInfo();
             info.Add(time, new PlaybackMessage(Instrument, Channel));
             foreach (var s in sequences)
+            {
                 info += s.GeneratePlaybackInfo(Channel, time);
+                time += (int)(1000 * Note.ToRealDuration(s.Duration));
+            }
             return info;
         }
 

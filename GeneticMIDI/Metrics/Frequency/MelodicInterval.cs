@@ -5,20 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeneticMIDI.Metrics.Types
+namespace GeneticMIDI.Metrics.Frequency
 {
-    class Pitch : MetricFrequency
+    public class MelodicInterval : MetricFrequency
     {
-
         public override void GenerateFrequencies(Note[] notes)
         {
-            foreach(Note n in notes)
+            for(int i = 0; i < notes.Length-1; i++)
             {
-                int pitch = n.Pitch;
-                Add(new Pair(pitch));
+                int interval = Math.Abs(notes[i].Pitch - notes[i+1].Pitch);
+                Add(new Pair(interval));
             }
         }
     }
-
-
 }

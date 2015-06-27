@@ -16,6 +16,8 @@ namespace GeneticMIDI.Generators
         HiddenMarkovModel pitch_hmm;
         HiddenMarkovModel duration_hmm;
         NaiveBayes duration_bayes;
+        Dictionary<int, int> pitch_map;
+        Dictionary<int, int> duration_map;
         public MarkovGenerator(string path)
         {
             
@@ -38,6 +40,8 @@ namespace GeneticMIDI.Generators
             }
 
             int max_notes = 0;
+            Dictionary<int, int> pitch_map = new Dictionary<int, int>();
+            Dictionary<int, int> duration_map = new Dictionary<int, int>();
             foreach (string file in files)
             {
                 if (System.IO.Path.GetExtension(file).ToLower() != ".mid")
@@ -104,9 +108,101 @@ namespace GeneticMIDI.Generators
             
 
         }
+
+
+        public MarkovGenerator(MelodySequence[] seqs)
+        {
+
+            int count = seqs.Length;
+
+            List<int[]> pitches = new List<int[]>();
+            List<int[]> durations = new List<int[]>();
+
+            List<int[]> bayesInputs = new List<int[]>();
+            List<int> bayesOutputs = new List<int>();
+            pitch_map = new Dictionary<int, int>();
+            duration_map = new Dictionary<int, int>();
+
+            int max_notes = 0;
+          
+            int pitch = 0;
+            int dur_ = 0;
+            foreach (MelodySequence m in seqs)
+            {
+                Note[] song = m.ToArray();
+
+                int[] _pitches = new int[song.Length];
+                int[] _durations = new int[20];
+
+                for (int i = 0; i < song.Length; i++)
+                {
+                    if(pitch_map.ContainsKey(song[i].Pitch))
+                        _pitches[i] = pitch_map[song[i].Pitch];
+                    else
+                    {
+                        pitch_map[song[i].Pitch] = pitch++;
+                        _pitches[i] = pitch_map[song[i].Pitch];
+                    }
+
+                    int dur = song[i].Duration;
+ 
+                    if (duration_map.ContainsKey(dur))
+                    {
+                        if (i < 20)
+                            _durations[i] =  duration_map[dur];
+                    }
+                    else
+                    {
+                        duration_map[dur] = dur_++;
+                    }
+                    if (i > 3)
+                    {
+                        int dur2 = duration_map[song[i - 2].Duration];
+                        int dur1 = duration_map[song[i - 1].Duration];
+
+                        bayesInputs.Add(new int[] { _pitches[i - 2], dur2, _pitches[i - 1], dur1, _pitches[i] });
+                        bayesOutputs.Add(dur);
+                    }
+                }
+                pitches.Add(_pitches);
+                durations.Add(_durations);
+                if (song.Length > max_notes)
+                    max_notes = song.Length;
+            }
+            int max_pitches = pitch_map.Keys.Count;
+            int max_durs = duration_map.Keys.Count;
+            Console.WriteLine("Training Pitches");
+            pitch_hmm = new HiddenMarkovModel(max_pitches, max_pitches);
+            var teacher = new BaumWelchLearning(pitch_hmm) { Tolerance = 0.001, Iterations = 0 };
+            var __pitches = pitches.ToArray();
+            teacher.Run(__pitches);
+
+            Console.WriteLine("Training Durations");
+            duration_hmm = new HiddenMarkovModel(max_durs, max_durs);
+            teacher = new BaumWelchLearning(duration_hmm) { Tolerance = 0.001, Iterations = 0 };
+            var __durations = durations.ToArray();
+            teacher.Run(__durations);
+
+            Console.WriteLine("Training Bayes");
+            duration_bayes = new NaiveBayes(max_durs, new int[] { max_pitches, max_durs, max_pitches, max_durs, max_pitches });
+            duration_bayes.Estimate(bayesInputs.ToArray(), bayesOutputs.ToArray());
+
+
+            Console.WriteLine("Done training");
+
+
+        }
+        
         public IEnumerable<Note> Generate()
         {
-            var notes1 = pitch_hmm.Generate(100);
+            Dictionary<int, int> reverse_pitch_map = new Dictionary<int, int>();
+            Dictionary<int, int> reverse_duration_map = new Dictionary<int, int>();
+            foreach (int k in pitch_map.Keys)
+                reverse_pitch_map[pitch_map[k]] = k;
+            foreach (int k in duration_map.Keys)
+                reverse_duration_map[duration_map[k]] = k;
+
+            var notes1 = pitch_hmm.Generate(40);
             var durs1 = duration_hmm.Generate(20);
             var durs = new int[100];
             for (int i = 0; i < durs1.Length; i++)
@@ -116,7 +212,7 @@ namespace GeneticMIDI.Generators
             {
 
                 int dur;
-                if(i>10)
+                if(i>2)
                 {
                     dur = duration_bayes.Compute(new int[] { notes1[i - 2], durs[i - 2], notes1[i - 1], durs[i - 1], notes1[i] });
                 }
@@ -125,7 +221,14 @@ namespace GeneticMIDI.Generators
                 if (dur < 1)
                     dur = durs1[i % 20];
                 durs[i] = dur;
-                notes3[i] = new Note(notes1[i], dur);
+
+                int duration = reverse_duration_map[dur];
+                if (duration < (int)Durations.sn)
+                    duration *= (int)Durations.sn;
+                if (duration >= (int)Durations.bn)
+                    duration /= (int)Durations.wn;
+                //duration = (int)Durations.qn;
+                notes3[i] = new Note(reverse_pitch_map[notes1[i]], duration);
             }
             return notes3;
 

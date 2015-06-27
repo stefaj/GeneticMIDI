@@ -14,9 +14,9 @@ namespace GeneticMIDI.FitnessFunctions
         double[] pitches;
         double[] durations;
         double highest_peak;
-        public CrossCorrelation(string target)
+        public CrossCorrelation(MelodySequence seq)
         {
-            this.target = Note.LoadFromFileSampled(target);
+            this.target = seq.ToArray();
             pitches = new double[this.target.Length];
             durations = new double[this.target.Length];
             for(int i = 0; i < this.target.Length; i++)
