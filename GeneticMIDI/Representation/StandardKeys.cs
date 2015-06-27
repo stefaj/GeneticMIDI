@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Representation
 {
-    public static class StandardChords
+    public static class StandardKeys
     {
         public const int A = (int)NoteNames.A;
         public const int B = (int)NoteNames.B;
@@ -41,6 +41,6 @@ namespace GeneticMIDI.Representation
         public static int[] GS_MAJOR = { Ab, Bb, C, Db, Eb, F, G, Ab }; //Ab
         public static int[] AS_MAJOR = { Bb, C, D, Eb, F, G, A, Bb }; //Bb
 
-        public static int[][] MAJOR_CHORDS = { C_MAJOR, D_MAJOR, E_MAJOR, F_MAJOR, G_MAJOR, A_MAJOR, B_MAJOR, CS_MAJOR, DS_MAJOR, FS_MAJOR, GS_MAJOR, AS_MAJOR };
+        public static int[][] MAJOR_KEYS = { C_MAJOR, D_MAJOR, E_MAJOR, F_MAJOR, G_MAJOR, A_MAJOR, B_MAJOR, CS_MAJOR, DS_MAJOR, FS_MAJOR, GS_MAJOR, AS_MAJOR };
     }
 }

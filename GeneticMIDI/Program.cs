@@ -306,6 +306,18 @@ namespace GeneticMIDI
             return comp.GetLongestTrack().GetMainSequence() as MelodySequence;
         }
 
+        static void FMajorTest()
+        {
+            MusicPlayer player2 = new MusicPlayer();
+            Random r = new Random();
+            while (true)
+            {
+                int c = StandardKeys.C_MAJOR[r.Next(0, StandardKeys.F_MAJOR.Length)];
+                player2.PlayNotes(new Note[] { new Note((NoteNames)c, 4 + r.Next(0, 2), Durations.qn) });
+            }
+
+        }
+
        
         
     }

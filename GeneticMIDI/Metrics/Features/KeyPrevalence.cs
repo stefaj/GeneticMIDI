@@ -14,7 +14,7 @@ namespace GeneticMIDI.Metrics.Features
             Dictionary<object, float> dic = new Dictionary<object, float>();
            for(int i = 0; i < 12; i++)
            {
-               int[] chords = StandardChords.MAJOR_CHORDS[i];
+               int[] chords = StandardKeys.MAJOR_KEYS[i];
                float sum = 0;
                foreach(Note n in notes)
                     if(chords.Contains(n.NotePitch))
