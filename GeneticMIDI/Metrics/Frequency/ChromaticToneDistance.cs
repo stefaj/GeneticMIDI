@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Metrics.Frequency
 {
-    class ChromaticToneDistance : MetricFrequency
+    public class ChromaticToneDistance : MetricFrequency
     {
         public override void GenerateFrequencies(Note[] notes)
         {

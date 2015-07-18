@@ -6,6 +6,7 @@ using GeneticMIDI.Generators.Harmony;
 using GeneticMIDI.Metrics;
 using GeneticMIDI.Metrics.Features;
 using GeneticMIDI.Metrics.Frequency;
+using GeneticMIDI.Output;
 using GeneticMIDI.Representation;
 using NAudio.Midi;
 using System;
@@ -21,60 +22,13 @@ namespace GeneticMIDI
     {
         static void Main(string[] args)
         {
-
-            CosineChromaticTest();
+            DemoTest2();
+            //DemoTest2();
             return;
-            //player.Play();
-
-            MusicPlayer player = new MusicPlayer();
-            Console.WriteLine("Harmony Test");
-            //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
-            CosineSimiliarity cosine = new CosineSimiliarity(GetMelodySequence(@"test\other\ff7tifa.mid"), new ChromaticToneDuration());
-            GeneticGenerator evolver = new GeneticGenerator(cosine);
-            var notes = evolver.Generate();
-            SimpleChord ch = new SimpleChord();
-            var melody = new MelodySequence(notes);
-            HarmonySequence harmony = ch.GetHarmonySequence(melody);
-            Track t1 = new Track(PatchNames.Acoustic_Grand, 2);
-            t1.AddSequence(melody);
-            Track t2 = new Track(PatchNames.Church_Organ, 1);
-            t2.AddSequence(harmony);
-            Composition comp = new Composition();
-           // comp.Add(t1); 
-            comp.Add(t2);
-            player.Play(comp);
-            Console.ReadLine();
-            return;
-
-
-
-
-
-
-
-
-
-
-
-            //Chord Test
-
-
-            //player.PlayChords(new Chord[] { dminor, dmajor, cmajor });
-
-       
-
-
-
-
-
-
-
-
-
 
             if(args.Length == 0)
             {
-                Test1();
+                Test4();
                // Test4();
                 return;
             }
@@ -82,19 +36,25 @@ namespace GeneticMIDI
             switch (args[0])
             {
                 case "1":
-                    Test1();
+                    DemoTest1();
                     break;
                 case "2":
-                    Test2();
-                    break;
-                case "3":
                     CosineChromaticTest();
                     break;
+                case "3":
+                    ChordTest();
+                    break;
                 case "4":
-                    Test4();
+                    Test8();
                     break;
                 case "5":
-                    Test5();
+                    ChordTest2();
+                    break;
+                case "6":
+                    FMajorTest();
+                    break;
+                case "7":
+                    LoadSongTest();
                     break;
                 default:
                     Test1();
@@ -105,6 +65,44 @@ namespace GeneticMIDI
 
             Console.ReadLine();
   
+        }
+
+        static void LoadSongTest()
+        {
+            Console.WriteLine("Playing test ff7tifa");
+            MusicPlayer player = new MusicPlayer();
+            Composition c = new Composition();
+            c.LoadFromMIDI("test/other/ff7tifa.mid");
+            player.Play(c);
+        }
+
+        static void DemoTest1()
+        {
+            Console.WriteLine("Hidden Markov Model, constant duration, twinkle");
+            var mel1 = GetMelodySequence(@"test\harry.mid");
+            var stoch = new StochasticGenerator(new MelodySequence[] { mel1 });
+            var notes3 = stoch.Generate();
+            Play(notes3);
+            return;
+
+        }
+
+        static void DemoTest2()
+        {
+            MusicPlayer player = new MusicPlayer();
+            Composition comp = new Composition();
+            Track track1 = new Track(PatchNames.Acoustic_Grand, 1);
+            Track track2 = new Track(PatchNames.Cello, 2);
+            Console.WriteLine("Hidden Markov Model, constant duration, twinkle");
+            var mel1 = GetMelodySequence(@"test\harry.mid");
+            var stoch = new StochasticGenerator(new MelodySequence[] { mel1 });
+            track1.AddSequence(new MelodySequence(stoch.Generate()));
+            track2.AddSequence(new MelodySequence(stoch.Generate()));
+            //comp.Add(track1);
+            comp.Add(track2);
+            player.Play(comp);
+            return;
+
         }
 
         static void Test1()
@@ -129,10 +127,10 @@ namespace GeneticMIDI
             Console.WriteLine("Chromatic Tone and Duration");
             //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
             var mel = GetMelodySequence(@"test\harry.mid");
-            CosineSimiliarity cosine = new CosineSimiliarity(mel, new IMetric[]{new DurationSim(), new PitchSim()});
+            CosineSimiliarity cosine = new CosineSimiliarity(mel, new IMetric[]{new ChromaticToneDuration(), new DurationSim()});
             GeneticGenerator evolver = new GeneticGenerator(cosine, mel);
             var notes = evolver.Generate();
-            Play(notes);
+            Play(notes, PatchNames.Music_Box);
         }
         static void CosineTest()
         {
@@ -180,12 +178,12 @@ namespace GeneticMIDI
             player.Close();
         }
 
-        void Test8()
+        static void Test8()
         {
             MusicPlayer player = new MusicPlayer();
 
             Console.WriteLine("Hidden Markov Model");
-            var m1 = GetMelodySequence(@"test\frere.mid");
+            var m1 = GetMelodySequence(@"test\other\frere.mid");
             var m2 = GetMelodySequence(@"test\other\babaa.mid");
             var m3 = GetMelodySequence(@"test\other\twinkle.mid");
 
@@ -268,10 +266,36 @@ namespace GeneticMIDI
             }
         }
 
+        static void Test9()
+        {
+
+            MusicPlayer player = new MusicPlayer();
+            Console.WriteLine("Harmony Test");
+            //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
+            CosineSimiliarity cosine = new CosineSimiliarity(GetMelodySequence(@"test\other\ff7tifa.mid"), new ChromaticToneDuration());
+            GeneticGenerator evolver = new GeneticGenerator(cosine);
+            var notes = evolver.Generate();
+            SimpleChord ch = new SimpleChord();
+            var melody = new MelodySequence(notes);
+            HarmonySequence harmony = ch.GetHarmonySequence(melody);
+            Track t1 = new Track(PatchNames.Acoustic_Grand, 2);
+            t1.AddSequence(melody);
+            Track t2 = new Track(PatchNames.Church_Organ, 1);
+            t2.AddSequence(harmony);
+            Composition comp = new Composition();
+            // comp.Add(t1); 
+            comp.Add(t2);
+            player.Play(comp);
+            Console.ReadLine();
+            return;
+
+        }
+
 
         static void ChordTest2()
         {
             MusicPlayer player = new MusicPlayer();
+            //player.SetPatch((int)PatchNames.Overdriven_Guitar, 1);
             var a = new Chord(new NoteNames[] { NoteNames.C, NoteNames.E, NoteNames.G }, 4, Durations.hn);
             var b = new Chord(new NoteNames[] { NoteNames.Cs, NoteNames.E, NoteNames.GS }, 4, Durations.hn);
             var c = new Chord(new NoteNames[] { NoteNames.D, NoteNames.F, NoteNames.A }, 4, Durations.hn);
@@ -291,10 +315,10 @@ namespace GeneticMIDI
             }
         }
 
-        static void Play(IEnumerable<Note> notes)
+        static void Play(IEnumerable<Note> notes, PatchNames instrument = PatchNames.Vibraphone)
         {
             MusicPlayer player = new MusicPlayer();
-            player.SetPatch((int)PatchNames.Vibraphone, 1);
+            player.SetPatch((int)instrument, 1);
             player.PlayNotes(notes);
             player.Close();
         }
@@ -310,11 +334,15 @@ namespace GeneticMIDI
         {
             MusicPlayer player2 = new MusicPlayer();
             Random r = new Random();
-            while (true)
+            for (int i = 0; i < 20; i++ )
             {
                 int c = StandardKeys.C_MAJOR[r.Next(0, StandardKeys.F_MAJOR.Length)];
                 player2.PlayNotes(new Note[] { new Note((NoteNames)c, 4 + r.Next(0, 2), Durations.qn) });
             }
+            int d = StandardKeys.C_MAJOR[r.Next(0, StandardKeys.F_MAJOR.Length)];
+            player2.PlayNotes(new Note[] { new Note((NoteNames)d, 5, Durations.hn) });
+            d = StandardKeys.C_MAJOR[r.Next(0, StandardKeys.F_MAJOR.Length)];
+            player2.PlayNotes(new Note[] { new Note((NoteNames)d, 3, Durations.wn) });
 
         }
 

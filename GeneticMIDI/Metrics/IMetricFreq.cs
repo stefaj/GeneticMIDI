@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Metrics
 {
-    interface IMetric
+    public interface IMetric
     {
         //Vector
         Dictionary<object, float> Generate(Note[] notes);

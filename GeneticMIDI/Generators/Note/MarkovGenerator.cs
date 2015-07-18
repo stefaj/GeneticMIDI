@@ -85,14 +85,14 @@ namespace GeneticMIDI.Generators
                     max_notes = song.Length;
             }
             Console.WriteLine("Training Pitches");
-            pitch_hmm = new HiddenMarkovModel(max_notes, 128);
+            pitch_hmm = new HiddenMarkovModel(10, 128);
             var teacher = new BaumWelchLearning(pitch_hmm) { Tolerance = 0.001, Iterations = 0 };
             var __pitches = pitches.ToArray();
             teacher.Run(__pitches);
             pitch_hmm.Save(path + "\\" + "pitch_model.dat");
 
             Console.WriteLine("Training Durations");
-            duration_hmm = new HiddenMarkovModel(20, 32);
+            duration_hmm = new HiddenMarkovModel(10, 32);
             teacher = new BaumWelchLearning(duration_hmm) { Tolerance = 0.001, Iterations = 0 };
             var __durations = durations.ToArray();
             teacher.Run(__durations);
@@ -202,7 +202,7 @@ namespace GeneticMIDI.Generators
             foreach (int k in duration_map.Keys)
                 reverse_duration_map[duration_map[k]] = k;
 
-            var notes1 = pitch_hmm.Generate(40);
+            var notes1 = pitch_hmm.Generate(50);
             var durs1 = duration_hmm.Generate(20);
             var durs = new int[100];
             for (int i = 0; i < durs1.Length; i++)
@@ -227,7 +227,7 @@ namespace GeneticMIDI.Generators
                     duration *= (int)Durations.sn;
                 if (duration >= (int)Durations.bn)
                     duration /= (int)Durations.wn;
-                //duration = (int)Durations.qn;
+                duration = (int)Durations.qn;
                 notes3[i] = new Note(reverse_pitch_map[notes1[i]], duration);
             }
             return notes3;

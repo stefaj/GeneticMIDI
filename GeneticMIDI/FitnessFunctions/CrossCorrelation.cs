@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.FitnessFunctions
 {
-    class CrossCorrelation : IFitnessFunction 
+    public class CrossCorrelation : IFitnessFunction 
     {
         Note[] target;
         double[] pitches;

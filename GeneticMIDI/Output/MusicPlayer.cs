@@ -1,4 +1,5 @@
-﻿using NAudio.Midi;
+﻿using GeneticMIDI.Representation;
+using NAudio.Midi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,17 +7,68 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GeneticMIDI.Representation
+namespace GeneticMIDI.Output
 {
+    public delegate void MusicHandler(object sender, int key, PlaybackMessage msg);
     public class MusicPlayer
     {
+
+        public event MusicHandler OnMessageSent;
+
         MidiOut midiOut;
+
+        int currentIndex;
+        PlaybackInfo currentInfo;
+        int state = 0;
+
+        public int CurrentPosition
+        {
+            get { return currentIndex; }
+        }
 
         public MusicPlayer()
         {
             midiOut = new MidiOut(0);
         }
 
+
+        public void Stop()
+        {
+            state = 2;
+        }
+
+        public void Pause()
+        {
+            state = 1;
+        }
+
+        public void Resume()
+        {
+            if (currentInfo == null)
+                return;
+            state = 0;
+            var keys = new int[currentInfo.Messages.Keys.Count];
+            int i = 0;
+            foreach (var k in currentInfo.Messages.Keys)
+            {
+                keys[i++] = k;
+            }
+            for (i = currentIndex; i < keys.Length - 1; i++)
+            {
+                currentIndex = i;
+                if (state != 0)
+                    break;
+                foreach (PlaybackMessage message in currentInfo.Messages[keys[i]])
+                {
+                    if (OnMessageSent != null)
+                        OnMessageSent(this, keys[i], message);
+
+                    midiOut.Send(message.GenerateMidiMessage().RawData);
+                }
+                int sleep_dur = keys[i + 1] - keys[i];
+                Thread.Sleep(sleep_dur);
+            }
+        }
         
         public void Play(ISequence seq)
         {
@@ -36,8 +88,10 @@ namespace GeneticMIDI.Representation
             Play(info);
         }
 
-        private void Play(PlaybackInfo info)
+
+        public void Play(PlaybackInfo info)
         {
+            state = 0;
             var keys = new int[info.Messages.Keys.Count];
             int i = 0;
             foreach(var k in info.Messages.Keys)
@@ -46,8 +100,13 @@ namespace GeneticMIDI.Representation
             }
             for(i = 0; i < keys.Length - 1; i++)
             {
+                currentIndex = i;
+                if (state != 0)
+                    break;
                 foreach(PlaybackMessage message in info.Messages[keys[i]])
                 {
+                    if (OnMessageSent != null)
+                        OnMessageSent(this, keys[i], message);
                     midiOut.Send(message.GenerateMidiMessage().RawData);
                 }
                 int sleep_dur = keys[i + 1] - keys[i];
@@ -59,7 +118,8 @@ namespace GeneticMIDI.Representation
 
         public void PlayChord(Chord c)
         {
-            midiOut.Send(MidiMessage.ChangePatch((int)PatchNames.Electric_Piano_2, 1).RawData);
+            state = 0;
+            //midiOut.Send(MidiMessage.ChangePatch((int)PatchNames.Electric_Piano_2, 1).RawData);
             foreach (Note n in c.Notes)
             {
                 midiOut.Send(MidiMessage.StartNote(n.Pitch, c.Velocity, 1).RawData);
@@ -74,6 +134,7 @@ namespace GeneticMIDI.Representation
 
         public void PlayChords(Chord[] chords)
         {
+            state = 0;
             foreach(Chord c in chords)
             {
                 foreach (Note n in c.Notes)
@@ -95,6 +156,7 @@ namespace GeneticMIDI.Representation
         /// <param name="notes"></param>
         public void PlayNotes(IEnumerable<Note> notes)
         {
+            state = 0;
             foreach (Note n in notes)
             {
 

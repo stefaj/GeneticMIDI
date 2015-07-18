@@ -98,7 +98,7 @@ namespace GeneticMIDI.Representation
                     time += (int)(1000 * Note.ToRealDuration(n.Duration));
                     continue;
                 }
-                PlaybackMessage m = new PlaybackMessage(PlaybackMessage.PlaybackMessageType.Start, channel, (byte)n.Velocity, (byte)n.Pitch);
+                PlaybackMessage m = new PlaybackMessage(PlaybackMessage.PlaybackMessageType.Start, channel, (byte)n.Velocity, (byte)n.Pitch, n.Duration);
                 info.Add(time, m);
                 time += (int)(1000 * Note.ToRealDuration(n.Duration));
                 m = new PlaybackMessage(PlaybackMessage.PlaybackMessageType.Stop, channel, (byte)n.Velocity, (byte)n.Pitch);

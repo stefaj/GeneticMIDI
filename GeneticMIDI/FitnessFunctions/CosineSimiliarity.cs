@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.FitnessFunctions
 {
-    class CosineSimiliarity : IFitnessFunction
+    public class CosineSimiliarity : IFitnessFunction
     {
         IMetric[] metrics;
         Note[] target;
@@ -40,7 +40,7 @@ namespace GeneticMIDI.FitnessFunctions
             var notes = chromo.GenerateNotes();
 
 
-            return ComputeFitness2(notes.ToArray());
+            return ComputeFitness(notes.ToArray());
         }
 
         public float ComputeFitnessCorrelation(Note[] individual)

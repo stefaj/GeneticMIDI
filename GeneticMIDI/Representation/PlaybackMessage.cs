@@ -24,12 +24,17 @@ namespace GeneticMIDI.Representation
         byte pitch;
         public byte Pitch { get { return pitch; } }
 
-        public PlaybackMessage(PlaybackMessageType message_, byte channel_, byte velocity_, byte pitch_)
+        // Only really used for start messages
+        int duration;
+        public int Duration { get { return duration; } }
+
+        public PlaybackMessage(PlaybackMessageType message_, byte channel_, byte velocity_, byte pitch_, int duration_=0)
         {
             message = message_;
             channel = channel_;
             velocity = velocity_;
             pitch = pitch_;
+            duration = duration_;
         }
 
         public PlaybackMessage(PatchNames patch, byte channel_)
@@ -38,6 +43,7 @@ namespace GeneticMIDI.Representation
             velocity = (byte)patch;
             channel = channel_;
             pitch = 0;
+            duration = 0;
 
         }
 

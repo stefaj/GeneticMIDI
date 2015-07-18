@@ -26,6 +26,9 @@ namespace GeneticMIDI.Representation
             }
         }
 
+        /// <summary>
+        /// Chromatic Tone
+        /// </summary>
         public int NotePitch
         {
             get
