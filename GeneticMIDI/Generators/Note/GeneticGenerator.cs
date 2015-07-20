@@ -1,4 +1,5 @@
 ﻿using AForge.Genetic;
+using GeneticMIDI.Generators.NoteGenerators;
 using GeneticMIDI.Representation;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,13 @@ namespace GeneticMIDI.Generators
 
             if (base_seq != null)
                 CreateUniques();
+
+            if (base_seq != null)
+            {
+                var mark = new MarkovChainGenerator(2);
+                mark.AddMelody(base_seq);
+                GPCustomTree.generator = mark;
+            }
         }
 
         private void CreateUniques()

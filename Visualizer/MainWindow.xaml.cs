@@ -117,7 +117,7 @@ namespace Visualizer
             guide.LoadFromMIDI("ff7tifa.mid");
 
             //Load files
-            foreach(string file in System.IO.Directory.GetFiles("test/beet/"))
+            foreach(string file in System.IO.Directory.GetFiles("test/"))
             {
                 if (System.IO.Path.GetExtension(file) != ".mid")
                     continue;
@@ -173,6 +173,16 @@ namespace Visualizer
                 songModel.Axes[2].Minimum = -2;
             }
 
+            progressSongSlider.Dispatcher.Invoke(() =>
+            {
+                if (!progressSongSlider.IsMouseCaptured && !progressSongSlider.IsMouseDirectlyOver )
+                {
+                    progressSongSlider.Maximum = player.MaxKey;
+                    progressSongSlider.Value = key;
+                } 
+            }
+            );
+            
         }
 
         void SetupColumnPlot(OxyPlot.Wpf.PlotView plot, string title)
@@ -429,6 +439,8 @@ namespace Visualizer
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            // Play button
+
            // if (comp == null)
            //     return;
             if (playCompRad.IsChecked == true)

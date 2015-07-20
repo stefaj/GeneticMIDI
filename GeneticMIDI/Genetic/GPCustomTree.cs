@@ -182,7 +182,19 @@ namespace AForge.Genetic
                 else
                 {
                     var notes = generator.Generate();
-                    node.Generate(notes);
+                    List<Note> notes_cut = new List<Note>();
+                    int j = 0;
+                    int max = (int)Math.Pow(2,level-1);
+                    foreach(Note n in notes)
+                    {
+                        if(j>max)
+                        {
+                            if (n.Velocity <= 0 || n.Pitch < 0)
+                                break;
+                        }
+                        notes_cut.Add(n);
+                    }
+                    node.Generate(notes_cut);
                 }
                 return;
             }

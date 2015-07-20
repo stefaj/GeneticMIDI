@@ -15,6 +15,8 @@ namespace GeneticMIDI.Generators.NoteGenerators
         public int MaxLength { get; private set; }
 
         public event OnFitnessUpdate OnPercentage;
+
+        int generatesNo = 0;
         public MarkovChainGenerator(int order = 3, int length = 150)
         {
             chain = new MarkovChain<Note>(order);
@@ -41,11 +43,17 @@ namespace GeneticMIDI.Generators.NoteGenerators
 
         public IEnumerable<Note> Generate()
         {
-            var gen_ = chain.Chain();
+            IEnumerable<Note> chain_notes = null;
+            if (generatesNo == 0)
+                chain_notes = chain.Chain();
+            else
+                chain_notes = chain.Chain(generatesNo);
+            generatesNo++;
+
             var gen = new List<Note>();
 
             int i = 0;
-            foreach (Note n in gen_)
+            foreach (Note n in chain_notes)
             {
                 gen.Add(n);
                 if (i++ > MaxLength)

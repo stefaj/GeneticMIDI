@@ -7,13 +7,12 @@
     <Grid>
         <TabControl Margin="10">
             <TabItem Header="Play">
-                <Grid Background="#FFE5E5E5">
+                <Grid>
                     <oxy:PlotView x:Name="midiPlot" Margin="-1,38,1,362"/>
-                    <Button HorizontalAlignment="Left" VerticalAlignment="Top" Width="48" Height="48" Margin="401,585,0,0" Click="Button_Click_1">
-
-                    </Button>
+                    <Button VerticalAlignment="Bottom" Height="48" Width="48" Margin="427,0,425,10" Click="Button_Click_1"/>
                     <RadioButton x:Name="playGuideRad" Content="Guide" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True"/>
                     <RadioButton x:Name="playCompRad" Content="Composed Piece" HorizontalAlignment="Left" Margin="115,10,0,0" VerticalAlignment="Top"/>
+                    <Slider x:Name="progressSongSlider" Margin="10,0,10,68" VerticalAlignment="Bottom"/>
                 </Grid>
 
             </TabItem>

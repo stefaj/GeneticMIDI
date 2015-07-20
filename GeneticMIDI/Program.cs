@@ -24,16 +24,23 @@ namespace GeneticMIDI
     {
         static void Main(string[] args)
         {
-           // MusicPlayer player = new MusicPlayer();
+            //MusicPlayer player = new MusicPlayer();
             Composition inputComp = new Composition();
-            inputComp.LoadFromMIDI(@"test/harry.mid");
+            inputComp.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\Visual Studio 2013\Projects\GeneticMIDI\Visualizer\bin\Debug\test\mono__rise__elude.mid");
+            var mel = inputComp.GetLongestTrack().GetMainSequence() as MelodySequence;
 
+            GeneticGenerator gen = new GeneticGenerator(new MetricSimilarity(mel, new IMetric[]{new MelodicBigram(), new RhythmicBigram() }), mel );
+            gen.MaxGenerations = 1000;
+            var notes = gen.Generate();
+            /*foreach (Note n in notes)
+                n.Duration *= 2;*/
 
-            Console.WriteLine("Hidden Markov Model");
-            MarkovChainGenerator markov = new MarkovChainGenerator();
-            markov.AddMelody(inputComp.GetLongestTrack().GetMainSequence() as MelodySequence);
-            var notes3 = markov.Generate();
-            Play(notes3);
+            //MarkovChainGenerator gen = new MarkovChainGenerator();
+            //gen.AddMelody(inputComp.GetLongestTrack().GetMainSequence() as MelodySequence);
+            //var c = gen.Generate();
+            Play(notes, PatchNames.Acoustic_Grand);
+            //player.Play(c);
+            //Play(notes3);
             //player.Play(comp);
             
                 return;

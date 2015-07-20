@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators
 {
-    interface IGenerator
+    public interface IGenerator
     {
         IEnumerable<Note> Generate();
     }

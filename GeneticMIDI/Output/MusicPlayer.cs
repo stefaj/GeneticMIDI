@@ -21,6 +21,8 @@ namespace GeneticMIDI.Output
         PlaybackInfo currentInfo;
         int state = 0;
 
+        public int MaxKeyTime { get; private set; }
+
         public int CurrentPosition
         {
             get { return currentIndex; }
@@ -29,6 +31,7 @@ namespace GeneticMIDI.Output
         public MusicPlayer()
         {
             midiOut = new MidiOut(0);
+            MaxKeyTime = 0;
         }
 
 
@@ -98,6 +101,14 @@ namespace GeneticMIDI.Output
             {
                 keys[i++] = k;
             }
+
+            MaxKeyTime = keys[info.Messages.Keys.Count - 1];
+         /*   foreach(PlaybackMessage m in info.Messages[keys[info.Messages.Keys.Count - 1])
+            {
+                if(m.Message == PlaybackMessage.PlaybackMessageType.Start
+            }*/
+
+
             for(i = 0; i < keys.Length - 1; i++)
             {
                 currentIndex = i;

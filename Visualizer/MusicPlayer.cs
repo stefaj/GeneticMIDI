@@ -20,6 +20,16 @@ namespace Visualizer
 
         public event MusicHandler OnMessageSent;
 
+        public int MaxKey 
+        { 
+            get 
+            { 
+                if(player == null)
+                    return 0;
+                return player.MaxKeyTime;
+            } 
+        }
+
         public MusicPlayer()
         {
             player = new GeneticMIDI.Output.MusicPlayer();
