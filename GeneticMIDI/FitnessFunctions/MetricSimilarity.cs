@@ -9,25 +9,29 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.FitnessFunctions
 {
-    public class CosineSimiliarity : IFitnessFunction
+    public enum SimilarityType { Cosine, Euclidian, Pearson}
+    public class MetricSimilarity : IFitnessFunction
     {
         IMetric[] metrics;
         Note[] target;
 
         Dictionary<object, float>[] target_metrics;
-
-        public CosineSimiliarity(MelodySequence seq, IMetric metric)
+        SimilarityType type;
+        public MetricSimilarity(MelodySequence seq, IMetric metric, SimilarityType type = SimilarityType.Cosine)
         {
             this.metrics = new IMetric[]{metric};
             this.target = seq.ToArray();
+            this.type = type;
             this.target_metrics = new Dictionary<object, float>[] { this.metrics[0].Generate(this.target) };
+           
         }
 
-        public CosineSimiliarity(MelodySequence seq, IMetric[] metrics)
+        public MetricSimilarity(MelodySequence seq, IMetric[] metrics, SimilarityType type = SimilarityType.Cosine)
         {
             this.metrics = metrics;
             this.target = seq.ToArray();
             target_metrics = new Dictionary<object, float>[metrics.Length];
+            this.type = type;
             for (int i = 0; i < metrics.Length; i++)
                 target_metrics[i] = this.metrics[i].Generate(this.target);
         }
@@ -39,8 +43,14 @@ namespace GeneticMIDI.FitnessFunctions
                 return 0;
             var notes = chromo.GenerateNotes();
 
-
-            return ComputeFitness(notes.ToArray());
+            if (type == SimilarityType.Cosine)
+                return ComputeFitness(notes.ToArray());
+            if (type == SimilarityType.Euclidian)
+                return ComputeFitness2(notes.ToArray(), new AForge.Math.Metrics.EuclideanSimilarity());
+            if (type == SimilarityType.Pearson)
+                return ComputeFitness2(notes.ToArray(), new AForge.Math.Metrics.PearsonCorrelation());
+            else
+                return ComputeFitness(notes.ToArray()); 
         }
 
         public float ComputeFitnessCorrelation(Note[] individual)
@@ -74,10 +84,9 @@ namespace GeneticMIDI.FitnessFunctions
             return (float)(metr.GetSimilarityScore(pitches1,pitches2) + metr.GetSimilarityScore(durations1, durations2)) ;
         }
 
-        public float ComputeFitness2(Note[] individual)
+        public float ComputeFitness2(Note[] individual, AForge.Math.Metrics.ISimilarity similarity)
         {
             float weighted = 0;
-             var cos = new AForge.Math.Metrics.CosineSimilarity();
              for (int i = 0; i < metrics.Length; i++)
             {
                 var x = metrics[i].Generate(individual);
@@ -97,7 +106,7 @@ namespace GeneticMIDI.FitnessFunctions
                      arr1.Add(x[k]);
                      arr2.Add(target_metrics[i][k]);
                  }
-                 weighted += (float)cos.GetSimilarityScore(arr1.ToArray(), arr2.ToArray());
+                weighted += (float)similarity.GetSimilarityScore(arr1.ToArray(), arr2.ToArray());
             }
 
              return weighted / (float)metrics.Length;

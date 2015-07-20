@@ -20,15 +20,15 @@
             <TabItem Header="Generate">
                 <Grid>
                     <Label Content="Procedure" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="procedureCombo" HorizontalAlignment="Left" Margin="91,10,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="1">
-                        <ComboBoxItem>Hidden Markov Model</ComboBoxItem>
+                    <ComboBox x:Name="procedureCombo" HorizontalAlignment="Left" Margin="91,10,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="1" SelectionChanged="procedureCombo_SelectionChanged">
+                        <ComboBoxItem>Markov Chain</ComboBoxItem>
                         <ComboBoxItem>Genetic Algorithm</ComboBoxItem>
                     </ComboBox>
-                    <TabControl HorizontalAlignment="Right" Margin="0,41,10,10" Width="429" SelectedIndex="1">
-                        <TabItem Header="HMM" FontSize="8" Controls:ControlsHelper.HeaderFontSize="18" Height="30">
+                    <TabControl x:Name="optionsTab" HorizontalAlignment="Right" Margin="0,41,10,10" Width="429" SelectedIndex="1">
+                        <TabItem Header="MC" FontSize="8" Controls:ControlsHelper.HeaderFontSize="18" Height="30">
                             <Grid/>
                         </TabItem>
-                        <TabItem Header="GA" Controls:ControlsHelper.HeaderFontSize="18">
+                        <TabItem x:Name="tabGA" Header="GA" Controls:ControlsHelper.HeaderFontSize="18">
                             <Grid>
                                 <Label Content="Metrics:" HorizontalAlignment="Left" Margin="10,42,0,0" VerticalAlignment="Top"/>
                                 <CheckBox x:Name="metricChromaticTone" Content="Chromatic Tone" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top" IsChecked="True"/>
@@ -41,31 +41,30 @@
                                 <CheckBox x:Name="metricRhythm" Content="Rhythm" HorizontalAlignment="Left" Margin="202,142,0,0" VerticalAlignment="Top"/>
                                 <CheckBox x:Name="metricRhythmicBigram" Content="Rhymthic Bigram" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top"/>
                                 <CheckBox x:Name="metricRhythmicInterval" Content="Rhythmic Interval" HorizontalAlignment="Left" Margin="202,165,0,0" VerticalAlignment="Top"/>
-                                <Label Content="Maximum Generations" HorizontalAlignment="Left" Margin="10,199,0,0" VerticalAlignment="Top"/>
-                                <Slider x:Name="maxGenerationSlider" HorizontalAlignment="Left" Margin="19,230,0,0" VerticalAlignment="Top" Width="394" Minimum="500" Maximum="12000" Value="2000"/>
                                 <ComboBox x:Name="fitnessFuncCombo" HorizontalAlignment="Left" Margin="132,10,0,0" VerticalAlignment="Top" Width="196" SelectedIndex="0">
                                     <ComboBoxItem>Cosine Similarity</ComboBoxItem>
+                                    <ComboBoxItem>Euclidian Similarity</ComboBoxItem>
+                                    <ComboBoxItem>Pearson Correlation</ComboBoxItem>
                                     <ComboBoxItem>Cross Correlation</ComboBoxItem>
                                     <ComboBoxItem>Normalized Compression Distance</ComboBoxItem>
                                 </ComboBox>
                                 <Label Content="Fitness Function&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26"/>
-
-                                <oxy:PlotView x:Name="fitnessPlot" Margin="10,0,10,10" Height="209" VerticalAlignment="Bottom"/>
-                                <Label Content="Average Fitness" HorizontalAlignment="Left" Margin="10,0,0,224" VerticalAlignment="Bottom" Height="26"/>
                             </Grid>
                         </TabItem>
                     </TabControl>
-                    <Label Content="Options" HorizontalAlignment="Left" Margin="461,10,0,0" VerticalAlignment="Top"/>
-                    <Button Content="Generate" HorizontalAlignment="Left" Margin="91,82,0,0" VerticalAlignment="Top" Width="130" Click="Button_Click"/>
-                    <ComboBox x:Name="guideCombo" HorizontalAlignment="Left" Margin="91,41,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="2">
+                    <Label Content="Options" HorizontalAlignment="Right" Margin="0,10,387,0" VerticalAlignment="Top"/>
+                    <Button Content="Generate" HorizontalAlignment="Left" Margin="32,367,0,0" VerticalAlignment="Top" Width="130" Click="Button_Click"/>
+                    <ComboBox x:Name="guideCombo" HorizontalAlignment="Left" Margin="91,41,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="2" SelectionChanged="guideCombo_SelectionChanged">
 
                     </ComboBox>
                     <Label Content="Guide" HorizontalAlignment="Left" Margin="10,44,0,0" VerticalAlignment="Top"/>
-                    <ProgressBar x:Name="progressGenSlider" HorizontalAlignment="Left" Margin="20,247,0,0" VerticalAlignment="Top" Width="201" Height="24">
+                    <ProgressBar x:Name="progressGenSlider" HorizontalAlignment="Left" Margin="167,368,0,0" VerticalAlignment="Top" Width="201" Height="24">
 
                     </ProgressBar>
-                    <Label Content="Progress" HorizontalAlignment="Left" Margin="23,216,0,0" VerticalAlignment="Top"/>
-                    <Button Content="Generate and Play" HorizontalAlignment="Left" Margin="91,112,0,0" VerticalAlignment="Top" Width="130"/>
+                    <Label Content="Maximum Iterations" HorizontalAlignment="Left" Margin="10,75,0,0" VerticalAlignment="Top"/>
+                    <Slider x:Name="maxGenerationSlider" HorizontalAlignment="Left" Margin="15,106,0,0" VerticalAlignment="Top" Width="290" Minimum="500" Maximum="12000" Value="2000"/>
+                    <oxy:PlotView x:Name="fitnessPlot" Margin="15,0,482,6" Height="209" VerticalAlignment="Bottom"/>
+                    <Label Content="Average Fitness" HorizontalAlignment="Left" Margin="15,0,0,220" VerticalAlignment="Bottom" Height="26"/>
                 </Grid>
 
             </TabItem>

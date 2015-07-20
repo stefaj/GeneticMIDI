@@ -14,6 +14,7 @@ namespace AForge.Genetic
     using AForge;
     using GeneticMIDI;
     using GeneticMIDI.Representation;
+    using GeneticMIDI.Generators;
 
 /// <summary>
 /// Reimplementation of GPCustomTree from Aforge for simple series monophonic note sequences
@@ -27,6 +28,8 @@ namespace AForge.Genetic
         private static int maxInitialLevel = 6;
         // maximum level of the tree
         private static int maxLevel = 12;
+
+        public static IGenerator generator = null;
 
         /// <summary>
         /// Random generator used for chromosoms' generation.
@@ -170,6 +173,21 @@ namespace AForge.Genetic
         /// 
         protected void Generate(GPCustomTreeNode node, int level)
         {
+            if(generator != null)
+            {
+                if (level == 0)
+                {
+                    node.Gene = root.Gene.CreateNew(GPGeneType.Argument);
+                }
+                else
+                {
+                    var notes = generator.Generate();
+                    node.Generate(notes);
+                }
+                return;
+            }
+
+            /// OLD !!!
             // create gene for the node
             if (level == 0)
             {

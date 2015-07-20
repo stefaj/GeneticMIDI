@@ -27,6 +27,8 @@ namespace GeneticMIDI.Metrics
             frequencies.Clear();
             GenerateFrequencies(notes);
             Filter();
+            Sort();
+            //Sort
             return frequencies;
         }
 
@@ -42,6 +44,22 @@ namespace GeneticMIDI.Metrics
                     frequencies.Remove(k);
                 }
             }
+        }
+
+        private void Sort()
+        {
+            var list = frequencies.Keys.ToList();
+            list.Sort();
+
+            Dictionary<object, float> frequencies2 = new Dictionary<object,float>();
+            
+            // Loop through keys.
+            foreach (var key in list)
+            {
+                frequencies2[key] = frequencies[key];
+            }
+
+            frequencies = frequencies2;
         }
 
         public void Add(Pair p)

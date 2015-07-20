@@ -1,6 +1,7 @@
 ﻿using Accord.MachineLearning.Bayes;
 using Accord.Statistics.Models.Markov;
 using Accord.Statistics.Models.Markov.Learning;
+using GeneticMIDI.Metrics.Frequency;
 using GeneticMIDI.Representation;
 using System;
 using System.Collections.Generic;
@@ -11,13 +12,21 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators
 {
-    class StochasticGenerator : IGenerator
+    public class StochasticGenerator : IGenerator
     {
         HiddenMarkovModel pitch_hmm;
         Dictionary<int, int> notes_map;
 
+        MelodySequence base_seq = null;
+
+        public event OnFitnessUpdate OnPercentage;
+
+        public int MaxGenerations { get; set; }
+
         public StochasticGenerator(MelodySequence[] seqs)
         {
+            if(seqs != null && seqs.Length > 0)
+                this.base_seq = seqs[0];
 
             int count = seqs.Length;
 
@@ -58,14 +67,47 @@ namespace GeneticMIDI.Generators
             var teacher = new BaumWelchLearning(pitch_hmm) { Tolerance = 0.0001, Iterations = 0 };
             var __pitches = notes.ToArray();
             teacher.Run(__pitches);
-
-   
+            teacher.Run(__pitches);   
             Console.WriteLine("Done training");
 
+            this.MaxGenerations = 2000;
 
         }
         
+
         public IEnumerable<Note> Generate()
+        {
+            if (base_seq == null)
+                return GenerateSingle();
+
+            float best_fitness = 0;
+            IEnumerable<Note> best_individual = null;
+
+            FitnessFunctions.MetricSimilarity sim = new 
+                FitnessFunctions.MetricSimilarity(base_seq, new Metrics.IMetric[] {new RhythmicInterval(), new Rhythm(), new RhythmicBigram()/*,new MelodicBigram()*/ }, FitnessFunctions.SimilarityType.Euclidian);
+
+            int percentage = MaxGenerations / 100;
+            for(int i = 0; i < MaxGenerations; i++)
+            {
+                var indiv = GenerateSingle();
+                float fitness = sim.ComputeFitness(indiv);
+                if(fitness > best_fitness)
+                {
+                    best_fitness = fitness;
+                    best_individual = indiv;
+                }
+
+                if (i > percentage)
+                {
+                    if (OnPercentage != null)
+                        OnPercentage(this, i, best_fitness);
+                    percentage += MaxGenerations / 100;
+                }
+            }
+            return best_individual;
+        }
+
+        public Note[] GenerateSingle()
         {
             Dictionary<int, int> reverse_note_map = new Dictionary<int, int>();
             foreach (int k in notes_map.Keys)

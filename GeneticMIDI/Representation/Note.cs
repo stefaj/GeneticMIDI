@@ -11,7 +11,7 @@ namespace GeneticMIDI.Representation
     public enum NoteNames { C, Cs, D, Ds, E, F, Fs, G, GS, A, As, B };
 
     public enum Durations { tn=1, sn=2, en=4, qn=8, hn=16, wn=32, bn=64};
-    public class Note : ICloneable
+    public class Note : ICloneable, IEquatable<Note>
     {
         public int Pitch { get; set; }
         public int Velocity { get; set; }
@@ -105,14 +105,20 @@ namespace GeneticMIDI.Representation
             return p.Duration == this.Duration && p.Velocity == this.Velocity && p.Pitch == this.Pitch;
         }
 
-        public static bool operator == (Note n1, Note n2)
+        /*public static bool operator == (Note n1, Note n2)
         {
+            if (n1 == null && n2 == null)
+                return true;
+            else if (n1 == null || n2 == null)
+                return false;
+
             return n1.Equals(n2);
-        }
-        public static bool operator != (Note n1, Note n2)
+        }*/
+
+      /*  public static bool operator != (Note n1, Note n2)
         {
             return !n1.Equals(n2);
-        }
+        }*/
 
         public static Note[] LoadFromFileSampledSpaced(string filename)
         {
@@ -197,6 +203,13 @@ namespace GeneticMIDI.Representation
         public object Clone()
         {
             return new Note(this.Pitch, this.Duration, this.Velocity);
+        }
+
+        public bool Equals(Note other)
+        {
+            if (other == null)
+                return false;
+            return (this.Pitch == other.Pitch && this.Duration == other.Duration);
         }
     }
 

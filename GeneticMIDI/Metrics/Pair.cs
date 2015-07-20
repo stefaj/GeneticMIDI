@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Metrics
 {
-   public class Pair
+   public class Pair : IComparable 
     {
        public float Comp1;
        public float Comp2;
@@ -36,6 +36,18 @@ namespace GeneticMIDI.Metrics
                return Comp1.ToString();
            else
                return "(" + Comp1 + "," + Comp2 + ")";
+       }
+
+       public int CompareTo(object obj)
+       {
+           Pair p = obj as Pair;
+           if (p == null)
+               throw new Exception("Cannot compare to a stranger");
+
+           int comp = this.Comp1.CompareTo(p.Comp1);
+           if (comp == 0)
+               return this.Comp2.CompareTo(p.Comp2);
+           return comp;
        }
     }
 }

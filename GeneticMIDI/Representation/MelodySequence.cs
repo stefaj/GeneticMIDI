@@ -32,6 +32,19 @@ namespace GeneticMIDI.Representation
                 AddNote(n);
         }
 
+        public void TrimLeadingRests()
+        {
+            Note[] seq = new Note[sequence.Count];
+            sequence.CopyTo(seq);
+            foreach (Note n in seq)
+            {
+                if (n.Pitch < 0 || n.Velocity == 0)
+                    sequence.Remove(n);
+                else
+                    break;
+            }
+        }
+
         public void AddNote(NoteNames name, int octave, Durations d)
         {
             AddNote(new Note(name, octave, d));

@@ -113,6 +113,20 @@ namespace AForge.Genetic
             return clone;
         }
 
+        public void Generate(IEnumerable<Note> notes)
+        {
+            var node = this;
+            foreach (Note n in notes)
+            {
+                node.Gene = new NoteGene(0, 0, 0, NoteGene.FunctionTypes.Concatenation, GPGeneType.Function);
+                node.Children = new List<GPCustomTreeNode>(2);
+                node.Children.Add(new GPCustomTreeNode(new NoteGene(n.NotePitch, (Durations)n.Duration, n.Octave, NoteGene.FunctionTypes.Concatenation, GPGeneType.Argument)));
+                node.Children.Add(new GPCustomTreeNode(new NoteGene(0, 0, 0, NoteGene.FunctionTypes.Concatenation, GPGeneType.Function)));
+                node = node.Children[1];
+            }
+
+        }
+
         public void ShiftPitch(int val)
         {
             var root_gene = this.Gene as NoteGene;

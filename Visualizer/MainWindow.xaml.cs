@@ -1,5 +1,6 @@
 ﻿using AForge.Genetic;
 using GeneticMIDI.Generators;
+using GeneticMIDI.Generators.NoteGenerators;
 using GeneticMIDI.Metrics;
 using GeneticMIDI.Metrics.Frequency;
 using GeneticMIDI.Representation;
@@ -116,7 +117,7 @@ namespace Visualizer
             guide.LoadFromMIDI("ff7tifa.mid");
 
             //Load files
-            foreach(string file in System.IO.Directory.GetFiles("test/"))
+            foreach(string file in System.IO.Directory.GetFiles("test/beet/"))
             {
                 if (System.IO.Path.GetExtension(file) != ".mid")
                     continue;
@@ -282,7 +283,7 @@ namespace Visualizer
             PlotMetric(metricPlot4, new MelodicBigram(), "Melodic Bigram", seq);
             PlotMetric(metricPlot5, new MelodicInterval(), "Melodic Interval", seq);
             PlotMetric(metricPlot6, new Pitch(), "Pitch", seq);
-            PlotMetric(metricPlot7, new PitchDistance(), "Pitch Distance", seq);
+            PlotMetric(metricPlot7, new Rhythm(), "Rhythm", seq);
             PlotMetric(metricPlot8, new RhythmicBigram(), "Rhythmic Bigram", seq);
             PlotMetric(metricPlot9, new RhythmicInterval(), "Rhythmic Interval", seq);
 
@@ -310,7 +311,8 @@ namespace Visualizer
                 return;
             if(guideCombo.SelectedIndex < 0)
                 return;
-            
+
+            progressGenSlider.Value = 0;
             
             guide = new Composition();
             guide.LoadFromMIDI((guideCombo.SelectedItem as ComboBoxItem).Tag.ToString());
@@ -318,6 +320,24 @@ namespace Visualizer
             if(procedureCombo.SelectedIndex == 0)
             {
                 //HMM
+                MelodySequence seq = guide.GetLongestTrack().GetMainSequence() as MelodySequence;
+                MarkovChainGenerator gen = new MarkovChainGenerator();
+                gen.AddMelody(seq);
+                //gen.AddMelody("test/bach/bwv651.mid");
+
+                gen.OnPercentage += gen_OnPercentage;
+                //gen.MaxGenerations = (int)maxGenerationSlider.Value*10;
+
+                new Thread(() =>
+                {
+                    var notes = gen.Generate();
+                    comp = new MelodySequence(notes);
+                    progressGenSlider.Dispatcher.Invoke(() =>
+                        {
+                            progressGenSlider.Value = 100;
+                        });
+                }).Start();
+                
             }
             if(procedureCombo.SelectedIndex == 1)
             {
@@ -358,25 +378,37 @@ namespace Visualizer
                     activeMetrics.Add(new RhythmicInterval());
 
 
-                
+                                    //<ComboBoxItem>Cosine Similarity</ComboBoxItem>
+                                    //<ComboBoxItem>Euclidian Similarity</ComboBoxItem>
+                                    //<ComboBoxItem>Pearson Correlation</ComboBoxItem>
+                                    //<ComboBoxItem>Cross Correlation</ComboBoxItem>
+                                    //<ComboBoxItem>Normalized Compression Distance</ComboBoxItem>
+
                 if(fitnessFuncCombo.SelectedIndex == 0)
-                    fitness = new GeneticMIDI.FitnessFunctions.CosineSimiliarity(seq, activeMetrics.ToArray());
-                if(fitnessFuncCombo.SelectedIndex == 2)
-                    fitness = new GeneticMIDI.FitnessFunctions.NCD(new MelodySequence[]{seq});
-                if(fitnessFuncCombo.SelectedIndex == 1)
+                    fitness = new GeneticMIDI.FitnessFunctions.MetricSimilarity(seq, activeMetrics.ToArray(), GeneticMIDI.FitnessFunctions.SimilarityType.Cosine);
+                if (fitnessFuncCombo.SelectedIndex == 1)
+                    fitness = new GeneticMIDI.FitnessFunctions.MetricSimilarity(seq, activeMetrics.ToArray(), GeneticMIDI.FitnessFunctions.SimilarityType.Euclidian);
+                if (fitnessFuncCombo.SelectedIndex == 2)
+                    fitness = new GeneticMIDI.FitnessFunctions.MetricSimilarity(seq, activeMetrics.ToArray(), GeneticMIDI.FitnessFunctions.SimilarityType.Pearson);
+                if (fitnessFuncCombo.SelectedIndex == 3)
                     fitness = new GeneticMIDI.FitnessFunctions.CrossCorrelation(seq);
+                if(fitnessFuncCombo.SelectedIndex == 4)
+                    fitness = new GeneticMIDI.FitnessFunctions.NCD(new MelodySequence[]{seq});
+
 
                 GeneticGenerator gen = new GeneticGenerator(fitness, seq);
                 gen.OnPercentage += gen_OnPercentage;
 
                 gen.MaxGenerations = (int)maxGenerationSlider.Value;
 
-                progressGenSlider.Value = 0;
-
                 new Thread(() =>
                     {
                         var notes = gen.Generate();
                         comp = new MelodySequence(notes);
+                        progressGenSlider.Dispatcher.Invoke(() =>
+                        {
+                            progressGenSlider.Value = 100;
+                        });
                     }).Start();
             }
         }
@@ -426,6 +458,33 @@ namespace Visualizer
             if (comp == null)
                 return;
             GenerateMetrics(comp);
+        }
+
+        private void guideCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            guide = new Composition();
+            guide.LoadFromMIDI((guideCombo.SelectedItem as ComboBoxItem).Tag.ToString());
+        }
+
+        private void procedureCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (tabGA == null)
+                return;
+            if (optionsTab == null)
+                return;
+
+            if (procedureCombo.SelectedIndex != 1)
+            {
+                tabGA.IsEnabled = false;
+                tabGA.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                tabGA.IsEnabled = true;
+                tabGA.Visibility = System.Windows.Visibility.Visible;
+            }
+            optionsTab.SelectedIndex = procedureCombo.SelectedIndex;
+
         }
     }
 }

@@ -2,7 +2,9 @@
 using AForge.Genetic;
 using GeneticMIDI.FitnessFunctions;
 using GeneticMIDI.Generators;
+using GeneticMIDI.Generators.CompositionGenerator;
 using GeneticMIDI.Generators.Harmony;
+using GeneticMIDI.Generators.NoteGenerators;
 using GeneticMIDI.Metrics;
 using GeneticMIDI.Metrics.Features;
 using GeneticMIDI.Metrics.Frequency;
@@ -22,9 +24,19 @@ namespace GeneticMIDI
     {
         static void Main(string[] args)
         {
-            DemoTest2();
-            //DemoTest2();
-            return;
+           // MusicPlayer player = new MusicPlayer();
+            Composition inputComp = new Composition();
+            inputComp.LoadFromMIDI(@"test/harry.mid");
+
+
+            Console.WriteLine("Hidden Markov Model");
+            MarkovChainGenerator markov = new MarkovChainGenerator();
+            markov.AddMelody(inputComp.GetLongestTrack().GetMainSequence() as MelodySequence);
+            var notes3 = markov.Generate();
+            Play(notes3);
+            //player.Play(comp);
+            
+                return;
 
             if(args.Length == 0)
             {
@@ -107,10 +119,10 @@ namespace GeneticMIDI
 
         static void Test1()
         {
-            Console.WriteLine("Hidden Markov Model");
+            /*Console.WriteLine("Hidden Markov Model");
             MarkovGenerator markov = new MarkovGenerator(@"test");
             var notes3 = markov.Generate();
-            Play(notes3);
+            Play(notes3);*/
         }
 
         static void Test2()
@@ -127,7 +139,7 @@ namespace GeneticMIDI
             Console.WriteLine("Chromatic Tone and Duration");
             //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
             var mel = GetMelodySequence(@"test\harry.mid");
-            CosineSimiliarity cosine = new CosineSimiliarity(mel, new IMetric[]{new ChromaticToneDuration(), new DurationSim()});
+            MetricSimilarity cosine = new MetricSimilarity(mel, new IMetric[]{new ChromaticToneDuration(), new DurationSim()});
             GeneticGenerator evolver = new GeneticGenerator(cosine, mel);
             var notes = evolver.Generate();
             Play(notes, PatchNames.Music_Box);
@@ -136,7 +148,7 @@ namespace GeneticMIDI
         {
             Console.WriteLine("Chromatic Tone and Duration");
             //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
-            CosineSimiliarity cosine = new CosineSimiliarity(GetMelodySequence(@"test\frere.mid"),
+            MetricSimilarity cosine = new MetricSimilarity(GetMelodySequence(@"test\frere.mid"),
                 new IMetric[] { new ChromaticToneDuration(), new MelodicBigram(), new RhythmicBigram() });
             GeneticGenerator evolver = new GeneticGenerator(cosine);
             var notes = evolver.Generate();
@@ -149,7 +161,7 @@ namespace GeneticMIDI
         {
             Console.WriteLine("Melodic Bigram");
             //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
-            CosineSimiliarity cosine = new CosineSimiliarity(GetMelodySequence(@"test\harry.mid"), new MelodicBigram());
+            MetricSimilarity cosine = new MetricSimilarity(GetMelodySequence(@"test\harry.mid"), new MelodicBigram());
             GeneticGenerator evolver = new GeneticGenerator(cosine);
             var notes = evolver.Generate();
             Play(notes);
@@ -195,7 +207,7 @@ namespace GeneticMIDI
             {
                 Composition comp = new Composition();
 
-                GeneticGenerator gen = new GeneticGenerator(new CosineSimiliarity(m6, new IMetric[] { new Rhythm(), new RhythmicBigram(), new RhythmicInterval() }));
+                GeneticGenerator gen = new GeneticGenerator(new MetricSimilarity(m6, new IMetric[] { new Rhythm(), new RhythmicBigram(), new RhythmicInterval() }));
                 var notes2 = gen.Generate();
                 Track t2 = new Track((PatchNames)0, 10);
                 MelodySequence s = new MelodySequence();
@@ -272,7 +284,7 @@ namespace GeneticMIDI
             MusicPlayer player = new MusicPlayer();
             Console.WriteLine("Harmony Test");
             //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
-            CosineSimiliarity cosine = new CosineSimiliarity(GetMelodySequence(@"test\other\ff7tifa.mid"), new ChromaticToneDuration());
+            MetricSimilarity cosine = new MetricSimilarity(GetMelodySequence(@"test\other\ff7tifa.mid"), new ChromaticToneDuration());
             GeneticGenerator evolver = new GeneticGenerator(cosine);
             var notes = evolver.Generate();
             SimpleChord ch = new SimpleChord();
