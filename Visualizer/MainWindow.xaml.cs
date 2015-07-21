@@ -47,68 +47,19 @@ namespace Visualizer
         Composition guide;
 
         double prevTime = 0;
-        int currentTime = 0;
+        double currentTime = 0;
 
         DispatcherTimer songUpdateTimer;
+
+        INoteGenerator lastGen = null;
 
         public MainWindow()
         {
             InitializeComponent();
 
 
-            this.songModel = new PlotModel { Title = "Song" };
-
-            // this.songModel.Series.Add(new FunctionSeries(Math.Cos, 0, 10, 0.1, "Ellie(x)"));
-            this.midiPlot.Model = songModel;
-
-            SongPoints = new List<ScatterPoint>{                               
-                              };
-            SongConPoints = new List<DataPoint>();
-
-            SongSeries = new ScatterSeries();
-            SongSeries.ItemsSource = SongPoints;
-            SongSeries.MarkerType = MarkerType.Circle;
-            SongSeries.MarkerSize = 0.1;
-
-            SongConSeries = new LineSeries();
-            SongConSeries.LineStyle = LineStyle.Dash;
-            SongConSeries.Color = OxyColors.SteelBlue;
-            SongConSeries.StrokeThickness = 0.3;
-            SongConSeries.ItemsSource = SongConPoints;
-            SongConSeries.Smooth = true;
-            SongConSeries.CanTrackerInterpolatePoints = true;
-
-            //SongSeries.FillColor = OxyColors.SteelBlue;
-            
-            //SongSeries.Color = OxyColors.SteelBlue;
-            //SongSeries.MarkerFill = OxyColors.SteelBlue;
-            //SongSeries.MarkerType = MarkerType.Circle;
-
-            this.midiPlot.Model.Series.Add(SongConSeries);
-            this.midiPlot.Model.Series.Add(SongSeries);
-
-            x_axes = new OxyPlot.Axes.LinearAxis()
-            {
-                Key = "XAxis",
-                Position = OxyPlot.Axes.AxisPosition.Bottom,
-                //AbsoluteMaximum = 1800,
-                //AbsoluteMinimum = -1,
-                //MinorStep = 10,
-            };
-            y_axes = new LinearColorAxis()
-            {
-                Key = "YAxis",
-                Position = OxyPlot.Axes.AxisPosition.Left,
-                Palette = OxyPalettes.Hue(12),
-                Minimum = 0,
-                Maximum = 12,
-
-
-            };
-            midiPlot.ActualController.UnbindAll();
-
-            songModel.Axes.Add(x_axes);
-            songModel.Axes.Add(y_axes);
+            setupMidiPlot();
+            setupMidiPlotFull();
 
             player = new MusicPlayer();
             player.OnMessageSent += player_OnMessageSent;
@@ -136,6 +87,137 @@ namespace Visualizer
             SetupLinePlot(fitnessPlot, "Average Fitness");
         }
 
+        void setupMidiPlot()
+        {
+            this.songModel = new PlotModel { Title = "Song" };
+
+            // this.songModel.Series.Add(new FunctionSeries(Math.Cos, 0, 10, 0.1, "Ellie(x)"));
+            this.midiPlot.Model = songModel;
+
+            SongPoints = new List<ScatterPoint>
+            {
+            };
+            SongConPoints = new List<DataPoint>();
+
+            SongSeries = new ScatterSeries();
+            SongSeries.ItemsSource = SongPoints;
+            SongSeries.MarkerType = MarkerType.Circle;
+            SongSeries.MarkerSize = 0.1;
+
+            SongConSeries = new LineSeries();
+            SongConSeries.LineStyle = LineStyle.Dash;
+            SongConSeries.Color = OxyColors.SteelBlue;
+            SongConSeries.StrokeThickness = 0.3;
+            SongConSeries.ItemsSource = SongConPoints;
+            SongConSeries.Smooth = true;
+            SongConSeries.CanTrackerInterpolatePoints = true;
+
+            this.midiPlot.Model.Series.Add(SongConSeries);
+            this.midiPlot.Model.Series.Add(SongSeries);
+
+            x_axes = new OxyPlot.Axes.LinearAxis()
+            {
+                Key = "XAxis",
+                Position = OxyPlot.Axes.AxisPosition.Bottom,
+                //AbsoluteMaximum = 1800,
+                //AbsoluteMinimum = -1,
+                //MinorStep = 10,
+            };
+            y_axes = new LinearColorAxis()
+            {
+                Key = "YAxis",
+                Position = OxyPlot.Axes.AxisPosition.Left,
+                Palette = OxyPalettes.Hue(12),
+                Minimum = 0,
+                Maximum = 12,
+                IsAxisVisible = false
+
+
+            };
+            midiPlot.ActualController.UnbindAll();
+
+            songModel.Axes.Add(x_axes);
+            songModel.Axes.Add(y_axes);
+        }
+
+        void setupMidiPlotFull()
+        {
+            var fullPlotModel = new PlotModel { };
+
+            // this.songModel.Series.Add(new FunctionSeries(Math.Cos, 0, 10, 0.1, "Ellie(x)"));
+            this.midiPlotFull.Model = fullPlotModel;
+
+            var songPointsFull = new List<ScatterPoint>();
+
+            var songSeries = new ScatterSeries();
+            songSeries.ItemsSource = songPointsFull;
+            songSeries.MarkerType = MarkerType.Diamond;
+            songSeries.MarkerSize = 0.1;
+
+            fullPlotModel.Series.Add(songSeries);
+
+            var x_axis = new OxyPlot.Axes.LinearAxis()
+            {
+                Key = "XAxis",
+                Position = OxyPlot.Axes.AxisPosition.Bottom,
+                IsAxisVisible = false,
+                //AbsoluteMaximum = 1800,
+                //AbsoluteMinimum = -1,
+                //MinorStep = 10,
+            };
+            var y_axis = new LinearColorAxis()
+            {
+                Key = "YAxis",
+                Position = OxyPlot.Axes.AxisPosition.Left,
+                Palette = OxyPalettes.Hue(12),
+                Minimum = 0,
+                Maximum = 12,
+                IsAxisVisible = false
+
+
+            };
+            midiPlotFull.ActualController.UnbindAll();
+            fullPlotModel.IsLegendVisible = false;
+
+
+            fullPlotModel.Axes.Add(x_axis);
+            fullPlotModel.Axes.Add(y_axis);
+
+        }
+
+        void generateSongPlotFull(PlotModel model, PlaybackInfo info)
+        {
+            var songpoints = (model.Series[0] as ScatterSeries).ItemsSource as List<ScatterPoint>;
+            songpoints.Clear();
+            model.InvalidatePlot(true);
+
+            var keys = new int[info.Messages.Keys.Count];
+            int i = 0;
+            foreach (var k in info.Messages.Keys)
+            {
+                keys[i++] = k;
+            }
+
+            for (i = 0; i < keys.Length - 1; i++)
+            {
+
+                foreach (PlaybackMessage message in info.Messages[keys[i]])
+                {
+                    if(message.Message == PlaybackMessage.PlaybackMessageType.Start)
+                        songpoints.Add(new ScatterPoint(keys[i], message.Pitch % 12, message.Duration / 2, message.Pitch / 12));
+                }
+            }
+
+
+
+            if (model.Axes.Count > 2)
+            {
+                model.Axes[2].IsAxisVisible = false;
+            }
+
+            model.InvalidatePlot(true);
+        }
+
         void songUpdateTimer_Tick(object sender, EventArgs e)
         {
 
@@ -144,8 +226,8 @@ namespace Visualizer
 
 
 
-            x_axes.Minimum = prevTime - 800;
-            x_axes.Maximum = prevTime + 200;
+            x_axes.Minimum = prevTime - 16;
+            x_axes.Maximum = prevTime + 4;
 
             double interval = currentTime - prevTime;
             interval /= 10;
@@ -163,7 +245,7 @@ namespace Visualizer
         void player_OnMessageSent(object sender, int key, PlaybackMessage msg)
         {
 
-            currentTime = key / 10;
+            currentTime = key / 1000.0f;
             SongPoints.Add(new ScatterPoint(currentTime, msg.Pitch % 12, msg.Duration / 2, msg.Pitch / 12));
             //SongConPoints.Add(new DataPoint(currentTime, msg.Pitch % 12));
 
@@ -171,6 +253,7 @@ namespace Visualizer
             {
                 songModel.Axes[2].Maximum = 14;
                 songModel.Axes[2].Minimum = -2;
+                songModel.Axes[2].IsAxisVisible = false;
             }
 
             progressSongSlider.Dispatcher.Invoke(() =>
@@ -336,6 +419,8 @@ namespace Visualizer
                 //gen.AddMelody("test/bach/bwv651.mid");
 
                 gen.OnPercentage += gen_OnPercentage;
+
+                lastGen = gen;
                 //gen.MaxGenerations = (int)maxGenerationSlider.Value*10;
 
                 new Thread(() =>
@@ -406,10 +491,11 @@ namespace Visualizer
                     fitness = new GeneticMIDI.FitnessFunctions.NCD(new MelodySequence[]{seq});
 
 
-                GeneticGenerator gen = new GeneticGenerator(fitness, seq);
+                var gen = new GeneticGenerator(fitness, seq);
                 gen.OnPercentage += gen_OnPercentage;
 
                 gen.MaxGenerations = (int)maxGenerationSlider.Value;
+                lastGen = gen;
 
                 new Thread(() =>
                     {
@@ -439,6 +525,7 @@ namespace Visualizer
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            player.Stop();
             // Play button
 
            // if (comp == null)
@@ -497,6 +584,45 @@ namespace Visualizer
             }
             optionsTab.SelectedIndex = procedureCombo.SelectedIndex;
 
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            // Stop
+            player.Stop();
+        }
+
+        private void playGuideRad_Checked(object sender, RoutedEventArgs e)
+        {
+            if(guide == null)
+                return;
+            generateSongPlotFull(midiPlotFull.Model, guide.GeneratePlaybackInfo());
+        }
+
+        private void playCompRad_Checked(object sender, RoutedEventArgs e)
+        {
+            if (comp == null)
+                return;
+            generateSongPlotFull(midiPlotFull.Model, comp.GeneratePlaybackInfo(1));
+        }
+
+        private void randomizeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            // Randomize
+
+            if (lastGen == null)
+                return;
+            comp = new MelodySequence(lastGen.Next());
+
+            generateSongPlotFull(midiPlotFull.Model, comp.GeneratePlaybackInfo(1));
+
+            playCompRad.IsChecked = true;
+        }
+
+        private void MetroWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            player.Stop();
+            Thread.Sleep(100);
         }
     }
 }

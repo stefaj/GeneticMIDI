@@ -91,11 +91,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Resource Include="Resources\Icons.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MusicPlayer.cs" />
@@ -125,7 +120,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <Resource Include="Resources\Entypo.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -139,15 +133,24 @@
   <ItemGroup>
     <Resource Include="Resources\back.png" />
     <Resource Include="Resources\forward.png" />
-    <Resource Include="Resources\music.png" />
-    <Resource Include="Resources\pause.png" />
-    <Resource Include="Resources\play.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\WindowsIcons-license.txt" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Entypo-license.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\glyphicons-174-play.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\glyphicons-175-pause.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\glyphicons-176-stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\glyphicons-323-playing-dices.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Cogwheel_32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

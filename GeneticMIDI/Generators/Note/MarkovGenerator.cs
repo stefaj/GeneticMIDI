@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators
 {
-    class MarkovGenerator : IGenerator
+    class MarkovGenerator : INoteGenerator
     {
         Dictionary<Note, int> note_map;
         HiddenMarkovModel hmm;
@@ -79,6 +79,17 @@ namespace GeneticMIDI.Generators
             }
             return notes3;
 
+        }
+
+
+        public IEnumerable<Note> Next()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool HasNext
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

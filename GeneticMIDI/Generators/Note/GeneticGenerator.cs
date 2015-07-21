@@ -11,13 +11,15 @@ namespace GeneticMIDI.Generators
 {
     public delegate void OnFitnessUpdate(object sender, int percentage, double fitness);
 
-    public class GeneticGenerator : IGenerator
+    public class GeneticGenerator : INoteGenerator
     {
 
         public int MaxGenerations { get; set; }
 
         IFitnessFunction fitnessFunction;
         MelodySequence base_seq = null;
+
+        Population pop = null;
 
         public event OnFitnessUpdate OnPercentage;
 
@@ -69,7 +71,7 @@ namespace GeneticMIDI.Generators
                 GPCustomTree.MaxLevel = depth + 5;
             }
             var selection = new EliteSelection();
-            Population pop = new Population(30, tree, fitnessFunction, selection);
+            pop = new Population(30, tree, fitnessFunction, selection);
             
             pop.AutoShuffling = true;
             pop.CrossoverRate = 0.9;
@@ -96,5 +98,33 @@ namespace GeneticMIDI.Generators
             return notes;
         }
 
+
+
+        public IEnumerable<Note> Next()
+        {
+            if (pop == null)
+                throw new Exception("Run generate first");
+
+            GPCustomTree.generator = null;
+            pop.BestChromosome.Crossover(pop.BestChromosome);
+            pop.BestChromosome.Mutate();
+
+            pop.Shuffle();
+
+            for (int i = 0; i < 10; i++)
+                pop.RunEpoch();
+            if (OnPercentage != null)
+                OnPercentage(this, MaxGenerations++, pop.FitnessAvg);
+            
+            GPCustomTree best = pop.BestChromosome as GPCustomTree;
+            var notes = best.GenerateNotes();
+            return notes;
+        }
+
+
+        public bool HasNext
+        {
+            get { return pop != null; }
+        }
     }
 }

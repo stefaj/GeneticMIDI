@@ -58,7 +58,13 @@ namespace GeneticMIDI.Representation
 
         public override string ToString()
         {
-            return "(" + NoteNames[this.NotePitch] + this.Octave + "-" + (int)(this.Duration / 100.0f * 8.0f) + ")";
+            string notename = "!";
+            if (this.NotePitch >= 0)
+                notename = NoteNames[this.NotePitch];
+            string duration = this.Duration.ToString();
+            duration = ((Durations)this.Duration).ToString();
+
+            return "(" + notename + this.Octave + "-" + duration+ ")";
         }
 
         public static float ToRealDuration(int note_duration, int bpm=120)

@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators
 {
-    public class StochasticGenerator : IGenerator
+    public class StochasticGenerator : INoteGenerator
     {
-        HiddenMarkovModel pitch_hmm;
+        HiddenMarkovModel pitch_hmm = null;
         Dictionary<int, int> notes_map;
 
         MelodySequence base_seq = null;
@@ -127,6 +127,17 @@ namespace GeneticMIDI.Generators
             }
             return notes3;
 
+        }
+
+
+        public IEnumerable<Note> Next()
+        {
+            return GenerateSingle();
+        }
+
+        public bool HasNext
+        {
+            get { return true; }
         }
     }
 }

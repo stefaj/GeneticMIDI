@@ -96,7 +96,7 @@
     <Compile Include="FitnessFunctions\CrossCorrelation.cs" />
     <Compile Include="Generators\CompositionGenerator\CompositionGenerator.cs" />
     <Compile Include="Generators\Harmony\SimpleChord.cs" />
-    <Compile Include="Generators\Note\IGenerator.cs" />
+    <Compile Include="Generators\Note\INoteGenerator.cs" />
     <Compile Include="Generators\Note\GeneticGenerator.cs" />
     <Compile Include="FitnessFunctions\NCD.cs" />
     <Compile Include="Generators\Note\MarkovChainGenerator.cs" />

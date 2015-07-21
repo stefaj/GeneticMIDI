@@ -29,7 +29,7 @@ namespace AForge.Genetic
         // maximum level of the tree
         private static int maxLevel = 12;
 
-        public static IGenerator generator = null;
+        public static INoteGenerator generator = null;
 
         /// <summary>
         /// Random generator used for chromosoms' generation.
@@ -282,7 +282,10 @@ namespace AForge.Genetic
                     else
                     {
                         // generate subtree
-                        Generate(node, rand.Next(maxLevel - currentLevel));
+                        int level = maxLevel - currentLevel;
+                        if (level < 0)
+                            level = 0;
+                        Generate(node, rand.Next(level));
                     }
                     break;
                 }

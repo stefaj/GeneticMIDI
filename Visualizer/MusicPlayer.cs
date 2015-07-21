@@ -46,6 +46,7 @@ namespace Visualizer
         {
             if (playingThread != null)
                 playingThread.Abort();
+            player.SetPatch((int)PatchNames.Acoustic_Grand, 1);
             playingThread = new System.Threading.Thread(() => player.Play(seq));
             playingThread.Start();
 
@@ -69,6 +70,9 @@ namespace Visualizer
 
         public void Stop()
         {
+            if (playingThread == null)
+                return;
+
             player.Stop();
             System.Threading.Thread.Sleep(100);
             playingThread.Abort();

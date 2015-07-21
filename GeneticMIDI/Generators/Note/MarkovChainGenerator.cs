@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators.NoteGenerators
 {
-    public class MarkovChainGenerator : IGenerator
+    public class MarkovChainGenerator : INoteGenerator
     {
         MarkovChain<Note> chain;
 
@@ -61,6 +61,17 @@ namespace GeneticMIDI.Generators.NoteGenerators
             }
 
             return gen;
+        }
+
+
+        public IEnumerable<Note> Next()
+        {
+            return Generate();
+        }
+
+        public bool HasNext
+        {
+            get { return true; }
         }
     }
 }
