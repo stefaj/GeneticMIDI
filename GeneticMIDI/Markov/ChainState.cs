@@ -25,16 +25,20 @@
 
 namespace Markov
 {
+    using ProtoBuf;
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
+    [ProtoContract]
+    [Serializable]
     /// <summary>
     /// Represents a state in a Markov chain.
     /// </summary>
     /// <typeparam name="T">The type of the constituent parts of each state in the Markov chain.</typeparam>
     public class ChainState<T> : IEquatable<ChainState<T>>
     {
+        [ProtoMember(1)]
         private readonly T[] items;
 
         /// <summary>
@@ -49,6 +53,11 @@ namespace Markov
             }
 
             this.items = items.ToArray();
+        }
+
+        public ChainState()
+        {
+            this.items = new T[] { };
         }
 
         /// <summary>

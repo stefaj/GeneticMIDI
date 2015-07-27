@@ -12,6 +12,14 @@ namespace GeneticMIDI.Representation
 
         public int Duration { get; private set; }
 
+        public float RealDuration
+        {
+            get
+            {
+                return Note.ToRealDuration(Duration);
+            }
+        }
+
         public int Length
         {
             get
@@ -29,6 +37,12 @@ namespace GeneticMIDI.Representation
         {
             sequence = new List<Note>();
             foreach (Note n in notes)
+                AddNote(n);
+        }
+
+        public void AddMelodySequence(MelodySequence seq)
+        {
+            foreach (Note n in seq.ToArray())
                 AddNote(n);
         }
 

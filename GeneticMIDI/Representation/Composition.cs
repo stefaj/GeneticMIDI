@@ -45,9 +45,10 @@ namespace GeneticMIDI.Representation
             return Tracks[id];
         }
 
-        public void LoadFromMIDI(string filename)
+        public static Composition LoadFromMIDI(string filename)
         {
-            Tracks.Clear();
+            Composition comp = new Composition();
+            comp.Tracks.Clear();
 
             NAudio.Midi.MidiFile f = new MidiFile(filename);
             f.Events.MidiFileType = 0;
@@ -95,9 +96,11 @@ namespace GeneticMIDI.Representation
                 if(seqs[i].Length > 0)
                 {
                     tracks[i].AddSequence(seqs[i]);
-                    Tracks.Add(tracks[i]);
+                    comp.Tracks.Add(tracks[i]);
                 }
             }
+
+            return comp;
         }
     }
 }

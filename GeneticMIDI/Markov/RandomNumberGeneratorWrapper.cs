@@ -28,6 +28,7 @@ namespace Markov
     using System;
     using System.Security.Cryptography;
 
+    [Serializable]
     /// <summary>
     /// Wraps an instance of <see cref="System.Security.Cryptography.RandomNumberGenerator"/> to provide the <see cref="IRandom"/> interface.
     /// </summary>

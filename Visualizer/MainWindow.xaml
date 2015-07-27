@@ -14,7 +14,7 @@
                     </Button>
                     <RadioButton x:Name="playGuideRad" Content="Guide" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True" Checked="playGuideRad_Checked"/>
                     <RadioButton x:Name="playCompRad" Content="Composed Piece" HorizontalAlignment="Left" Margin="115,10,0,0" VerticalAlignment="Top" Checked="playCompRad_Checked"/>
-                    <Slider x:Name="progressSongSlider" Margin="10,0,10,68" VerticalAlignment="Bottom"/>
+                    <Slider x:Name="progressSongSlider" Margin="10,0,10,68" VerticalAlignment="Bottom" Thumb.DragCompleted ="Slider_DragCompleted"></Slider>
                     <Button x:Name="stopBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="374,0,478,10" Click="Button_Click_2">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-176-stop.png"></Image>
                     </Button>
@@ -31,9 +31,10 @@
                     <ComboBox x:Name="procedureCombo" HorizontalAlignment="Left" Margin="91,10,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="1" SelectionChanged="procedureCombo_SelectionChanged">
                         <ComboBoxItem>Markov Chain</ComboBoxItem>
                         <ComboBoxItem>Genetic Algorithm</ComboBoxItem>
+                        <ComboBoxItem>Composition Test</ComboBoxItem>
                     </ComboBox>
                     <TabControl x:Name="optionsTab" HorizontalAlignment="Right" Margin="0,41,10,10" Width="429" SelectedIndex="1">
-                        <TabItem Header="MC" FontSize="8" Controls:ControlsHelper.HeaderFontSize="18" Height="30">
+                        <TabItem x:Name="tabMC" Header="MC" FontSize="8" Controls:ControlsHelper.HeaderFontSize="18" Height="30">
                             <Grid/>
                         </TabItem>
                         <TabItem x:Name="tabGA" Header="GA" Controls:ControlsHelper.HeaderFontSize="18">
@@ -63,6 +64,8 @@
                                 <Slider x:Name="maxGenerationSlider" HorizontalAlignment="Left" Margin="15,281,0,0" VerticalAlignment="Top" Width="290" Minimum="500" Maximum="12000" Value="2000"/>
                             </Grid>
                         </TabItem>
+                        <TabItem x:Name="tabComp" Header="Comp" Controls:ControlsHelper.HeaderFontSize="18">
+                            </TabItem>
                     </TabControl>
                     <Label Content="Options" HorizontalAlignment="Right" Margin="0,10,387,0" VerticalAlignment="Top"/>
                     <Button  HorizontalAlignment="Left" Margin="10,585,0,0" VerticalAlignment="Top" Width="48" Height="48" Click="Button_Click">

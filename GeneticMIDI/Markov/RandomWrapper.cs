@@ -27,6 +27,7 @@ namespace Markov
 {
     using System;
 
+    [Serializable]
     /// <summary>
     /// Wraps an instance of <see cref="System.Random"/> to provide the <see cref="IRandom"/> interface.
     /// </summary>

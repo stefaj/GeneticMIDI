@@ -64,6 +64,9 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -95,8 +98,10 @@
     <Compile Include="FitnessFunctions\MetricSimilarity.cs" />
     <Compile Include="FitnessFunctions\CrossCorrelation.cs" />
     <Compile Include="Generators\CompositionGenerator\CompositionGenerator.cs" />
+    <Compile Include="Generators\CompositionGenerator\InstrumentalGenerator.cs" />
     <Compile Include="Generators\Harmony\SimpleChord.cs" />
-    <Compile Include="Generators\Note\INoteGenerator.cs" />
+    <Compile Include="Generators\IPlaybackGenerator.cs" />
+    <Compile Include="Generators\INoteGenerator.cs" />
     <Compile Include="Generators\Note\GeneticGenerator.cs" />
     <Compile Include="FitnessFunctions\NCD.cs" />
     <Compile Include="Generators\Note\MarkovChainGenerator.cs" />
@@ -104,6 +109,7 @@
     <Compile Include="Generators\Note\MarkovGenerator.cs" />
     <Compile Include="Genetic\GPCustomTree.cs" />
     <Compile Include="Genetic\GPCustomTreeNode.cs" />
+    <Compile Include="Generators\ICompositionGenerator.cs" />
     <Compile Include="Markov\ChainState.cs" />
     <Compile Include="Markov\IRandom.cs" />
     <Compile Include="Markov\MarkovChain.cs" />
@@ -125,6 +131,8 @@
     <Compile Include="Metrics\Frequency\Rhythm.cs" />
     <Compile Include="Metrics\Frequency\RhythmicBigram.cs" />
     <Compile Include="Metrics\Frequency\RhythmicInterval.cs" />
+    <Compile Include="Representation\ActivityColumn.cs" />
+    <Compile Include="Representation\ActivityMatrix.cs" />
     <Compile Include="Representation\Chord.cs" />
     <Compile Include="Representation\Composition.cs" />
     <Compile Include="Representation\HarmonySequence.cs" />

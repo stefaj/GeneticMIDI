@@ -25,20 +25,27 @@
 
 namespace Markov
 {
+    using ProtoBuf;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Security.Cryptography;
 
+    [ProtoContract]
+    [Serializable]
     /// <summary>
     /// Builds and walks interconnected states based on a weighted probability.
     /// </summary>
     /// <typeparam name="T">The type of the constituent parts of each state in the Markov chain.</typeparam>
     public class MarkovChain<T> where T : IEquatable<T>
     {
+        [ProtoMember(1)]
         private readonly int order;
 
+        [ProtoMember(2)]
         private readonly Dictionary<ChainState<T>, Dictionary<T, int>> items = new Dictionary<ChainState<T>, Dictionary<T, int>>();
+
+        [ProtoMember(3)]
         private readonly Dictionary<ChainState<T>, int> terminals = new Dictionary<ChainState<T>, int>();
 
         /// <summary>
@@ -61,6 +68,11 @@ namespace Markov
             }
 
             this.order = order;
+        }
+
+        public MarkovChain()
+        {
+            this.order = 1;
         }
 
         /// <summary>

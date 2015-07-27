@@ -42,11 +42,11 @@ namespace Visualizer
                 OnMessageSent(this, key, msg);
         }
 
-        public void Play(MelodySequence seq)
+        public void Play(MelodySequence seq, PatchNames instrument = PatchNames.Acoustic_Grand)
         {
             if (playingThread != null)
                 playingThread.Abort();
-            player.SetPatch((int)PatchNames.Acoustic_Grand, 1);
+            player.SetPatch((int)instrument, 1);
             playingThread = new System.Threading.Thread(() => player.Play(seq));
             playingThread.Start();
 
@@ -66,6 +66,16 @@ namespace Visualizer
                 playingThread.Abort();
             playingThread = new System.Threading.Thread(() => player.Play(info));
             playingThread.Start();
+        }
+
+        public void Seek(int key)
+        {
+            player.Pause();
+            if (playingThread != null)
+                playingThread.Abort();
+            playingThread = new System.Threading.Thread(() => player.Seek(key));
+            playingThread.Start();
+            
         }
 
         public void Stop()

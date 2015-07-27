@@ -1,5 +1,6 @@
 ﻿using AForge.Genetic;
 using GeneticMIDI.Generators;
+using GeneticMIDI.Generators.CompositionGenerator;
 using GeneticMIDI.Generators.NoteGenerators;
 using GeneticMIDI.Metrics;
 using GeneticMIDI.Metrics.Frequency;
@@ -16,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -64,8 +66,7 @@ namespace Visualizer
             player = new MusicPlayer();
             player.OnMessageSent += player_OnMessageSent;
 
-            guide = new Composition();
-            guide.LoadFromMIDI("ff7tifa.mid");
+            guide = new Composition.LoadFromMIDI("ff7tifa.mid");
 
             //Load files
             foreach(string file in System.IO.Directory.GetFiles("test/"))
@@ -258,11 +259,12 @@ namespace Visualizer
 
             progressSongSlider.Dispatcher.Invoke(() =>
             {
-                if (!progressSongSlider.IsMouseCaptured && !progressSongSlider.IsMouseDirectlyOver )
-                {
-                    progressSongSlider.Maximum = player.MaxKey;
-                    progressSongSlider.Value = key;
-                } 
+
+                if (progressSongSlider.IsMouseCaptured || progressSongSlider.IsMouseOver)
+                    return;
+                
+                progressSongSlider.Maximum = player.MaxKey;
+                progressSongSlider.Value = key; 
             }
             );
             
@@ -472,13 +474,6 @@ namespace Visualizer
                 if (metricRhythmicInterval.IsChecked == true)
                     activeMetrics.Add(new RhythmicInterval());
 
-
-                                    //<ComboBoxItem>Cosine Similarity</ComboBoxItem>
-                                    //<ComboBoxItem>Euclidian Similarity</ComboBoxItem>
-                                    //<ComboBoxItem>Pearson Correlation</ComboBoxItem>
-                                    //<ComboBoxItem>Cross Correlation</ComboBoxItem>
-                                    //<ComboBoxItem>Normalized Compression Distance</ComboBoxItem>
-
                 if(fitnessFuncCombo.SelectedIndex == 0)
                     fitness = new GeneticMIDI.FitnessFunctions.MetricSimilarity(seq, activeMetrics.ToArray(), GeneticMIDI.FitnessFunctions.SimilarityType.Cosine);
                 if (fitnessFuncCombo.SelectedIndex == 1)
@@ -506,6 +501,23 @@ namespace Visualizer
                             progressGenSlider.Value = 100;
                         });
                     }).Start();
+            }
+            if(procedureCombo.SelectedIndex == 2)
+            {
+                CompositionGenerator gen = new CompositionGenerator(guide);
+
+                //lastGen = gen;
+                //gen.MaxGenerations = (int)maxGenerationSlider.Value*10;
+
+                new Thread(() =>
+                {
+                    var notes = gen.Generate();
+                    //comp = new MelodySequence(notes);
+                    progressGenSlider.Dispatcher.Invoke(() =>
+                    {
+                        progressGenSlider.Value = 100;
+                    });
+                }).Start();
             }
         }
 
@@ -567,17 +579,32 @@ namespace Visualizer
 
         private void procedureCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (tabGA == null)
-                return;
             if (optionsTab == null)
                 return;
-
-            if (procedureCombo.SelectedIndex != 1)
+            if (tabGA == null)
+                return;
+            foreach(TabItem tab in optionsTab.Items)
             {
-                tabGA.IsEnabled = false;
-                tabGA.Visibility = System.Windows.Visibility.Collapsed;
+                tab.Visibility = System.Windows.Visibility.Collapsed;
+                tab.IsEnabled = false;
             }
-            else
+
+            /*                        <ComboBoxItem>Markov Chain</ComboBoxItem>
+                        <ComboBoxItem>Genetic Algorithm</ComboBoxItem>
+                        <ComboBoxItem>Composition Test</ComboBoxItem>*/
+
+  
+            if (procedureCombo.SelectedIndex == 0)
+            {
+                tabMC.IsEnabled = true;
+                tabMC.Visibility = System.Windows.Visibility.Visible;
+            }
+            if (procedureCombo.SelectedIndex == 1)
+            {
+                tabGA.IsEnabled = true;
+                tabGA.Visibility = System.Windows.Visibility.Visible;
+            }
+            if (procedureCombo.SelectedIndex == 2)
             {
                 tabGA.IsEnabled = true;
                 tabGA.Visibility = System.Windows.Visibility.Visible;
@@ -623,6 +650,11 @@ namespace Visualizer
         {
             player.Stop();
             Thread.Sleep(100);
+        }
+
+        private void Slider_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            player.Seek((int)progressSongSlider.Value);
         }
     }
 }

@@ -25,9 +25,8 @@ namespace GeneticMIDI.Generators.NoteGenerators
 
         public void AddMelody(string path)
         {
-            Composition comp = new Composition();
-            comp.LoadFromMIDI(path);
-
+            Composition comp = Composition.LoadFromMIDI(path);
+            
             var m = comp.GetLongestTrack().GetMainSequence() as MelodySequence;
             m.TrimLeadingRests();
             Representation.Note[] notes = m.ToArray();

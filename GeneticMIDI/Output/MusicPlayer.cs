@@ -38,6 +38,7 @@ namespace GeneticMIDI.Output
         public void Stop()
         {
             state = 2;
+            midiOut.Reset();
         }
 
         public void Pause()
@@ -46,6 +47,7 @@ namespace GeneticMIDI.Output
         }
 
         public void Resume()
+
         {
             if (currentInfo == null)
                 return;
@@ -94,6 +96,10 @@ namespace GeneticMIDI.Output
 
         public void Play(PlaybackInfo info)
         {
+            if (info.Messages.Count == 0)
+                return;
+
+            currentInfo = info;
             state = 0;
             var keys = new int[info.Messages.Keys.Count];
             int i = 0;
@@ -103,11 +109,6 @@ namespace GeneticMIDI.Output
             }
 
             MaxKeyTime = keys[info.Messages.Keys.Count - 1];
-         /*   foreach(PlaybackMessage m in info.Messages[keys[info.Messages.Keys.Count - 1])
-            {
-                if(m.Message == PlaybackMessage.PlaybackMessageType.Start
-            }*/
-
 
             for(i = 0; i < keys.Length - 1; i++)
             {
@@ -123,6 +124,47 @@ namespace GeneticMIDI.Output
                 int sleep_dur = keys[i + 1] - keys[i];
                 Thread.Sleep(sleep_dur);
             }
+
+        }
+
+
+        public void Seek(int key)
+        {
+
+            if (currentInfo == null)
+                return;
+            midiOut.Reset();
+            currentIndex = key;
+
+            state = 0;
+            var keys = new int[currentInfo.Messages.Keys.Count];
+            int i = 0;
+            bool keySet = false;
+            foreach (var k in currentInfo.Messages.Keys)
+            {
+                keys[i++] = k;
+                if (k > key && !keySet)
+                {
+                    currentIndex = i-1;
+                    keySet = true;
+                }
+            }
+   
+
+            for(i = 0; i < keys.Length - 1; i++)
+            {
+                if (keys[i] == key) 
+                    break;
+                if (state != 0)
+                    break;
+                foreach (PlaybackMessage message in currentInfo.Messages[keys[i]])
+                {
+                    if (message.Message != PlaybackMessage.PlaybackMessageType.Start && message.Message != PlaybackMessage.PlaybackMessageType.Stop)
+                        midiOut.Send(message.GenerateMidiMessage().RawData);
+                }
+            }
+
+            Resume();
 
         }
 

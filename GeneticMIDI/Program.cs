@@ -14,6 +14,7 @@ using NAudio.Midi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,65 +25,36 @@ namespace GeneticMIDI
     {
         static void Main(string[] args)
         {
-            //MusicPlayer player = new MusicPlayer();
-            Composition inputComp = new Composition();
-            inputComp.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\Visual Studio 2013\Projects\GeneticMIDI\Visualizer\bin\Debug\test\mono__rise__elude.mid");
-            var mel = inputComp.GetLongestTrack().GetMainSequence() as MelodySequence;
 
-            GeneticGenerator gen = new GeneticGenerator(new MetricSimilarity(mel, new IMetric[]{new MelodicBigram(), new RhythmicBigram() }), mel );
-            gen.MaxGenerations = 1000;
-            var notes = gen.Generate();
-            /*foreach (Note n in notes)
-                n.Duration *= 2;*/
-
-            //MarkovChainGenerator gen = new MarkovChainGenerator();
-            //gen.AddMelody(inputComp.GetLongestTrack().GetMainSequence() as MelodySequence);
-            //var c = gen.Generate();
-            Play(notes, PatchNames.Acoustic_Grand);
-            //player.Play(c);
-            //Play(notes3);
-            //player.Play(comp);
+            /*
+            Composition com = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\Visual Studio 2013\Projects\GeneticMIDI\Visualizer\bin\Debug\test\bach\bwv651.mid");
+            var am = ActivityMatrix.GenerateFromComposition(com);
+            Console.WriteLine("gg");
+            return;
+            */
+            InstrumentalGenerator gen = new InstrumentalGenerator(@"D:\Sync\4th year\Midi\scraped");
             
-                return;
 
-            if(args.Length == 0)
-            {
-                Test4();
-               // Test4();
-                return;
-            }
+            Console.WriteLine("Generating");
+            System.Random rand = new Random();
+            var seed = rand.Next();
 
-            switch (args[0])
-            {
-                case "1":
-                    DemoTest1();
-                    break;
-                case "2":
-                    CosineChromaticTest();
-                    break;
-                case "3":
-                    ChordTest();
-                    break;
-                case "4":
-                    Test8();
-                    break;
-                case "5":
-                    ChordTest2();
-                    break;
-                case "6":
-                    FMajorTest();
-                    break;
-                case "7":
-                    LoadSongTest();
-                    break;
-                default:
-                    Test1();
-                    CosineChromaticTest();
-                    break;
-            }
-         
 
-            Console.ReadLine();
+            //var comp = gen.Generate(seed);
+            var comp = gen.Generate(new PatchNames[] { PatchNames.Flute, PatchNames.String_Ensemble_1, PatchNames.Synth_Voice });
+
+
+            Console.WriteLine("Playing seed {0}", seed);
+
+
+            MusicPlayer player = new MusicPlayer();
+
+
+            foreach (var t in comp.Tracks)
+                Console.WriteLine(t.Instrument.ToString());
+
+            player.Play(comp);
+  
   
         }
 
@@ -90,8 +62,7 @@ namespace GeneticMIDI
         {
             Console.WriteLine("Playing test ff7tifa");
             MusicPlayer player = new MusicPlayer();
-            Composition c = new Composition();
-            c.LoadFromMIDI("test/other/ff7tifa.mid");
+            Composition c = Composition.LoadFromMIDI("test/other/ff7tifa.mid");
             player.Play(c);
         }
 
@@ -344,8 +315,7 @@ namespace GeneticMIDI
 
         static MelodySequence GetMelodySequence(string file)
         {
-            Composition comp = new Composition();
-            comp.LoadFromMIDI(file);
+            Composition comp = Composition.LoadFromMIDI(file);
             return comp.GetLongestTrack().GetMainSequence() as MelodySequence;
         }
 

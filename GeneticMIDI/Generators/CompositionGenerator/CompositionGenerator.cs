@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators.CompositionGenerator
 {
-    public class CompositionGenerator
+    public class CompositionGenerator : IPlaybackGenerator, ICompositionGenerator
     {
         Composition composition;
         //IGenerator trackGenerator;
@@ -45,6 +45,16 @@ namespace GeneticMIDI.Generators.CompositionGenerator
             return newComp;
 
 
+        }
+
+        public PlaybackInfo GeneratePlayback()
+        {
+            return Generate().GeneratePlaybackInfo();
+        }
+
+        public Composition GenerateComposition()
+        {
+            return Generate();
         }
     }
 }

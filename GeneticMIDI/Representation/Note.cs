@@ -1,5 +1,6 @@
 ﻿using AForge.Genetic;
 using NAudio.Midi;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,25 @@ namespace GeneticMIDI.Representation
     public enum NoteNames { C, Cs, D, Ds, E, F, Fs, G, GS, A, As, B };
 
     public enum Durations { tn=1, sn=2, en=4, qn=8, hn=16, wn=32, bn=64};
+
+    [ProtoContract]
+    [Serializable]
     public class Note : ICloneable, IEquatable<Note>
     {
+        [ProtoMember(1)]
         public int Pitch { get; set; }
+        [ProtoMember(2)]
         public int Velocity { get; set; }
+        [ProtoMember(3)]
         public int Duration { get; set; } // wn = 16; bn 32; hn 8;
+
+        public float RealDuration
+        {
+            get
+            {
+                return Note.ToRealDuration(Duration);
+            }
+        }
 
         public int Octave { get { return Pitch / 12; }
             set
@@ -47,6 +62,13 @@ namespace GeneticMIDI.Representation
             this.Pitch = pitch;
             this.Duration = duration;
             this.Velocity = volume;
+        }
+
+        public Note()
+        {
+            this.Pitch = 0;
+            this.Duration = 0;
+            this.Velocity = 0;
         }
 
         public Note(NoteNames chromatic_tone, int octave, Durations duration, int volume=127)
