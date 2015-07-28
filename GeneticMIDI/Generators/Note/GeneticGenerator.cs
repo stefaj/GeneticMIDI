@@ -11,7 +11,7 @@ namespace GeneticMIDI.Generators
 {
     public delegate void OnFitnessUpdate(object sender, int percentage, double fitness);
 
-    public class GeneticGenerator : INoteGenerator
+    public class GeneticGenerator : INoteGenerator, IPlaybackGenerator
     {
 
         public int MaxGenerations { get; set; }
@@ -54,7 +54,7 @@ namespace GeneticMIDI.Generators
             NoteGene.AllowedFullPitches = fullPitches.ToArray();
         }
 
-        public IEnumerable<Note> Generate()
+        public MelodySequence Generate()
         {
             NoteGene baseGene = new NoteGene(GPGeneType.Function);
             baseGene.Function = NoteGene.FunctionTypes.Concatenation;
@@ -95,12 +95,12 @@ namespace GeneticMIDI.Generators
             
             GPCustomTree best = pop.BestChromosome as GPCustomTree;
             var notes = best.GenerateNotes();
-            return notes;
+            return new MelodySequence(notes);
         }
 
 
 
-        public IEnumerable<Note> Next()
+        public MelodySequence Next()
         {
             if (pop == null)
                 throw new Exception("Run generate first");
@@ -118,13 +118,23 @@ namespace GeneticMIDI.Generators
             
             GPCustomTree best = pop.BestChromosome as GPCustomTree;
             var notes = best.GenerateNotes();
-            return notes;
+            return new MelodySequence(notes);
         }
 
 
         public bool HasNext
         {
             get { return pop != null; }
+        }
+
+        IPlayable IPlaybackGenerator.Generate()
+        {
+            return Generate();
+        }
+
+        IPlayable IPlaybackGenerator.Next()
+        {
+            return Next();
         }
     }
 }

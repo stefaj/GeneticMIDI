@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Representation
 {
-    public class MelodySequence : ISequence, ICloneable
+    public class MelodySequence : ISequence, ICloneable, IPlayable
     {
         List<Note> sequence;
 
@@ -25,6 +25,14 @@ namespace GeneticMIDI.Representation
             get
             {
                 return sequence.Count;
+            }
+        }
+
+        public IEnumerable<Note> Notes
+        {
+            get
+            {
+                return sequence;
             }
         }
 
@@ -105,6 +113,11 @@ namespace GeneticMIDI.Representation
             return noteStr;
         }
 
+        public override string ToString()
+        {
+            return GetNoteStr();
+        }
+
         public static string GetNoteStr(IEnumerable<Note> notes)
         {
             string noteStr = "";
@@ -142,6 +155,11 @@ namespace GeneticMIDI.Representation
             foreach (Note n in sequence)
                 seq.AddNote(n.Clone() as Note);
             return seq;
+        }
+
+        public PlaybackInfo GeneratePlayback()
+        {
+            return this.GeneratePlaybackInfo(1);
         }
     }
 }

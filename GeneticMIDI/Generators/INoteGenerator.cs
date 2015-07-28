@@ -9,9 +9,9 @@ namespace GeneticMIDI.Generators
 {
     public interface INoteGenerator
     {
-        IEnumerable<Note> Generate();
+        MelodySequence Generate();
 
-        IEnumerable<Note> Next();
+        MelodySequence Next();
 
         bool HasNext { get; }
     }

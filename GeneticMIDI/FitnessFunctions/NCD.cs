@@ -18,35 +18,58 @@ namespace GeneticMIDI.FitnessFunctions
         string[] songs;
 
         
-        public NCD(IEnumerable<MelodySequence> seqs)
+        public static NCD FromMelodies(string path)
         {
-            string notes = "";
-            foreach (var m in seqs)
-                notes += m.GetNoteStr();
-            string hash = MD5Hash(notes);
+            NCD ncd = new NCD();
+            MelodySequence[] seqs = Utils.LoadMelodySequencesFromDirectory(path);
 
-            string savepath =  "ncd_" + hash + ".dat";
+            string savepath = path + Path.DirectorySeparatorChar +  "ncdm_" + ".dat";
             if(File.Exists(savepath))
             {
-                Deserialize(savepath);
-                return;
+                ncd.Deserialize(savepath);
+                return ncd;
             }
 
 
-            songs = new string[seqs.Count()];
+            ncd.songs = new string[seqs.Count()];
             
             int i = 0;
             int j = 0;
             foreach (MelodySequence m in seqs)
             {
-                Note[] song;
-
-                song = m.ToArray();
-
-                songs[i++] = m.GetNoteStr();
+                ncd.songs[i++] = m.ToString();
             }
 
-            Serialize(savepath);
+            ncd.Serialize(savepath);
+
+            return ncd;
+        }
+
+        public static NCD FromCompositions(string path)
+        {
+            NCD ncd = new NCD();
+            Composition[] seqs = Utils.LoadCompositionsFromDirectory(path);
+
+            string savepath = path + Path.DirectorySeparatorChar + "ncdc" + ".dat";
+            if (File.Exists(savepath))
+            {
+                ncd.Deserialize(savepath);
+                return ncd;
+            }
+
+
+            ncd.songs = new string[seqs.Count()];
+
+            int i = 0;
+            int j = 0;
+            foreach (var comp in seqs)
+            {
+                ncd.songs[i++] = comp.ToString();
+            }
+
+            ncd.Serialize(savepath);
+
+            return ncd;
         }
 
         public float ComputeFitness(IEnumerable<Note> individual)
@@ -185,7 +208,7 @@ namespace GeneticMIDI.FitnessFunctions
 
         }
 
-        private string MD5Hash(string str)
+        private static string MD5Hash(string str)
         {
             byte[] encodedPassword = new UTF8Encoding().GetBytes(str);
 

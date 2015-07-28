@@ -63,7 +63,7 @@ namespace GeneticMIDI.Generators
             
         }
         
-        public IEnumerable<Note> Generate()
+        public MelodySequence Generate()
         {
             Dictionary<int, Note> reverse_note_map = new Dictionary<int, Note>();
 
@@ -77,12 +77,12 @@ namespace GeneticMIDI.Generators
                 notes3[i] = reverse_note_map[notes1[i]];
                 //notes3[i] = reverse_note_map[pitches[0][i]];
             }
-            return notes3;
+            return new MelodySequence(notes3);
 
         }
 
 
-        public IEnumerable<Note> Next()
+        public MelodySequence Next()
         {
             throw new NotImplementedException();
         }

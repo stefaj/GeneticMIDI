@@ -26,12 +26,21 @@ namespace GeneticMIDI
         static void Main(string[] args)
         {
 
-            /*
-            Composition com = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\Visual Studio 2013\Projects\GeneticMIDI\Visualizer\bin\Debug\test\bach\bwv651.mid");
+            
+           /* Composition com = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\Visual Studio 2013\Projects\GeneticMIDI\Visualizer\bin\Debug\test\bach\bwv651.mid");
             var am = ActivityMatrix.GenerateFromComposition(com);
             Console.WriteLine("gg");
+
+
+
+                return;*/
+            foreach (var s in Utils.GetFiles(@"D:\Sync\4th year\Midi\Library\Anime", 3))
+                Console.WriteLine(s);
+
+            Console.ReadLine();
+
             return;
-            */
+            
             InstrumentalGenerator gen = new InstrumentalGenerator(@"D:\Sync\4th year\Midi\scraped");
             
 
@@ -39,13 +48,10 @@ namespace GeneticMIDI
             System.Random rand = new Random();
             var seed = rand.Next();
 
-
             //var comp = gen.Generate(seed);
             var comp = gen.Generate(new PatchNames[] { PatchNames.Flute, PatchNames.String_Ensemble_1, PatchNames.Synth_Voice });
 
-
             Console.WriteLine("Playing seed {0}", seed);
-
 
             MusicPlayer player = new MusicPlayer();
 
@@ -86,8 +92,8 @@ namespace GeneticMIDI
             Console.WriteLine("Hidden Markov Model, constant duration, twinkle");
             var mel1 = GetMelodySequence(@"test\harry.mid");
             var stoch = new StochasticGenerator(new MelodySequence[] { mel1 });
-            track1.AddSequence(new MelodySequence(stoch.Generate()));
-            track2.AddSequence(new MelodySequence(stoch.Generate()));
+            track1.AddSequence(stoch.Generate());
+            track2.AddSequence(stoch.Generate());
             //comp.Add(track1);
             comp.Add(track2);
             player.Play(comp);
@@ -190,7 +196,7 @@ namespace GeneticMIDI
                 Track t2 = new Track((PatchNames)0, 10);
                 MelodySequence s = new MelodySequence();
                 s.AddPause((int)Durations.wn * 10);
-                foreach (Note n in notes2)
+                foreach (Note n in notes2.Notes)
                 {
                     if (n.Pitch <= 0)
                         n.Pitch = 0;
@@ -209,7 +215,7 @@ namespace GeneticMIDI
                 }
                 t2.AddSequence(s);
 
-                var notes3 = markov.Generate() as Note[];
+                var notes3 = markov.Generate().Notes as Note[];
 
                 MelodySequence baseseq = new MelodySequence();
 
@@ -266,7 +272,7 @@ namespace GeneticMIDI
             GeneticGenerator evolver = new GeneticGenerator(cosine);
             var notes = evolver.Generate();
             SimpleChord ch = new SimpleChord();
-            var melody = new MelodySequence(notes);
+            var melody = notes;
             HarmonySequence harmony = ch.GetHarmonySequence(melody);
             Track t1 = new Track(PatchNames.Acoustic_Grand, 2);
             t1.AddSequence(melody);
@@ -312,6 +318,15 @@ namespace GeneticMIDI
             player.PlayNotes(notes);
             player.Close();
         }
+
+        static void Play(MelodySequence notes, PatchNames instrument = PatchNames.Vibraphone)
+        {
+            MusicPlayer player = new MusicPlayer();
+            player.SetPatch((int)instrument, 1);
+            player.Play(notes);
+            player.Close();
+        }
+
 
         static MelodySequence GetMelodySequence(string file)
         {

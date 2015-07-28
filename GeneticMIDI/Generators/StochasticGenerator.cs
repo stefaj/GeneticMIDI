@@ -75,10 +75,10 @@ namespace GeneticMIDI.Generators
         }
         
 
-        public IEnumerable<Note> Generate()
+        public MelodySequence Generate()
         {
             if (base_seq == null)
-                return GenerateSingle();
+                return new MelodySequence(GenerateSingle());
 
             float best_fitness = 0;
             IEnumerable<Note> best_individual = null;
@@ -104,7 +104,7 @@ namespace GeneticMIDI.Generators
                     percentage += MaxGenerations / 100;
                 }
             }
-            return best_individual;
+            return new MelodySequence(best_individual);
         }
 
         public Note[] GenerateSingle()
@@ -130,9 +130,9 @@ namespace GeneticMIDI.Generators
         }
 
 
-        public IEnumerable<Note> Next()
+        public MelodySequence Next()
         {
-            return GenerateSingle();
+            return new MelodySequence(GenerateSingle());
         }
 
         public bool HasNext

@@ -1,4 +1,5 @@
 ﻿using AForge.Genetic;
+using GeneticMIDI;
 using GeneticMIDI.Generators;
 using GeneticMIDI.Generators.CompositionGenerator;
 using GeneticMIDI.Generators.NoteGenerators;
@@ -44,16 +45,18 @@ namespace Visualizer
 
         MusicPlayer player;
 
-        MelodySequence comp;
+        Composition generated;
 
-        Composition guide;
+        Composition loaded;
+
+        string guide;
 
         double prevTime = 0;
         double currentTime = 0;
 
         DispatcherTimer songUpdateTimer;
 
-        INoteGenerator lastGen = null;
+        IPlaybackGenerator lastGen = null;
 
         public MainWindow()
         {
@@ -66,19 +69,8 @@ namespace Visualizer
             player = new MusicPlayer();
             player.OnMessageSent += player_OnMessageSent;
 
-            guide = new Composition.LoadFromMIDI("ff7tifa.mid");
-
             //Load files
-            foreach(string file in System.IO.Directory.GetFiles("test/"))
-            {
-                if (System.IO.Path.GetExtension(file) != ".mid")
-                    continue;
-                var c = new ComboBoxItem();
-                c.Content = System.IO.Path.GetFileNameWithoutExtension(file);
-                c.Tag = file;
-                guideCombo.Items.Add(c);
-            }
-
+            SetupCategories();
 
             songUpdateTimer = new DispatcherTimer();
             songUpdateTimer.Interval = new TimeSpan(0, 0, 0, 0, 50);
@@ -86,6 +78,50 @@ namespace Visualizer
             songUpdateTimer.Start();
 
             SetupLinePlot(fitnessPlot, "Average Fitness");
+        }
+
+        void SetupCategories()
+        {
+            ComboBoxItem classical = new ComboBoxItem();
+            classical.Content = "Classical";
+            classical.Tag = @"D:\Sync\4th year\Midi\Library\Classical\Mixed";
+
+            ComboBoxItem classicRock = new ComboBoxItem();
+            classicRock.Content = "Classic Rock";
+            classicRock.Tag = @"D:\Sync\4th year\Midi\Library\ClassicRock";
+
+            ComboBoxItem danceTechno = new ComboBoxItem();
+            danceTechno.Content = "Dance Techno";
+            danceTechno.Tag = @"D:\Sync\4th year\Midi\Library\Dance_Techno";
+
+            ComboBoxItem jazz = new ComboBoxItem();
+            jazz.Content = "Jazz";
+            jazz.Tag = @"D:\Sync\4th year\Midi\Library\Jazz";
+
+            ComboBoxItem pop = new ComboBoxItem();
+            pop.Content = "Pop";
+            pop.Tag = @"D:\Sync\4th year\Midi\Library\Pop_and_Top40";
+
+            ComboBoxItem videoGames = new ComboBoxItem();
+            videoGames.Content = "Video Games";
+            videoGames.Tag = @"D:\Sync\4th year\Midi\Library\Video_Games";
+
+            ComboBoxItem classicalPiano = new ComboBoxItem();
+            classicalPiano.Content = "Classical Piano";
+            classicalPiano.Tag = @"D:\Sync\4th year\Midi\Library\Classical\Classical Piano Midis";
+
+            ComboBoxItem test = new ComboBoxItem();
+            test.Content = "Test";
+            test.Tag = @"D:\Sync\4th year\Midi\Library\Test";
+            
+            guideCombo.Items.Add(classical);
+            guideCombo.Items.Add(classicRock);
+            guideCombo.Items.Add(danceTechno);
+            guideCombo.Items.Add(jazz);
+            guideCombo.Items.Add(pop);
+            guideCombo.Items.Add(videoGames);
+            guideCombo.Items.Add(classicalPiano);
+            guideCombo.Items.Add(test);
         }
 
         void setupMidiPlot()
@@ -283,6 +319,7 @@ namespace Visualizer
             {
                 Key = "XAxis",
                 Position = OxyPlot.Axes.AxisPosition.Bottom,
+                IsAxisVisible = false
             };
             var yaxis = new LinearAxis()
             {
@@ -336,38 +373,6 @@ namespace Visualizer
 
         void Play()
         {
-
-            //new Thread(() => { player.Play(comp); }).Start();
-
-            //var info = guide.GeneratePlaybackInfo();
-
-
-            /*
-            var keys = new int[info.Messages.Keys.Count];
-            int i = 0;
-            foreach (var k in info.Messages.Keys)
-            {
-                keys[i++] = k;
-            }
-            for (i = 0; i < keys.Length - 1; i++)
-            {
-                foreach (PlaybackMessage message in info.Messages[keys[i]])
-                {
-                    if(message.Message == PlaybackMessage.PlaybackMessageType.Start)
-                    {
-                        if (message.Velocity <= 0)
-                            continue;
-                        SongPoints.Add(new ScatterPoint(keys[i]/100, message.Pitch%12, message.Duration, message.Pitch / 12));
-                        //SongSeries.Items.Add(new ColumnItem(message.Pitch % 12));
-                    }
-
-                }
-                int sleep_dur = keys[i + 1] - keys[i];
-            }*/
-
-            //var seq = guide.GetLongestTrack().GetMainSequence() as MelodySequence;
-            //GenerateMetrics(seq);
-
         }
 
         void GenerateMetrics(MelodySequence seq)
@@ -396,8 +401,8 @@ namespace Visualizer
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
-             var seq = guide.GetLongestTrack().GetMainSequence() as MelodySequence;
-             GenerateMetrics(seq);
+            // var seq = guide.GetLongestTrack().GetMainSequence() as MelodySequence;
+             //GenerateMetrics(seq);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -409,13 +414,13 @@ namespace Visualizer
 
             progressGenSlider.Value = 0;
             
-            guide = new Composition();
-            guide.LoadFromMIDI((guideCombo.SelectedItem as ComboBoxItem).Tag.ToString());
+            guide = (guideCombo.SelectedItem as ComboBoxItem).Tag.ToString();
 
             if(procedureCombo.SelectedIndex == 0)
             {
                 //HMM
-                MelodySequence seq = guide.GetLongestTrack().GetMainSequence() as MelodySequence;
+
+                MelodySequence seq = Utils.GetRandomComposition(guide).GetLongestTrack().GetMainSequence() as MelodySequence;
                 MarkovChainGenerator gen = new MarkovChainGenerator();
                 gen.AddMelody(seq);
                 //gen.AddMelody("test/bach/bwv651.mid");
@@ -428,7 +433,12 @@ namespace Visualizer
                 new Thread(() =>
                 {
                     var notes = gen.Generate();
-                    comp = new MelodySequence(notes);
+                    GeneticMIDI.Representation.Track track = new GeneticMIDI.Representation.Track(PatchNames.Acoustic_Grand, 1);
+                    var mel= notes;
+                    track.AddSequence(mel);
+                    generated = new Composition();
+                    generated.Add(track);
+
                     progressGenSlider.Dispatcher.Invoke(() =>
                         {
                             progressGenSlider.Value = 100;
@@ -449,7 +459,7 @@ namespace Visualizer
                 //GA    
                 IFitnessFunction fitness = null;
 
-                MelodySequence seq = guide.GetLongestTrack().GetMainSequence() as MelodySequence;
+                MelodySequence seq = Utils.GetRandomComposition(guide).GetLongestTrack().GetMainSequence() as MelodySequence;
        
                 //Options
                 List<IMetric> activeMetrics = new List<IMetric>();
@@ -483,7 +493,7 @@ namespace Visualizer
                 if (fitnessFuncCombo.SelectedIndex == 3)
                     fitness = new GeneticMIDI.FitnessFunctions.CrossCorrelation(seq);
                 if(fitnessFuncCombo.SelectedIndex == 4)
-                    fitness = new GeneticMIDI.FitnessFunctions.NCD(new MelodySequence[]{seq});
+                    fitness = GeneticMIDI.FitnessFunctions.NCD.FromMelodies(guide);
 
 
                 var gen = new GeneticGenerator(fitness, seq);
@@ -495,7 +505,12 @@ namespace Visualizer
                 new Thread(() =>
                     {
                         var notes = gen.Generate();
-                        comp = new MelodySequence(notes);
+                        generated = new Composition();
+                        GeneticMIDI.Representation.Track track = new GeneticMIDI.Representation.Track(PatchNames.Acoustic_Grand, 1);
+                        
+                        var mel = notes;
+                        track.AddSequence(mel);
+                        generated.Add(track);
                         progressGenSlider.Dispatcher.Invoke(() =>
                         {
                             progressGenSlider.Value = 100;
@@ -504,20 +519,36 @@ namespace Visualizer
             }
             if(procedureCombo.SelectedIndex == 2)
             {
-                CompositionGenerator gen = new CompositionGenerator(guide);
+                CompositionGenerator gen = new CompositionGenerator(Utils.GetRandomComposition(guide));
 
-                //lastGen = gen;
-                //gen.MaxGenerations = (int)maxGenerationSlider.Value*10;
+                lastGen = gen;
+               // gen.MaxGenerations = (int)maxGenerationSlider.Value*10;
 
                 new Thread(() =>
                 {
-                    var notes = gen.Generate();
-                    //comp = new MelodySequence(notes);
+                    generated = gen.Generate();
                     progressGenSlider.Dispatcher.Invoke(() =>
                     {
                         progressGenSlider.Value = 100;
                     });
                 }).Start();
+            }
+            if(procedureCombo.SelectedIndex == 3)
+            {
+                InstrumentalGenerator gen = new InstrumentalGenerator(guide);
+                gen.OnPercentage += gen_OnPercentage;
+                lastGen = gen;
+
+                new Thread(() =>
+                {
+                    gen.Initialize();
+                    generated = gen.Generate();
+                    progressGenSlider.Dispatcher.Invoke(() =>
+                    {
+                        progressGenSlider.Value = 100;
+                    });
+                }).Start();
+
             }
         }
 
@@ -544,37 +575,38 @@ namespace Visualizer
            //     return;
             if (playCompRad.IsChecked == true)
             {
-                if (comp == null)
+                if (generated == null)
                     return;
                 currentTime = 0;
                 SongPoints.Clear();
                 prevTime = 0;
-                player.Play(comp);
+                player.Play(generated);
             }
-            if(playGuideRad.IsChecked == true)
+            if (playCompRad.IsChecked == false)
             {
-                if (guide == null)
+                if (loaded == null)
                     return;
                 currentTime = 0;
                 SongPoints.Clear();
                 prevTime = 0;
-                player.Play(guide);
+                player.Play(loaded);
             }
             songUpdateTimer.Stop();
             songUpdateTimer.Start();
+
+            generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
         }
 
         private void RadioButton_Checked_1(object sender, RoutedEventArgs e)
         {
-            if (comp == null)
+            if (generated == null)
                 return;
-            GenerateMetrics(comp);
+            GenerateMetrics(generated.GetLongestTrack().GetMainSequence() as MelodySequence);
         }
 
         private void guideCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            guide = new Composition();
-            guide.LoadFromMIDI((guideCombo.SelectedItem as ComboBoxItem).Tag.ToString());
+            guide = (guideCombo.SelectedItem as ComboBoxItem).Tag.ToString();
         }
 
         private void procedureCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -591,6 +623,7 @@ namespace Visualizer
 
             /*                        <ComboBoxItem>Markov Chain</ComboBoxItem>
                         <ComboBoxItem>Genetic Algorithm</ComboBoxItem>
+             * 
                         <ComboBoxItem>Composition Test</ComboBoxItem>*/
 
   
@@ -619,29 +652,34 @@ namespace Visualizer
             player.Stop();
         }
 
-        private void playGuideRad_Checked(object sender, RoutedEventArgs e)
-        {
-            if(guide == null)
-                return;
-            generateSongPlotFull(midiPlotFull.Model, guide.GeneratePlaybackInfo());
-        }
-
         private void playCompRad_Checked(object sender, RoutedEventArgs e)
         {
-            if (comp == null)
+            if (generated == null)
                 return;
-            generateSongPlotFull(midiPlotFull.Model, comp.GeneratePlaybackInfo(1));
+            generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
         }
 
         private void randomizeBtn_Click(object sender, RoutedEventArgs e)
         {
-            // Randomize
-
             if (lastGen == null)
                 return;
-            comp = new MelodySequence(lastGen.Next());
 
-            generateSongPlotFull(midiPlotFull.Model, comp.GeneratePlaybackInfo(1));
+            // Randomize
+            generated = new Composition();
+            var mel = lastGen.Next() as MelodySequence;
+            if(mel != null)
+            {
+                GeneticMIDI.Representation.Track track = new GeneticMIDI.Representation.Track(PatchNames.Acoustic_Grand, 1);
+                track.AddSequence(mel);
+                generated.Add(track);
+            }
+            else
+            {
+                generated = lastGen.Next() as Composition;
+            }
+           
+
+            generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
 
             playCompRad.IsChecked = true;
         }
@@ -655,6 +693,28 @@ namespace Visualizer
         private void Slider_DragCompleted(object sender, DragCompletedEventArgs e)
         {
             player.Seek((int)progressSongSlider.Value);
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            playCompRad.IsChecked = false;
+
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+            dlg.DefaultExt = ".mid";
+            dlg.Filter = "MIDI Files (*.mid)|*.mid";
+            dlg.Title = "Load MIDI file";
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                loaded = Composition.LoadFromMIDI(dlg.FileName);
+                generateSongPlotFull(midiPlotFull.Model, loaded.GeneratePlaybackInfo());
+
+            }
+
+
         }
     }
 }

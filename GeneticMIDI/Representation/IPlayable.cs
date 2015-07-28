@@ -5,14 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeneticMIDI.Generators
+namespace GeneticMIDI.Representation
 {
-    public interface IPlaybackGenerator
+    public interface IPlayable
     {
-        IPlayable Generate();
-
-        IPlayable Next();
-
-        bool HasNext { get; }
+        PlaybackInfo GeneratePlayback();
     }
 }

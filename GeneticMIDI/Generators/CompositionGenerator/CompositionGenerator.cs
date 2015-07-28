@@ -35,7 +35,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
 
 
                     Track track = new Track(instrument, (byte)(i + 1));
-                    track.AddSequence(new MelodySequence(notes));
+                    track.AddSequence(notes);
                     newComp.Add(track);
                     //var notes = trackGenerator.Generate();
                     Console.WriteLine("Done Generating track {0}", i);
@@ -55,6 +55,22 @@ namespace GeneticMIDI.Generators.CompositionGenerator
         public Composition GenerateComposition()
         {
             return Generate();
+        }
+
+
+        IPlayable IPlaybackGenerator.Generate()
+        {
+            return Generate();
+        }
+
+        IPlayable IPlaybackGenerator.Next()
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IPlaybackGenerator.HasNext
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

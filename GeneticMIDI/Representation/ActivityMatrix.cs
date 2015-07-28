@@ -87,5 +87,28 @@ namespace GeneticMIDI.Representation
             int index = key / ActivityColumn.KEYTIME;
             return activityColumns[index].IsActive(track);
         }
+
+        public string[] ToStrings()
+        {
+            string[] ons = new string[this.ActivityColumns[0].Rows];
+            for (int i = 0; i < this.ActivityColumns.Length; i++)
+            {
+                for (int j = 0; j < this.ActivityColumns[i].Rows; j++)
+                {
+                    bool isActive = this.ActivityColumns[i].IsActive(j);
+                    ons[j] += isActive ? '1' : '0';
+                }
+            }
+            return ons;
+        }
+
+        public void Save(string path)
+        {
+            System.IO.StreamWriter writer = new System.IO.StreamWriter("test.txt");
+            var ons = ToStrings();
+            foreach (var s in ons)
+                writer.WriteLine(s);
+            writer.Close();
+        }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Representation
 {
-    public class HarmonySequence : ISequence
+    public class HarmonySequence : ISequence, IPlayable
     {
         List<Chord> sequence;
 
@@ -70,6 +70,11 @@ namespace GeneticMIDI.Representation
                 time += 1;
             }
             return info;
+        }
+
+        public PlaybackInfo GeneratePlayback()
+        {
+            return GeneratePlaybackInfo(1,0);
         }
     }
 }

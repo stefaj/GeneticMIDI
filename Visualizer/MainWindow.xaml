@@ -12,8 +12,7 @@
                     <Button x:Name="playBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="427,0,425,10" Click="Button_Click_1">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-174-play.png"></Image>
                     </Button>
-                    <RadioButton x:Name="playGuideRad" Content="Guide" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="True" Checked="playGuideRad_Checked"/>
-                    <RadioButton x:Name="playCompRad" Content="Composed Piece" HorizontalAlignment="Left" Margin="115,10,0,0" VerticalAlignment="Top" Checked="playCompRad_Checked"/>
+                    <RadioButton x:Name="playCompRad" Content="Composed Piece" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="playCompRad_Checked" IsChecked="True"/>
                     <Slider x:Name="progressSongSlider" Margin="10,0,10,68" VerticalAlignment="Bottom" Thumb.DragCompleted ="Slider_DragCompleted"></Slider>
                     <Button x:Name="stopBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="374,0,478,10" Click="Button_Click_2">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-176-stop.png"></Image>
@@ -22,19 +21,21 @@
                     <Button x:Name="randomizeBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="480,0,372,10" Click="randomizeBtn_Click">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-323-playing-dices.png"></Image>
                     </Button>
+                    <Button Content="Load" HorizontalAlignment="Right" Margin="0,3,10,0" VerticalAlignment="Top" Width="75" Click="Button_Click_3"/>
                 </Grid>
 
             </TabItem>
             <TabItem Header="Generate">
                 <Grid>
                     <Label Content="Procedure" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="procedureCombo" HorizontalAlignment="Left" Margin="91,10,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="1" SelectionChanged="procedureCombo_SelectionChanged">
+                    <ComboBox x:Name="procedureCombo" HorizontalAlignment="Left" Margin="91,10,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="3" SelectionChanged="procedureCombo_SelectionChanged">
                         <ComboBoxItem>Markov Chain</ComboBoxItem>
                         <ComboBoxItem>Genetic Algorithm</ComboBoxItem>
-                        <ComboBoxItem>Composition Test</ComboBoxItem>
+                        <ComboBoxItem>Random Composition</ComboBoxItem>
+                        <ComboBoxItem>Instrumental</ComboBoxItem>
                     </ComboBox>
                     <TabControl x:Name="optionsTab" HorizontalAlignment="Right" Margin="0,41,10,10" Width="429" SelectedIndex="1">
-                        <TabItem x:Name="tabMC" Header="MC" FontSize="8" Controls:ControlsHelper.HeaderFontSize="18" Height="30">
+                        <TabItem x:Name="tabMC" Header="MC" FontSize="8" Controls:ControlsHelper.HeaderFontSize="18">
                             <Grid/>
                         </TabItem>
                         <TabItem x:Name="tabGA" Header="GA" Controls:ControlsHelper.HeaderFontSize="18">
@@ -65,7 +66,9 @@
                             </Grid>
                         </TabItem>
                         <TabItem x:Name="tabComp" Header="Comp" Controls:ControlsHelper.HeaderFontSize="18">
-                            </TabItem>
+                        </TabItem>
+                        <TabItem x:Name="tabInstru" Header="Instrumental" Controls:ControlsHelper.HeaderFontSize="18">
+                        </TabItem>
                     </TabControl>
                     <Label Content="Options" HorizontalAlignment="Right" Margin="0,10,387,0" VerticalAlignment="Top"/>
                     <Button  HorizontalAlignment="Left" Margin="10,585,0,0" VerticalAlignment="Top" Width="48" Height="48" Click="Button_Click">

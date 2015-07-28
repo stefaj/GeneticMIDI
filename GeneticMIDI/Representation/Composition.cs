@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Representation
 {
-    public class Composition
+    public class Composition : IPlayable
     {
         public List<Track> Tracks { get; private set; }
 
@@ -43,6 +43,19 @@ namespace GeneticMIDI.Representation
                 }
             }
             return Tracks[id];
+        }
+
+        public override string ToString()
+        {
+            string str = "";
+            for (int i = 0; i < Tracks.Count; i++ )
+            {
+                str += "(" + Tracks[i].ToString() + ")";
+
+                if (i != Tracks.Count - 1)
+                    str += " || ";
+            }
+            return str;
         }
 
         public static Composition LoadFromMIDI(string filename)
@@ -101,6 +114,11 @@ namespace GeneticMIDI.Representation
             }
 
             return comp;
+        }
+
+        public PlaybackInfo GeneratePlayback()
+        {
+            return GeneratePlaybackInfo();
         }
     }
 }

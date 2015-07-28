@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators.NoteGenerators
 {
-    public class MarkovChainGenerator : INoteGenerator
+    public class MarkovChainGenerator : INoteGenerator, IPlaybackGenerator
     {
         MarkovChain<Note> chain;
 
@@ -40,7 +40,7 @@ namespace GeneticMIDI.Generators.NoteGenerators
             chain.Add(notes);
         }
 
-        public IEnumerable<Note> Generate()
+        public MelodySequence Generate()
         {
             IEnumerable<Note> chain_notes = null;
             if (generatesNo == 0)
@@ -59,11 +59,11 @@ namespace GeneticMIDI.Generators.NoteGenerators
                     break;
             }
 
-            return gen;
+            return new MelodySequence(gen) ;
         }
 
 
-        public IEnumerable<Note> Next()
+        public MelodySequence Next()
         {
             return Generate();
         }
@@ -71,6 +71,16 @@ namespace GeneticMIDI.Generators.NoteGenerators
         public bool HasNext
         {
             get { return true; }
+        }
+
+        IPlayable IPlaybackGenerator.Generate()
+        {
+            return Generate();
+        }
+
+        IPlayable IPlaybackGenerator.Next()
+        {
+            return Next();
         }
     }
 }

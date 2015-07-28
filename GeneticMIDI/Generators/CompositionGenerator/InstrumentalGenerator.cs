@@ -9,16 +9,34 @@ using System.Threading.Tasks;
 namespace GeneticMIDI.Generators.CompositionGenerator
 {
 
-    class InstrumentalGenerator : IPlaybackGenerator, ICompositionGenerator
+    public class InstrumentalGenerator : IPlaybackGenerator, ICompositionGenerator
     {
         const string SAVE_FILE = "instrumental.dat";
         Dictionary<PatchNames, Markov.MarkovChain<Note>> instruments = new Dictionary<PatchNames, Markov.MarkovChain<Note>>();
 
         Markov.MarkovChain<ActivityColumn> activityGenerator;
+
+        public event OnFitnessUpdate OnPercentage;
+
+        string path = "";
+
+        private string SavePath
+        {
+            get
+            {
+                return path + System.IO.Path.DirectorySeparatorChar + SAVE_FILE;
+            }
+        }
+
         public InstrumentalGenerator(string path)
         {
             activityGenerator = new Markov.MarkovChain<ActivityColumn>(3);
-            if (System.IO.File.Exists(SAVE_FILE))
+            this.path = path;            
+        }
+
+        public void Initialize()
+        {
+            if (System.IO.File.Exists(SavePath))
             {
                 Console.WriteLine("Loading from file");
                 LoadFromFile();
@@ -28,18 +46,19 @@ namespace GeneticMIDI.Generators.CompositionGenerator
                 Console.WriteLine("Generating from library");
                 GenerateFromFiles(path);
             }
-            
         }
+
+
         public void GenerateFromFiles(string path)
         {
             instruments = new Dictionary<PatchNames, Markov.MarkovChain<Note>>();
             Dictionary<PatchNames, List<string>> instrument_tracker = new Dictionary<PatchNames, List<string>>();
             //BinaryFormatter serializer = new BinaryFormatter();
-            System.IO.FileStream fs = new System.IO.FileStream(SAVE_FILE, System.IO.FileMode.Create);
             ProtoBuf.Serializer.PrepareSerializer<Dictionary<PatchNames, Markov.MarkovChain<Note>>>();
             //System.IO.Compression.GZipStream gz = new System.IO.Compression.GZipStream(fs, System.IO.Compression.CompressionMode.Compress);
             int i = 0;
-            var files = System.IO.Directory.GetFiles(path);
+            var files = Utils.GetFiles(path);
+            int percentage = files.Length / 100;
             //foreach (string f in files)
             Parallel.For(0, files.Length, j =>
             {
@@ -75,6 +94,14 @@ namespace GeneticMIDI.Generators.CompositionGenerator
                     }
                 }
 
+                //Report progress
+                if (i > percentage)
+                {
+                    if (OnPercentage != null)
+                        OnPercentage(this, i, 0);
+                    percentage += files.Length / 100;
+                }
+
                 ActivityMatrix matrix = ActivityMatrix.GenerateFromComposition(comp);
                 activityGenerator.Add(matrix.ActivityColumns);
 
@@ -88,6 +115,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
 
             // try saving
            // serializer.Serialize(fs, instruments);
+            System.IO.FileStream fs = new System.IO.FileStream(SavePath, System.IO.FileMode.Create);
             ProtoBuf.Serializer.Serialize<Dictionary<PatchNames, Markov.MarkovChain<Note>>>(fs, instruments);
             //gz.Flush();
             //gz.Close();
@@ -101,7 +129,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
            // BinaryFormatter serializer = new BinaryFormatter();
             ProtoBuf.Serializer.PrepareSerializer<Dictionary<PatchNames, Markov.MarkovChain<Note>>>();
 
-            System.IO.FileStream fs = new System.IO.FileStream(SAVE_FILE, System.IO.FileMode.Open);
+            System.IO.FileStream fs = new System.IO.FileStream(SavePath, System.IO.FileMode.Open);
             //System.IO.Compression.GZipStream gz = new System.IO.Compression.GZipStream(fs, System.IO.Compression.CompressionMode.Decompress);
             //instruments = serializer.UnsafeDeserialize(fs, null) as Dictionary<PatchNames, Markov.MarkovChain<Note>>;
             instruments = ProtoBuf.Serializer.Deserialize<Dictionary<PatchNames, Markov.MarkovChain<Note>>>(fs);
@@ -156,6 +184,24 @@ namespace GeneticMIDI.Generators.CompositionGenerator
         public Composition GenerateComposition()
         {
             return Generate();
+        }
+
+
+
+        IPlayable IPlaybackGenerator.Generate()
+        {
+            return Generate();
+        }
+
+        int last_next = 0;
+        IPlayable IPlaybackGenerator.Next()
+        {
+            return Generate(last_next++);
+        }
+
+        bool IPlaybackGenerator.HasNext
+        {
+            get { return true; }
         }
     }
 }

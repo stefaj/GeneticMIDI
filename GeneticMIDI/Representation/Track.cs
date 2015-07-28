@@ -49,6 +49,9 @@ namespace GeneticMIDI.Representation
 
         public void AddSequence(ISequence seq)
         {
+            if (seq == null)
+                return;
+
             this.sequences.Add(seq);
             Duration += seq.Duration;
         }
@@ -68,6 +71,19 @@ namespace GeneticMIDI.Representation
                 time += (int)(1000 * Note.ToRealDuration(s.Duration));
             }
             return info;
+        }
+
+        public override string ToString()
+        {
+            string str = "";
+            for(int i = 0; i < sequences.Count; i++)
+            {
+                str += sequences[i].ToString();
+
+                if (i != sequences.Count - 1)
+                    str += " ++ ";
+            }
+            return str;
         }
 
     }

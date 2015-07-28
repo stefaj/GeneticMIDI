@@ -185,7 +185,7 @@ namespace AForge.Genetic
                     List<Note> notes_cut = new List<Note>();
                     int j = 0;
                     int max = (int)Math.Pow(2,level-1);
-                    foreach(Note n in notes)
+                    foreach(Note n in notes.Notes)
                     {
                         if(j>max)
                         {

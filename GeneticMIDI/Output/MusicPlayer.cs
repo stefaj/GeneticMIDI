@@ -75,21 +75,10 @@ namespace GeneticMIDI.Output
             }
         }
         
-        public void Play(ISequence seq)
-        {
-            var msgs = seq.GeneratePlaybackInfo(1,0);
-            Play(msgs);
-        }
 
-        public void Play(Composition comp)
+        public void Play(IPlayable comp)
         {
-            var info = comp.GeneratePlaybackInfo();
-            Play(info);
-        }
-
-        public void Play(Track track)
-        {
-            var info = track.GeneratePlaybackInfo();
+            var info = comp.GeneratePlayback();
             Play(info);
         }
 
