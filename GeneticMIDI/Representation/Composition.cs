@@ -120,5 +120,46 @@ namespace GeneticMIDI.Representation
         {
             return GeneratePlaybackInfo();
         }
+
+        public void WriteToMidi(string path)
+        {
+            MidiEventCollection events = new MidiEventCollection(1, 480);
+            foreach(Track t in Tracks)
+            {
+                List<MidiEvent> trackEvents = new List<MidiEvent>();
+                var info = t.GeneratePlaybackInfo();
+
+                var keys = new int[info.Messages.Keys.Count];
+                int i = 0;
+                foreach (var k in info.Messages.Keys)
+                {
+                    keys[i++] = k;
+                }
+
+                for (i = 0; i < keys.Length - 1; i++)
+                {
+                    foreach (PlaybackMessage message in info.Messages[keys[i]])
+                    {
+                        var e = MidiEvent.FromRawMessage(message.GenerateMidiMessage().RawData);
+                        int note_dur = (int)Note.ToNoteDuration(keys[i]);
+                        int midi_dur = Note.ToMidiLength(note_dur, 240, 60);
+                        e.AbsoluteTime = keys[i];
+                        trackEvents.Add(e);                    
+                    }
+                    int sleep_dur = keys[i + 1] - keys[i];
+                    //Thread.Sleep(sleep_dur);
+                }
+
+                // Append the end marker to the track
+                long absoluteTime = 0;
+                if (trackEvents.Count > 0)
+                    absoluteTime = trackEvents[trackEvents.Count - 1].AbsoluteTime+100;
+                trackEvents.Add(new MetaEvent(MetaEventType.EndTrack, 0, absoluteTime));
+
+                events.AddTrack(trackEvents);
+            }
+
+            MidiFile.Export(path, events);
+        }
     }
 }

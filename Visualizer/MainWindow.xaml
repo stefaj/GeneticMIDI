@@ -21,7 +21,14 @@
                     <Button x:Name="randomizeBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="480,0,372,10" Click="randomizeBtn_Click">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-323-playing-dices.png"></Image>
                     </Button>
-                    <Button Content="Load" HorizontalAlignment="Right" Margin="0,3,10,0" VerticalAlignment="Top" Width="75" Click="Button_Click_3"/>
+                    <Button HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Height="48" Width="48" Click="Button_Click_3">
+                        <Image Width="16" Height="16" Source="Resources/glyphicons-145-folder-open.png"></Image>
+                    </Button>
+
+                    <Label x:Name="fitnessLabelTest" Content="Label" HorizontalAlignment="Left" Margin="533,607,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="saveBtn" HorizontalAlignment="Right" Margin="0,0,63,10" VerticalAlignment="Bottom" Height="48" Width="48" Click="saveBtn_Click">
+                        <Image Width="16" Height="16" Source="Resources/glyphicons-445-floppy-saved.png"/>
+                    </Button>
                 </Grid>
 
             </TabItem>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Representation
 {
+    [ProtoContract]
+    [Serializable]
     public class ActivityMatrix
     {
+        [ProtoMember(1)]
         ActivityColumn[] activityColumns;
 
         public ActivityColumn[] ActivityColumns

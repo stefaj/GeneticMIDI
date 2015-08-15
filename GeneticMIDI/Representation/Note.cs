@@ -94,10 +94,22 @@ namespace GeneticMIDI.Representation
             return note_duration * 60.0f * 4.0f / 32.0f / bpm;
         }
 
-        public static int ToNoteLength(int note_length, int delta_ticks_qn, double tempo)
+        public static float ToNoteDuration(int real_duration, int bpm=120)
         {
-            return (int)((double)note_length / (double)delta_ticks_qn * (int)Durations.qn * (60 / tempo));
+            return real_duration / 60.0f / 4.0f * 32.0f * bpm;
         }
+
+
+        public static int ToNoteLength(int midi_length, int delta_ticks_qn, double tempo)
+        {
+            return (int)((double)midi_length / (double)delta_ticks_qn * (int)Durations.qn * (60 / tempo));
+        }
+
+        public static int ToMidiLength(int note_length, int delta_ticks_qn, double tempo)
+        {
+            return (int)((double)delta_ticks_qn * (double)note_length / (int)Durations.qn / (60 / tempo));
+        }
+
 
         private static readonly string[] NoteNames = new string[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 

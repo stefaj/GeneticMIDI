@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +7,20 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Representation
 {
+    [ProtoContract]
+    [Serializable]
     public class ActivityColumn : IEquatable<ActivityColumn>
     {
+        [ProtoMember(1)]
         bool[] activities;
+
         public const int KEYTIME = 100;
 
+        public ActivityColumn()
+        {
+
+        }
+        
         public int Rows
         {
             get

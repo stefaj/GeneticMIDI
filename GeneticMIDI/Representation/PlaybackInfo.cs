@@ -38,6 +38,6 @@ namespace GeneticMIDI.Representation
                 info.Add(k, info2.Messages[k]);
             return info;
         }
-
+    
     }
 }

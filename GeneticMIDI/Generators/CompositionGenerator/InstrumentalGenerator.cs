@@ -1,4 +1,5 @@
 ﻿using GeneticMIDI.Representation;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +9,21 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators.CompositionGenerator
 {
-
+    [Serializable]
+    [ProtoContract]
     public class InstrumentalGenerator : IPlaybackGenerator, ICompositionGenerator
     {
         const string SAVE_FILE = "instrumental.dat";
+
+        [ProtoMember(1)]
         Dictionary<PatchNames, Markov.MarkovChain<Note>> instruments = new Dictionary<PatchNames, Markov.MarkovChain<Note>>();
 
+        //[ProtoMember(2)]
         Markov.MarkovChain<ActivityColumn> activityGenerator;
 
+        [ProtoMember(3)]
+        Markov.MarkovChain<int> instrumentGenerator;
+        
         public event OnFitnessUpdate OnPercentage;
 
         string path = "";
@@ -31,7 +39,15 @@ namespace GeneticMIDI.Generators.CompositionGenerator
         public InstrumentalGenerator(string path)
         {
             activityGenerator = new Markov.MarkovChain<ActivityColumn>(3);
+            instrumentGenerator = new Markov.MarkovChain<int>(2);
             this.path = path;            
+        }
+
+        public InstrumentalGenerator()
+        {
+            activityGenerator = new Markov.MarkovChain<ActivityColumn>(3);
+            instrumentGenerator = new Markov.MarkovChain<int>(2);
+            this.path = ""; 
         }
 
         public void Initialize()
@@ -54,7 +70,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
             instruments = new Dictionary<PatchNames, Markov.MarkovChain<Note>>();
             Dictionary<PatchNames, List<string>> instrument_tracker = new Dictionary<PatchNames, List<string>>();
             //BinaryFormatter serializer = new BinaryFormatter();
-            ProtoBuf.Serializer.PrepareSerializer<Dictionary<PatchNames, Markov.MarkovChain<Note>>>();
+            
             //System.IO.Compression.GZipStream gz = new System.IO.Compression.GZipStream(fs, System.IO.Compression.CompressionMode.Compress);
             int i = 0;
             var files = Utils.GetFiles(path);
@@ -78,9 +94,11 @@ namespace GeneticMIDI.Generators.CompositionGenerator
                     Console.WriteLine("Skipping {0}", filename);
                     continue_ = false;
                 }
+                List<int> instruments_ints = new List<int>();
                 if(continue_)
                 foreach (var track in comp.Tracks)
                 {
+                    instruments_ints.Add((int)track.Instrument);
                     var mel = track.GetMainSequence() as MelodySequence;
                     if (!instruments.ContainsKey(track.Instrument))
                     {
@@ -93,6 +111,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
                         instruments[track.Instrument].Add(mel.ToArray());
                     }
                 }
+                instrumentGenerator.Add(instruments_ints);
 
                 //Report progress
                 if (i > percentage)
@@ -113,27 +132,36 @@ namespace GeneticMIDI.Generators.CompositionGenerator
                 Console.WriteLine("Instrument {0} with count {1}", k, instrument_tracker[k].Count);
             }
 
-            // try saving
-           // serializer.Serialize(fs, instruments);
-            System.IO.FileStream fs = new System.IO.FileStream(SavePath, System.IO.FileMode.Create);
-            ProtoBuf.Serializer.Serialize<Dictionary<PatchNames, Markov.MarkovChain<Note>>>(fs, instruments);
-            //gz.Flush();
-            //gz.Close();
-            fs.Close();
+            Save();
 
             Console.WriteLine("Done");
         }
 
+        private void Save()
+        {
+            System.IO.FileStream fs = new System.IO.FileStream(SavePath, System.IO.FileMode.Create);
+
+            ProtoBuf.Serializer.PrepareSerializer<InstrumentalGenerator>();
+
+            ProtoBuf.Serializer.Serialize(fs, this);
+
+            fs.Close();
+        }
+
         public void LoadFromFile()
         {
-           // BinaryFormatter serializer = new BinaryFormatter();
-            ProtoBuf.Serializer.PrepareSerializer<Dictionary<PatchNames, Markov.MarkovChain<Note>>>();
+            InstrumentalGenerator gen = new InstrumentalGenerator(path);
+
+            ProtoBuf.Serializer.PrepareSerializer<InstrumentalGenerator>();
 
             System.IO.FileStream fs = new System.IO.FileStream(SavePath, System.IO.FileMode.Open);
-            //System.IO.Compression.GZipStream gz = new System.IO.Compression.GZipStream(fs, System.IO.Compression.CompressionMode.Decompress);
-            //instruments = serializer.UnsafeDeserialize(fs, null) as Dictionary<PatchNames, Markov.MarkovChain<Note>>;
-            instruments = ProtoBuf.Serializer.Deserialize<Dictionary<PatchNames, Markov.MarkovChain<Note>>>(fs);
-            //gz.Close();
+
+            gen = ProtoBuf.Serializer.Deserialize<InstrumentalGenerator>(fs);
+
+            instruments = gen.instruments;
+            instrumentGenerator = gen.instrumentGenerator;
+            activityGenerator = gen.activityGenerator;
+
             fs.Close();
         }
 
@@ -162,7 +190,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
         public Composition Generate(int seed = 0)
         {
             Composition comp = new Composition();
-            Random ra = new Random(seed);
+            /*Random ra = new Random(seed);
             for(int i = 0; i < 4; i++)
             {
                 var keys = instruments.Keys.ToArray();
@@ -171,6 +199,27 @@ namespace GeneticMIDI.Generators.CompositionGenerator
                 Track track = new Track(instrument, (byte)(i + 1));
                 track.AddSequence(GenerateInstrument(instrument, seed));
                 comp.Add(track);
+            }*/
+
+            Random rand = new Random(seed);
+            var keys = instruments.Keys.ToArray();
+            PatchNames instrument = keys[rand.Next(0, instruments.Keys.Count)];
+
+            var instruments_ = instrumentGenerator.Chain(new int[]{(int)instrument}, seed);
+            Track track = new Track(instrument, 1);
+            track.AddSequence(GenerateInstrument(instrument, seed++));
+            comp.Add(track);
+
+            int j = 2;
+            foreach(var i in instruments_)
+            {
+                var instr = (PatchNames)i;
+                track = new Track(instr, (byte)(j));
+                track.AddSequence(GenerateInstrument(instr, seed++));
+                comp.Add(track);
+                if (j > 3)
+                    break;
+                j++;
             }
 
             return comp;

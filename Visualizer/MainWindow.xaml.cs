@@ -1,5 +1,6 @@
 ﻿using AForge.Genetic;
 using GeneticMIDI;
+using GeneticMIDI.FitnessFunctions;
 using GeneticMIDI.Generators;
 using GeneticMIDI.Generators.CompositionGenerator;
 using GeneticMIDI.Generators.NoteGenerators;
@@ -57,6 +58,18 @@ namespace Visualizer
         DispatcherTimer songUpdateTimer;
 
         IPlaybackGenerator lastGen = null;
+
+        NCD fitness = null;
+
+        private Composition ActiveComposition
+        {
+            get
+            {
+                if (playCompRad.IsChecked == true)
+                    return generated;
+                else return loaded;
+            }
+        }
 
         public MainWindow()
         {
@@ -240,8 +253,11 @@ namespace Visualizer
 
                 foreach (PlaybackMessage message in info.Messages[keys[i]])
                 {
-                    if(message.Message == PlaybackMessage.PlaybackMessageType.Start)
-                        songpoints.Add(new ScatterPoint(keys[i], message.Pitch % 12, message.Duration / 2, message.Pitch / 12));
+                    if (message.Message == PlaybackMessage.PlaybackMessageType.Start)
+                    {
+                        double duration = Math.Log(message.Duration + 1, 2) * 2;
+                        songpoints.Add(new ScatterPoint(keys[i], message.Pitch % 12, duration, message.Pitch / 12));
+                    }
                 }
             }
 
@@ -250,7 +266,10 @@ namespace Visualizer
             if (model.Axes.Count > 2)
             {
                 model.Axes[2].IsAxisVisible = false;
+                model.Axes[2].Maximum = 14;
+                model.Axes[2].Minimum = -2;
             }
+
 
             model.InvalidatePlot(true);
         }
@@ -283,7 +302,10 @@ namespace Visualizer
         {
 
             currentTime = key / 1000.0f;
-            SongPoints.Add(new ScatterPoint(currentTime, msg.Pitch % 12, msg.Duration / 2, msg.Pitch / 12));
+
+            double duration = Math.Log(msg.Duration + 1, 2) * 2;
+             
+            SongPoints.Add(new ScatterPoint(currentTime, msg.Pitch % 12, duration, msg.Pitch / 12));
             //SongConPoints.Add(new DataPoint(currentTime, msg.Pitch % 12));
 
             if (songModel.Axes.Count > 2)
@@ -535,6 +557,9 @@ namespace Visualizer
             }
             if(procedureCombo.SelectedIndex == 3)
             {
+                NCD.MaxTracks = 4;
+                fitness = NCD.FromCompositions(guide);
+
                 InstrumentalGenerator gen = new InstrumentalGenerator(guide);
                 gen.OnPercentage += gen_OnPercentage;
                 lastGen = gen;
@@ -581,6 +606,7 @@ namespace Visualizer
                 SongPoints.Clear();
                 prevTime = 0;
                 player.Play(generated);
+                generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
             }
             if (playCompRad.IsChecked == false)
             {
@@ -590,11 +616,12 @@ namespace Visualizer
                 SongPoints.Clear();
                 prevTime = 0;
                 player.Play(loaded);
+                generateSongPlotFull(midiPlotFull.Model, loaded.GeneratePlaybackInfo());
             }
             songUpdateTimer.Stop();
             songUpdateTimer.Start();
 
-            generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
+            
         }
 
         private void RadioButton_Checked_1(object sender, RoutedEventArgs e)
@@ -666,17 +693,34 @@ namespace Visualizer
 
             // Randomize
             generated = new Composition();
-            var mel = lastGen.Next() as MelodySequence;
-            if(mel != null)
+
+            Composition best = generated;
+            float highest_fit = 0;
+
+            for (int i = 0; i < 10; i++)
             {
-                GeneticMIDI.Representation.Track track = new GeneticMIDI.Representation.Track(PatchNames.Acoustic_Grand, 1);
-                track.AddSequence(mel);
-                generated.Add(track);
+                var mel = lastGen.Next() as MelodySequence;
+                if (mel != null)
+                {
+                    GeneticMIDI.Representation.Track track = new GeneticMIDI.Representation.Track(PatchNames.Acoustic_Grand, 1);
+                    track.AddSequence(mel);
+                    generated.Add(track);
+                }
+                else
+                {
+                    generated = lastGen.Next() as Composition;
+                }
+
+                float fitn = fitness.ComputeFitness(generated);
+                if(fitn > highest_fit)
+                {
+                    best = generated;
+                    highest_fit = fitn;
+                }
             }
-            else
-            {
-                generated = lastGen.Next() as Composition;
-            }
+
+
+            fitnessLabelTest.Content = highest_fit;
            
 
             generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
@@ -714,6 +758,26 @@ namespace Visualizer
 
             }
 
+
+        }
+
+        private void saveBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (ActiveComposition == null)
+                return;
+
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+
+            dlg.DefaultExt = ".mid";
+            dlg.Filter = "MIDI Files (*.mid)|*.mid";
+            dlg.Title = "Load MIDI file";
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                ActiveComposition.WriteToMidi(dlg.FileName);
+            }
 
         }
     }

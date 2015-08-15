@@ -75,7 +75,7 @@ namespace GeneticMIDI.Representation
 
         public override string ToString()
         {
-            string str = "";
+            string str = "" + Instrument.ToString() + " ";
             for(int i = 0; i < sequences.Count; i++)
             {
                 str += sequences[i].ToString();

@@ -16,7 +16,7 @@ namespace GeneticMIDI.FitnessFunctions
     public class NCD : IFitnessFunction
     {
         string[] songs;
-
+        public static int MaxTracks = 0;
         
         public static NCD FromMelodies(string path)
         {
@@ -48,7 +48,6 @@ namespace GeneticMIDI.FitnessFunctions
         public static NCD FromCompositions(string path)
         {
             NCD ncd = new NCD();
-            Composition[] seqs = Utils.LoadCompositionsFromDirectory(path);
 
             string savepath = path + Path.DirectorySeparatorChar + "ncdc" + ".dat";
             if (File.Exists(savepath))
@@ -57,6 +56,7 @@ namespace GeneticMIDI.FitnessFunctions
                 return ncd;
             }
 
+            Composition[] seqs = Utils.LoadCompositionsFromDirectory(path);
 
             ncd.songs = new string[seqs.Count()];
 
@@ -64,7 +64,18 @@ namespace GeneticMIDI.FitnessFunctions
             int j = 0;
             foreach (var comp in seqs)
             {
-                ncd.songs[i++] = comp.ToString();
+                var c = comp;
+                if (MaxTracks > 0)
+                {
+                    var newComp = new Composition();
+                    for(int k = 0; k < MaxTracks && k < comp.Tracks.Count; k++)
+                    {
+                        newComp.Add(comp.Tracks[k]);
+                    }
+                    c = newComp;
+                }
+
+                ncd.songs[i++] = c.ToString();
             }
 
             ncd.Serialize(savepath);
@@ -72,11 +83,11 @@ namespace GeneticMIDI.FitnessFunctions
             return ncd;
         }
 
-        public float ComputeFitness(IEnumerable<Note> individual)
+        public float ComputeFitness(string individual)
         {
-            string indi2str = MelodySequence.GetNoteStr(individual);
+            string indi2str = individual;
             float sum = 0;
-            foreach(string str in songs)
+            foreach (string str in songs)
             {
                 if (str == null)
                     continue;
@@ -84,7 +95,32 @@ namespace GeneticMIDI.FitnessFunctions
                 sum += ncd;
             }
             return 1 / sum;
+        }
 
+
+
+        public float ComputeFitness(IEnumerable<Note> individual)
+        {
+            string indi2str = MelodySequence.GetNoteStr(individual);
+            return ComputeFitness(indi2str);
+        }
+
+        public float ComputeFitness(Composition comp)
+        {
+            var c = comp;
+            if (MaxTracks > 0)
+            {
+                var newComp = new Composition();
+                for (int k = 0; k < MaxTracks && k < comp.Tracks.Count; k++)
+                {
+                    newComp.Add(comp.Tracks[k]);
+                }
+                c = newComp;
+            }
+
+            string indi2str = c.ToString();
+
+            return ComputeFitness(indi2str);
         }
 
         static float ComputeNCD(string indi1str, string indi2str)
@@ -193,7 +229,7 @@ namespace GeneticMIDI.FitnessFunctions
             try
             {
                 BinaryFormatter formatter = new BinaryFormatter();
-                string[] songs = (string[])formatter.Deserialize(fs);
+                songs = (string[])formatter.Deserialize(fs);
                 
             }
             catch (SerializationException e)
