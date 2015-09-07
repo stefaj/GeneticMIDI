@@ -28,6 +28,17 @@ namespace GeneticMIDI.Generators.CompositionGenerator
 
         string path = "";
 
+        private IEnumerable<PatchNames> lastInstruments = null;
+        
+        public IEnumerable<PatchNames> Instruments
+        {
+            get
+            {
+                return instruments.Keys;
+            }
+        }
+
+        public bool IsInitialized { get; private set; }
         private string SavePath
         {
             get
@@ -62,6 +73,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
                 Console.WriteLine("Generating from library");
                 GenerateFromFiles(path);
             }
+            IsInitialized = true;
         }
 
 
@@ -173,6 +185,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
 
         public Composition Generate(IEnumerable<PatchNames> instrs, int seed = 0)
         {
+            lastInstruments = instrs;
             int i = 1;
             Composition comp = new Composition();
             foreach(PatchNames instrument in instrs)
@@ -189,6 +202,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
 
         public Composition Generate(int seed = 0)
         {
+            lastInstruments = null;
             Composition comp = new Composition();
             /*Random ra = new Random(seed);
             for(int i = 0; i < 4; i++)
@@ -234,8 +248,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
         {
             return Generate();
         }
-
-
+        
 
         IPlayable IPlaybackGenerator.Generate()
         {
@@ -245,7 +258,10 @@ namespace GeneticMIDI.Generators.CompositionGenerator
         int last_next = 0;
         IPlayable IPlaybackGenerator.Next()
         {
-            return Generate(last_next++);
+            if (lastInstruments == null)
+                return Generate(last_next++);
+            else
+                return Generate(lastInstruments, last_next++);
         }
 
         bool IPlaybackGenerator.HasNext

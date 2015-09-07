@@ -13,6 +13,7 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -95,37 +96,40 @@ namespace Visualizer
 
         void SetupCategories()
         {
+            StreamReader reader = new StreamReader("options.txt");
+            string dir = reader.ReadLine();
+
             ComboBoxItem classical = new ComboBoxItem();
             classical.Content = "Classical";
-            classical.Tag = @"D:\Sync\4th year\Midi\Library\Classical\Mixed";
+            classical.Tag = dir + @"\Classical\Mixed";
 
             ComboBoxItem classicRock = new ComboBoxItem();
             classicRock.Content = "Classic Rock";
-            classicRock.Tag = @"D:\Sync\4th year\Midi\Library\ClassicRock";
+            classicRock.Tag = dir + @"\ClassicRock";
 
             ComboBoxItem danceTechno = new ComboBoxItem();
             danceTechno.Content = "Dance Techno";
-            danceTechno.Tag = @"D:\Sync\4th year\Midi\Library\Dance_Techno";
+            danceTechno.Tag = dir + @"\Dance_Techno";
 
             ComboBoxItem jazz = new ComboBoxItem();
             jazz.Content = "Jazz";
-            jazz.Tag = @"D:\Sync\4th year\Midi\Library\Jazz";
+            jazz.Tag = dir + @"\Jazz";
 
             ComboBoxItem pop = new ComboBoxItem();
             pop.Content = "Pop";
-            pop.Tag = @"D:\Sync\4th year\Midi\Library\Pop_and_Top40";
+            pop.Tag = dir + @"\Pop_and_Top40";
 
             ComboBoxItem videoGames = new ComboBoxItem();
             videoGames.Content = "Video Games";
-            videoGames.Tag = @"D:\Sync\4th year\Midi\Library\Video_Games";
+            videoGames.Tag = dir + @"\Video_Games";
 
             ComboBoxItem classicalPiano = new ComboBoxItem();
             classicalPiano.Content = "Classical Piano";
-            classicalPiano.Tag = @"D:\Sync\4th year\Midi\Library\Classical\Classical Piano Midis";
+            classicalPiano.Tag = dir + @"\Classical Piano Midis";
 
             ComboBoxItem test = new ComboBoxItem();
             test.Content = "Test";
-            test.Tag = @"D:\Sync\4th year\Midi\Library\Test";
+            test.Tag = dir + @"\Test";
             
             guideCombo.Items.Add(classical);
             guideCombo.Items.Add(classicRock);
@@ -560,18 +564,76 @@ namespace Visualizer
                 NCD.MaxTracks = 4;
                 fitness = NCD.FromCompositions(guide);
 
-                InstrumentalGenerator gen = new InstrumentalGenerator(guide);
-                gen.OnPercentage += gen_OnPercentage;
-                lastGen = gen;
+                InstrumentalGenerator2 gen = null;
+                if (lastGen as InstrumentalGenerator2 == null)
+                {
+                    gen = new InstrumentalGenerator2(guide);
+                    gen.OnPercentage += gen_OnPercentage;
+                    lastGen = gen;
+                }
+                else
+                {
+                    gen = lastGen as InstrumentalGenerator2;
+                }
+
 
                 new Thread(() =>
                 {
-                    gen.Initialize();
-                    generated = gen.Generate();
+                    if (lastGen as InstrumentalGenerator2 != null)
+                    {
+                        var g = lastGen as InstrumentalGenerator2;
+                        if(g.IsInitialized)
+                        {
+                            List<PatchNames> instruments = new List<PatchNames>();
+                            activeInstrBox.Dispatcher.Invoke(() =>
+                                {
+                                    foreach(ListBoxItem i in activeInstrBox.Items)
+                                    {
+                                        instruments.Add((PatchNames)i.Tag);
+                                    }
+                                });
+
+                            if(instruments.Count > 0)
+                            {
+                                generated = gen.Generate(instruments);
+                            }
+                            else
+                            {
+                                generated = gen.GenerateComposition();
+                            }
+                        }
+                        else
+                        {
+                            gen.Initialize();
+                        }
+                    }
+                    else
+                    {
+                        gen.Initialize();
+                    }
+
+                    availableInstrBox.Dispatcher.Invoke(() =>
+                        {
+                            availableInstrBox.Items.Clear();
+                            foreach(var i in gen.Instruments)
+                            {
+                                ListBoxItem boxItem = new ListBoxItem();
+                                boxItem.Content = i.ToString();
+                                boxItem.Tag = i;
+                                availableInstrBox.Items.Add(boxItem);
+                            }
+                        });
+
+                    
                     progressGenSlider.Dispatcher.Invoke(() =>
                     {
                         progressGenSlider.Value = 100;
                     });
+                    midiPlotFull.Dispatcher.Invoke(() =>
+                        {
+                            if(generated != null)
+                                generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
+                        });
                 }).Start();
 
             }
@@ -697,7 +759,7 @@ namespace Visualizer
             Composition best = generated;
             float highest_fit = 0;
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 2; i++)
             {
                 var mel = lastGen.Next() as MelodySequence;
                 if (mel != null)
@@ -779,6 +841,32 @@ namespace Visualizer
                 ActiveComposition.WriteToMidi(dlg.FileName);
             }
 
+        }
+
+        private void availableInstrBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void availableInstrBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var item = availableInstrBox.SelectedItem as ListBoxItem;
+            if(item == null)
+                return;
+            if (activeInstrBox.Items.Count >= 4)
+                return;
+            ListBoxItem newitem = new ListBoxItem();
+            newitem.Content = item.Content;
+            newitem.Tag = item.Tag;
+            activeInstrBox.Items.Add(newitem);
+        }
+
+        private void activeInstrBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var item = activeInstrBox.SelectedItem as ListBoxItem;
+            if (item == null)
+                return;
+            activeInstrBox.Items.Remove(item);
         }
     }
 }

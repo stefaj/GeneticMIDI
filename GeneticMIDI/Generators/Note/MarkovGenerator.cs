@@ -56,7 +56,9 @@ namespace GeneticMIDI.Generators
             var teacher = new BaumWelchLearning(hmm);
             teacher.Iterations = 10000;
             teacher.Run(pitches);
+
             
+       
             
             Console.WriteLine("Done training");
 

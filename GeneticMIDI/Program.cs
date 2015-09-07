@@ -1,5 +1,8 @@
-﻿using Accord.Statistics.Models.Markov.Learning;
+﻿using Accord.Neuro.Learning;
+using Accord.Statistics.Models.Markov.Learning;
 using AForge.Genetic;
+using AForge.Neuro;
+using AForge.Neuro.Learning;
 using GeneticMIDI.FitnessFunctions;
 using GeneticMIDI.Generators;
 using GeneticMIDI.Generators.CompositionGenerator;
@@ -25,43 +28,111 @@ namespace GeneticMIDI
     {
         static void Main(string[] args)
         {
-
-            
-           /* Composition com = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\Visual Studio 2013\Projects\GeneticMIDI\Visualizer\bin\Debug\test\bach\bwv651.mid");
-            var am = ActivityMatrix.GenerateFromComposition(com);
-            Console.WriteLine("gg");
-
-
-
-                return;*/
-            foreach (var s in Utils.GetFiles(@"D:\Sync\4th year\Midi\Library\Anime", 3))
-                Console.WriteLine(s);
+            Console.WriteLine("Please enter library path: ");
+            string path = Console.ReadLine();
+            Console.WriteLine("Please enter a seed: ");
+            int seed = int.Parse(Console.ReadLine());
+            InstrumentalGenerator2 gen = new InstrumentalGenerator2(path + @"\Classical\Mixed");
+            gen.Initialize();
+            var comp = gen.Generate(new PatchNames[] { PatchNames.Orchestral_Strings }, seed);
+            var str = comp.ToString();
+            Console.WriteLine(str);
+            Console.WriteLine(str.GetHashCode());
+            MusicPlayer player = new MusicPlayer();
+            player.Play(comp);
 
             Console.ReadLine();
+        }
 
-            return;
-            
-            InstrumentalGenerator gen = new InstrumentalGenerator(@"D:\Sync\4th year\Midi\scraped");
-            
+        static void NeuralNetworkAccompanimentTest()
+        {
 
-            Console.WriteLine("Generating");
-            System.Random rand = new Random();
-            var seed = rand.Next();
+            // initialize input and output values
+            double[][] input = new double[4][] {
+            new double[] {0, 0}, new double[] {0, 1},
+            new double[] {1, 0}, new double[] {1, 1}
+            };
+            double[][] output = new double[4][] {
+            new double[] {0}, new double[] {1},
+            new double[] {1}, new double[] {0}
+            };
+            SigmoidFunction sig = new SigmoidFunction();
 
-            //var comp = gen.Generate(seed);
-            var comp = gen.Generate(new PatchNames[] { PatchNames.Flute, PatchNames.String_Ensemble_1, PatchNames.Synth_Voice });
+            Accord.Neuro.Networks.RestrictedBoltzmannMachine boltz = new Accord.Neuro.Networks.RestrictedBoltzmannMachine(200, 200);
 
-            Console.WriteLine("Playing seed {0}", seed);
+            // create neural network
+            ActivationNetwork network = new ActivationNetwork(
+                new SigmoidFunction(2),
+                200,
+                20,
+                200);
+            //BackPropagationLearning teacher = new BackPropagationLearning(network);
+            //LevenbergMarquardtLearning teacher = new LevenbergMarquardtLearning(network);
+            Accord.Neuro.Learning.ParallelResilientBackpropagationLearning teacher = new ParallelResilientBackpropagationLearning(network);
+            Accord.Neuro.Networks.DeepBeliefNetwork dpn = new Accord.Neuro.Networks.DeepBeliefNetwork(200, 20);
+
+            // teacher.IncreaseFactor = 1.01;
+            Composition c = Composition.LoadFromMIDI("test/other/ff7tifa.mid");
 
             MusicPlayer player = new MusicPlayer();
+            //player.Play(c.Tracks[0]);
 
+            List<double[]> inputs = new List<double[]>(); List<double[]> outputs = new List<double[]>();
 
-            foreach (var t in comp.Tracks)
-                Console.WriteLine(t.Instrument.ToString());
+            inputs.Add(GetDoublesFromNotes((c.Tracks[0].GetMainSequence() as MelodySequence).ToArray()));
+            outputs.Add(GetDoublesFromNotes((c.Tracks[1].GetMainSequence() as MelodySequence).ToArray()));
 
-            player.Play(comp);
-  
-  
+            //  inputs.Add(GetDoublesFromNotes((c.Tracks[1].GetMainSequence() as MelodySequence).ToArray()));
+            //    outputs.Add(GetDoublesFromNotes((c.Tracks[2].GetMainSequence() as MelodySequence).ToArray()));
+
+            // inputs.Add(GetDoublesFromNotes((c.Tracks[0].GetMainSequence() as MelodySequence).ToArray()));
+            // outputs.Add(GetDoublesFromNotes((c.Tracks[3].GetMainSequence() as MelodySequence).ToArray()));
+
+            int its = 0;
+            while (its++ < 10000)
+            {
+
+                double error = teacher.RunEpoch(inputs.ToArray(), outputs.ToArray());
+                Console.WriteLine("{0}: Error - {1}", its, error);
+            }
+
+            var input_melody = (c.Tracks[0].GetMainSequence() as MelodySequence);
+            var new_notes = network.Compute(GetDoublesFromNotes(input_melody.ToArray()));
+
+            var new_mel = GetMelodyFromDoubles(new_notes);
+
+            player.Play(new_mel);
+
+            Console.ReadLine();
+        }
+
+        static double[] GetDoublesFromNotes(Note[] notes, int max_length=200)
+        {
+            int length = notes.Length > max_length ? max_length : notes.Length;
+            double[] outarr = new double[max_length];
+            int max = 128 * 128 + 64;
+
+            int i = 0;
+            for(i = 0; i < length; i++)
+            {
+                int o = notes[i].Pitch * 128 + notes[i].Duration;
+                outarr[i] = (double)o / (double)max;
+            }
+            for (; i < max_length; i++)
+                outarr[i] = 0;
+            return outarr;
+        }
+
+        static MelodySequence GetMelodyFromDoubles(double[] arr)
+        {
+            int max = 128 * 128 + 64;
+            Note[] notes = new Note[arr.Length];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                int num = (int)(arr[i] * max);
+                notes[i] = new Note(num / 128, num % 128);
+            }
+            return new MelodySequence(notes);
         }
 
         static void LoadSongTest()

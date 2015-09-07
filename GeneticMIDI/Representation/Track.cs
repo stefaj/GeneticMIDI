@@ -27,7 +27,7 @@ namespace GeneticMIDI.Representation
             Guitar_Fret_Noise,Breath_Noise,Seashore,Bird_Tweet,Telephone_Ring,Helicopter,Applause,Gunshot_
 };
 
-    public class Track
+    public class Track : IPlayable
     {
         List<ISequence> sequences;
         public PatchNames Instrument{get; set;}
@@ -86,5 +86,10 @@ namespace GeneticMIDI.Representation
             return str;
         }
 
+
+        public PlaybackInfo GeneratePlayback()
+        {
+            return this.GeneratePlaybackInfo(0);
+        }
     }
 }

@@ -1,387 +1,203 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="MarkovChain.cs" company="(none)">
-//  Copyright © 2011 John Gietzen.
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
-// </copyright>
-// <author>John Gietzen</author>
-//-----------------------------------------------------------------------
+﻿using ProtoBuf;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Markov
+namespace MachineLearningTestEnvironment
 {
-    using ProtoBuf;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Security.Cryptography;
-
-    [ProtoContract]
     [Serializable]
-    /// <summary>
-    /// Builds and walks interconnected states based on a weighted probability.
-    /// </summary>
-    /// <typeparam name="T">The type of the constituent parts of each state in the Markov chain.</typeparam>
-    public class MarkovChain<T> where T : IEquatable<T>
+    [ProtoContract]
+    class MarkovChain<T> where T : IEquatable<T>
     {
+
         [ProtoMember(1)]
-        private readonly int order;
+        Dictionary<ChainState<T>, Dictionary<T, int>> frequencyTable;
+
 
         [ProtoMember(2)]
-        private readonly Dictionary<ChainState<T>, Dictionary<T, int>> items = new Dictionary<ChainState<T>, Dictionary<T, int>>();
-
-        [ProtoMember(3)]
-        private readonly Dictionary<ChainState<T>, int> terminals = new Dictionary<ChainState<T>, int>();
-
-        /// <summary>
-        /// Initializes a new instance of the MarkovChain class.
-        /// </summary>
-        /// <param name="order">Indicates the desired order of the <see cref="Markov.MarkovChain&lt;T&gt;"/>.</param>
-        /// <remarks>
-        /// <para>The <paramref name="order"/> of a generator indicates the depth of its internal state.  A generator
-        /// with an order of 1 will choose items based on the previous item, a generator with an order of 2
-        /// will choose items based on the previous 2 items, and so on.</para>
-        /// <para>Zero is not classically a valid order value, but it is allowed here.  Choosing a zero value has the
-        /// effect that every state is equivalent to the starting state, and so items will be chosen based on their
-        /// total frequency.</para>
-        /// </remarks>
-        public MarkovChain(int order)
-        {
-            if (order < 0)
-            {
-                throw new ArgumentOutOfRangeException("order");
-            }
-
-            this.order = order;
-        }
-
+        public int Order { get; private set; }
+     
         public MarkovChain()
         {
-            this.order = 1;
+            this.Order = 2;
+            this.frequencyTable = new Dictionary<ChainState<T>, Dictionary<T, int>>();
+        }
+   
+        public MarkovChain(int order)
+        {
+            this.Order = order; 
+            this.frequencyTable = new Dictionary<ChainState<T>, Dictionary<T, int>>();
         }
 
-        /// <summary>
-        /// Adds the items to the generator with a weight of one.
-        /// </summary>
-        /// <param name="items">The items to add to the generator.</param>
         public void Add(IEnumerable<T> items)
         {
-            this.Add(items, 1);
+            //int i = 0;
+
+            List<T> items_list = new List<T>();
+
+            foreach (var it in items)
+                items_list.Add(it);
+
+            T[] items_arr = items_list.ToArray();
+            for (int i = Order; i < items_arr.Length; i++ )
+            {
+     
+                T[] temp_arr = new T[Order];
+                for(int j = Order; j > 0; j--)
+                {
+                    temp_arr[Order-j] = items_arr[i - (j)];
+                    //key.Add(items_arr[i - (j)]);
+                }
+                ChainState<T> key = new ChainState<T>(temp_arr);
+
+                var next_item = items_arr[i];
+
+
+                if (frequencyTable.ContainsKey(key))
+                {
+                }
+                else
+                {
+                    frequencyTable[key] = new Dictionary<T, int>();
+                }
+                if (frequencyTable[key].ContainsKey(next_item))
+                {
+                    frequencyTable[key][next_item]++;
+                }
+                else
+                {
+                    frequencyTable[key][next_item] = 1;
+                }
+
+            }
+
         }
 
         /// <summary>
-        /// Adds the items to the generator with the weight specified.
+        /// Returns a random item according to the proportions
         /// </summary>
-        /// <param name="items">The items to add to the generator.</param>
-        /// <param name="weight">The weight at which to add the items.</param>
-        public void Add(IEnumerable<T> items, int weight)
+        /// <typeparam name="B"></typeparam>
+        /// <param name="items">Array of values</param>
+        /// <param name="proportions">Weight of each item</param>
+        /// <param name="rand">Uses own random if none is given</param>
+        /// <returns></returns>
+        public static B RouletteSelection<B>(B[] items, float[] proportions, Random rand=null)
         {
-            Queue<T> previous = new Queue<T>();
-            foreach (var item in items)
+     
+            if (items.Length != proportions.Length)
+                throw new Exception("WTP length mismatch");
+
+            float total_freq = 0;
+            foreach (var freq in proportions)
+                total_freq += freq;
+
+            // Cumulative probabilities
+            float[] probabilities_cum = new float[proportions.Length];
+            for (int i = 0; i < items.Length; i++ )
             {
-                var key = new ChainState<T>(previous);
+                float proportion = proportions[i] / total_freq;
 
-                this.Add(key, item, weight);
+                if (i == 0)
+                    probabilities_cum[i] = proportion;
+                else
+                    probabilities_cum[i] = probabilities_cum[i - 1] + proportion;
+            }
 
-                previous.Enqueue(item);
-                if (previous.Count > this.order)
+            float randomDouble = (float)(rand == null ? StaticRandom.NextDouble() : rand.NextDouble());
+            float random_prob = (float)(probabilities_cum[probabilities_cum.Length - 1] * randomDouble);
+            int index = Array.BinarySearch<float>(probabilities_cum, random_prob);
+            if (index < 0)
+                index = -(index + 1);
+            if (index == items.Length)
+                index = items.Length - 1;
+            return items[index];
+        }
+
+        public T[] Chain(int MAX_LENGTH = 100, int seed=0)
+        {
+            Random random = new Random(seed);
+
+            var keys = frequencyTable.Keys.ToArray();
+            var randomKey = keys[random.Next(0, keys.Length)];
+            return Chain(randomKey.GetItems(), MAX_LENGTH, seed);
+        }
+
+        public T[] Chain(T[] start, int MAX_LENGTH = 100, int seed=0)
+        {
+            
+            List<T> ze_items = new List<T>();
+            Queue<T> last_words = new Queue<T>();
+
+            int max_key_items = Order;
+            foreach (var item in start)
+            {
+                ze_items.Add(item);
+                if (max_key_items > 0)
                 {
-                    previous.Dequeue();
+                    last_words.Enqueue(item);
+                    max_key_items--;
                 }
             }
 
-            var terminalKey = new ChainState<T>(previous);
-            this.terminals[terminalKey] = this.terminals.ContainsKey(terminalKey)
-                ? weight + this.terminals[terminalKey]
-                : weight;
-        }
+            int iterations = 0;
 
-        /// <summary>
-        /// Adds the item to the generator, with the specified items preceding it.
-        /// </summary>
-        /// <param name="previous">The items preceding the item.</param>
-        /// <param name="item">The item to add.</param>
-        /// <remarks>
-        /// See <see cref="Markov.MarkovChain&lt;T&gt;.Add(IEnumerable&lt;T&gt;, T, int)"/> for remarks.
-        /// </remarks>
-        public void Add(IEnumerable<T> previous, T item)
-        {
-            var state = new Queue<T>(previous);
-            while (state.Count > this.order)
+            Random random = new Random(seed);
+
+            while (iterations < MAX_LENGTH)
             {
-                state.Dequeue();
-            }
 
-            this.Add(new ChainState<T>(state), item, 1);
-        }
+                ChainState<T> item_key = new ChainState<T>(last_words);
 
-        /// <summary>
-        /// Adds the item to the generator, with the specified state preceding it.
-        /// </summary>
-        /// <param name="state">The state preceding the item.</param>
-        /// <param name="next">The item to add.</param>
-        /// <remarks>
-        /// See <see cref="Markov.MarkovChain&lt;T&gt;.Add(ChainState&lt;T&gt;, T, int)"/> for remarks.
-        /// </remarks>
-        public void Add(ChainState<T> state, T next)
-        {
-            this.Add(state, next, 1);
-        }
+                if (!frequencyTable.ContainsKey(item_key))
+                    break;
 
-        /// <summary>
-        /// Adds the item to the generator, with the specified items preceding it and the specified weight.
-        /// </summary>
-        /// <param name="previous">The items preceding the item.</param>
-        /// <param name="item">The item to add.</param>
-        /// <param name="weight">The weight of the item to add.</param>
-        /// <remarks>
-        /// This method does not add all of the preceding states to the generator.
-        /// Notably, the empty state is not added, unless the <paramref name="previous"/> parameter is empty.
-        /// </remarks>
-        public void Add(IEnumerable<T> previous, T item, int weight)
-        {
-            var state = new Queue<T>(previous);
-            while (state.Count > this.order)
-            {
-                state.Dequeue();
-            }
+                T[] words_arr = frequencyTable[item_key].Keys.ToArray();
 
-            this.Add(new ChainState<T>(state), item, weight);
-        }
+                float[] frequencies = new float[words_arr.Length];
 
-        /// <summary>
-        /// Adds the item to the generator, with the specified state preceding it and the specified weight.
-        /// </summary>
-        /// <param name="state">The state preceding the item.</param>
-        /// <param name="next">The item to add.</param>
-        /// <param name="weight">The weight of the item to add.</param>
-        /// <remarks>
-        /// This adds the state as-is.  The state may not be reachable if, for example, the
-        /// number of items in the state is greater than the order of the generator, or if the
-        /// combination of items is not available in the other states of the generator.
-        /// </remarks>
-        public void Add(ChainState<T> state, T next, int weight)
-        {
-            Dictionary<T, int> weights;
-            if (!this.items.TryGetValue(state, out weights))
-            {
-                weights = new Dictionary<T, int>();
-                this.items.Add(state, weights);
-            }
-
-            weights[next] = weights.ContainsKey(next)
-                ? weight + weights[next]
-                : weight;
-        }
-
-        /// <summary>
-        /// Gets the items from the generator that follow from an empty state.
-        /// </summary>
-        /// <returns>A dictionary of the items and their weight.</returns>
-        public Dictionary<T, int> GetInitialStates()
-        {
-            var startState = new ChainState<T>(Enumerable.Empty<T>());
-
-            Dictionary<T, int> weights;
-            if (this.items.TryGetValue(startState, out weights))
-            {
-                return new Dictionary<T, int>(weights);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the items from the generator that follow from the specified items preceding it.
-        /// </summary>
-        /// <param name="previous">The items preceding the items of interest.</param>
-        /// <returns>A dictionary of the items and their weight.</returns>
-        public Dictionary<T, int> GetNextStates(IEnumerable<T> previous)
-        {
-            var state = new Queue<T>(previous);
-            while (state.Count > this.order)
-            {
-                state.Dequeue();
-            }
-
-            return this.GetNextStates(new ChainState<T>(state));
-        }
-
-        /// <summary>
-        /// Gets the items from the generator that follow from the specified state preceding it.
-        /// </summary>
-        /// <param name="state">The state preceding the items of interest.</param>
-        /// <returns>A dictionary of the items and their weight.</returns>
-        public Dictionary<T, int> GetNextStates(ChainState<T> state)
-        {
-            Dictionary<T, int> weights;
-            if (this.items.TryGetValue(state, out weights))
-            {
-                return new Dictionary<T, int>(weights);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain()
-        {
-            return this.Chain(Enumerable.Empty<T>(), new RandomWrapper(new Random()));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        public IEnumerable<T> Chain(IEnumerable<T> previous)
-        {
-            return this.Chain(previous, new RandomWrapper(new Random()));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="seed">The seed for the random number generator, used as the random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain(int seed)
-        {
-            return this.Chain(Enumerable.Empty<T>(), new RandomWrapper(new Random(seed)));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <param name="seed">The seed for the random number generator, used as the random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        public IEnumerable<T> Chain(IEnumerable<T> previous, int seed)
-        {
-            return this.Chain(previous, new RandomWrapper(new Random(seed)));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain(Random rand)
-        {
-            return this.Chain(Enumerable.Empty<T>(), new RandomWrapper(rand));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        public IEnumerable<T> Chain(IEnumerable<T> previous, Random rand)
-        {
-            return this.Chain(previous, new RandomWrapper(rand));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain(RandomNumberGenerator rand)
-        {
-            return this.Chain(Enumerable.Empty<T>(), new RandomNumberGeneratorWrapper(rand));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        public IEnumerable<T> Chain(IEnumerable<T> previous, RandomNumberGenerator rand)
-        {
-            return this.Chain(previous, new RandomNumberGeneratorWrapper(rand));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain(IRandom rand)
-        {
-            return this.Chain(Enumerable.Empty<T>(), rand);
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        public IEnumerable<T> Chain(IEnumerable<T> previous, IRandom rand)
-        {
-            Queue<T> state = new Queue<T>(previous);
-            while (true)
-            {
-                while (state.Count > this.order)
+                int k = 0;
+                foreach (var next_word in words_arr)
                 {
-                    state.Dequeue();
+                    frequencies[k++] = frequencyTable[item_key][next_word];
                 }
 
-                var key = new ChainState<T>(state);
+                T next_word_ = RouletteSelection<T>(words_arr, frequencies, random);
+                ze_items.Add(next_word_);
 
-                Dictionary<T, int> weights;
-                if (!this.items.TryGetValue(key, out weights))
-                {
-                    yield break;
-                }
+                last_words.Dequeue();
+                last_words.Enqueue(next_word_);
 
-                int terminalWeight;
-                this.terminals.TryGetValue(key, out terminalWeight);
-
-                var total = weights.Sum(w => w.Value);
-                var value = rand.Next(total + terminalWeight) + 1;
-
-                if (value > total)
-                {
-                    yield break;
-                }
-
-                var currentWeight = 0;
-                foreach (var nextItem in weights)
-                {
-                    currentWeight += nextItem.Value;
-                    if (currentWeight >= value)
-                    {
-                        yield return nextItem.Key;
-                        state.Enqueue(nextItem.Key);
-                        break;
-                    }
-                }
+                iterations++;
             }
+            
+            return ze_items.ToArray();
         }
     }
 }
+
+
+/*Complete start
+i<1000
+--
+His
+Time 5142
+Length 147110
+
+Mine
+Time 2871
+Length 201000
+
+--
+Declaration done
+i<10000
+--
+His
+Time  10075
+Length 5 075 135
+
+Mine
+Time 10054
+Length 2 210 000
+*/
