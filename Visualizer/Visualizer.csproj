@@ -78,6 +78,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CompositionPreview.xaml.cs">
+      <DependentUpon>CompositionPreview.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MetricWindow.xaml.cs">
+      <DependentUpon>MetricWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TrackGenerator..xaml.cs">
+      <DependentUpon>TrackGenerator..xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TrackSelector.xaml.cs">
+      <DependentUpon>TrackSelector.xaml</DependentUpon>
+    </Compile>
+    <Page Include="CompositionPreview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -90,6 +106,18 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MetricWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TrackGenerator..xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TrackSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MusicPlayer.cs" />
@@ -156,6 +184,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\glyphicons-445-floppy-saved.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\glyphicons-433-plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\glyphicons-281-settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\glyphicons-208-remove-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\glyphicons-200-ban.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

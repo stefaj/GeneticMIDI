@@ -1,4 +1,5 @@
 ﻿using GeneticMIDI.Representation;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,18 +28,30 @@ namespace GeneticMIDI.Representation
             Guitar_Fret_Noise,Breath_Noise,Seashore,Bird_Tweet,Telephone_Ring,Helicopter,Applause,Gunshot_
 };
 
+    [Serializable]
+    [ProtoContract]
     public class Track : IPlayable
     {
+        [ProtoMember(1)]
         List<ISequence> sequences;
+
+        [ProtoMember(2)]
         public PatchNames Instrument{get; set;}
 
+        [ProtoMember(3)]
         public byte Channel { get; set; }
 
         public int Length { get { return sequences.Count; } }
 
+        [ProtoMember(4)]
         public int Duration { get; private set; }
 
         public IEnumerable<ISequence> Sequences { get { return sequences; } }
+
+        public Track()
+        {
+            sequences = new List<ISequence>();
+        }
 
         public Track(PatchNames instrument, byte channel)
         {

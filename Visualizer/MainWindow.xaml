@@ -12,7 +12,6 @@
                     <Button x:Name="playBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="427,0,425,10" Click="Button_Click_1">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-174-play.png"></Image>
                     </Button>
-                    <RadioButton x:Name="playCompRad" Content="Composed Piece" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="playCompRad_Checked" IsChecked="True"/>
                     <Slider x:Name="progressSongSlider" Margin="10,0,10,68" VerticalAlignment="Bottom" Thumb.DragCompleted ="Slider_DragCompleted"></Slider>
                     <Button x:Name="stopBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="374,0,478,10" Click="Button_Click_2">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-176-stop.png"></Image>
@@ -34,95 +33,21 @@
             </TabItem>
             <TabItem Header="Generate">
                 <Grid>
-                    <Label Content="Procedure" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="procedureCombo" HorizontalAlignment="Left" Margin="91,10,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="3" SelectionChanged="procedureCombo_SelectionChanged">
-                        <ComboBoxItem>Markov Chain</ComboBoxItem>
-                        <ComboBoxItem>Genetic Melody</ComboBoxItem>
-                        <ComboBoxItem>Random Composition</ComboBoxItem>
-                        <ComboBoxItem>Instrumental Composition</ComboBoxItem>
-                    </ComboBox>
-                    <TabControl x:Name="optionsTab" HorizontalAlignment="Right" Margin="0,41,10,10" Width="429" SelectedIndex="1">
-                        <TabItem x:Name="tabMC" Header="MC" FontSize="8" Controls:ControlsHelper.HeaderFontSize="18">
-                            <Grid/>
-                        </TabItem>
-                        <TabItem x:Name="tabGA" Header="GA" Controls:ControlsHelper.HeaderFontSize="18">
-                            <Grid>
-                                <Label Content="Metrics:" HorizontalAlignment="Left" Margin="10,42,0,0" VerticalAlignment="Top"/>
-                                <CheckBox x:Name="metricChromaticTone" Content="Chromatic Tone" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top" IsChecked="True"/>
-                                <CheckBox x:Name="metricChromaticToneDistance" Content="Chromatic Tone Distance" HorizontalAlignment="Left" Margin="202,73,0,0" VerticalAlignment="Top"/>
-                                <CheckBox x:Name="metricChromaticToneDuration" Content="Chromatic Tone Duration" HorizontalAlignment="Left" Margin="10,96,0,0" VerticalAlignment="Top"/>
-                                <CheckBox x:Name="metricMelodicBigram" Content="Melodic Bigram" HorizontalAlignment="Left" Margin="202,96,0,0" VerticalAlignment="Top"/>
-                                <CheckBox x:Name="metricMelodicInterval" Content="Melodic Interval" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top"/>
-                                <CheckBox x:Name="metricPitch" Content="Pitch" HorizontalAlignment="Left" Margin="202,119,0,0" VerticalAlignment="Top"/>
-                                <CheckBox x:Name="metricPitchDistance" Content="Pitch Distance" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top"/>
-                                <CheckBox x:Name="metricRhythm" Content="Rhythm" HorizontalAlignment="Left" Margin="202,142,0,0" VerticalAlignment="Top"/>
-                                <CheckBox x:Name="metricRhythmicBigram" Content="Rhymthic Bigram" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top"/>
-                                <CheckBox x:Name="metricRhythmicInterval" Content="Rhythmic Interval" HorizontalAlignment="Left" Margin="202,165,0,0" VerticalAlignment="Top"/>
-                                <ComboBox x:Name="fitnessFuncCombo" HorizontalAlignment="Left" Margin="132,10,0,0" VerticalAlignment="Top" Width="196" SelectedIndex="0">
-                                    <ComboBoxItem>Cosine Similarity</ComboBoxItem>
-                                    <ComboBoxItem>Euclidian Similarity</ComboBoxItem>
-                                    <ComboBoxItem>Pearson Correlation</ComboBoxItem>
-                                    <ComboBoxItem>Cross Correlation</ComboBoxItem>
-                                    <ComboBoxItem>Normalized Compression Distance</ComboBoxItem>
-                                </ComboBox>
-                                <Label Content="Fitness Function&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26"/>
-                                <oxy:PlotView x:Name="fitnessPlot" Margin="10,0,10,16" Height="209" VerticalAlignment="Bottom"/>
-                                <Label Content="Average Fitness" HorizontalAlignment="Left" Margin="10,0,0,230" VerticalAlignment="Bottom" Height="26"/>
-                                <Label Content="Maximum Iterations" HorizontalAlignment="Left" Margin="10,250,0,0" VerticalAlignment="Top"/>
-                                <Slider x:Name="maxGenerationSlider" HorizontalAlignment="Left" Margin="15,281,0,0" VerticalAlignment="Top" Width="290" Minimum="500" Maximum="12000" Value="2000"/>
-                            </Grid>
-                        </TabItem>
-                        <TabItem x:Name="tabComp" Header="Comp" Controls:ControlsHelper.HeaderFontSize="18">
-                        </TabItem>
-                        <TabItem x:Name="tabInstru" Header="Instrumental" Controls:ControlsHelper.HeaderFontSize="18">
-                            <Grid>
-                                <ListBox x:Name="activeInstrBox" Margin="10,34,262,319" BorderThickness="1" MouseDoubleClick="activeInstrBox_MouseDoubleClick"/>
-                                <Label Content="Active Instruments" Margin="10,0,295,524"/>
-                                <ListBox x:Name="availableInstrBox" Margin="262,34,10,319" BorderThickness="1" SelectionChanged="availableInstrBox_SelectionChanged" MouseDoubleClick="availableInstrBox_MouseDoubleClick"/>
-                                <Label Content="Available instruments" Margin="262,0,36,524"/>
-                                <Button Content="Random" HorizontalAlignment="Left" Margin="10,0,0,278" VerticalAlignment="Bottom" Width="75"/>
-                            </Grid>
-                        </TabItem>
-
-                    </TabControl>
-                    <Label Content="Options" HorizontalAlignment="Right" Margin="0,10,387,0" VerticalAlignment="Top"/>
                     <Button  HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="48" Height="48" Click="Button_Click">
-                        <Image Width="16" Height="16" Source="Resources/Cogwheel_32.png"></Image>
+                        <Image Width="16" Height="16" Source="Resources/glyphicons-433-plus.png"></Image>
                     </Button>
-                    <ComboBox x:Name="guideCombo" HorizontalAlignment="Left" Margin="91,41,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="2" SelectionChanged="guideCombo_SelectionChanged">
+                    <Button x:Name="clearBtn"  HorizontalAlignment="Left" Margin="63,0,0,10" VerticalAlignment="Bottom" Width="48" Height="48" Click="clearBtn_Click">
+                        <Image Width="16" Height="16" Source="Resources/glyphicons-200-ban.png"></Image>
+                    </Button>
+                    <ComboBox x:Name="guideCombo" HorizontalAlignment="Left" Margin="89,10,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="2" SelectionChanged="guideCombo_SelectionChanged">
 
                     </ComboBox>
-                    <Label Content="Guide" HorizontalAlignment="Left" Margin="10,44,0,0" VerticalAlignment="Top"/>
-                    <ProgressBar x:Name="progressGenSlider" HorizontalAlignment="Left" Margin="63,0,0,21" VerticalAlignment="Bottom" Width="201" Height="24">
-
-                    </ProgressBar>
+                    <Label Content="Guide" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top"/>
+                    <ListBox x:Name="itemsBox" Margin="10,60,10,73"/>
                 </Grid>
 
             </TabItem>
-            <TabItem Header="Metrics">
-                <Grid>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,32,0,0">
-                        <StackPanel Width="300">
-                            <oxy:PlotView x:Name="metricPlot1" Height="200"/>
-                            <oxy:PlotView x:Name="metricPlot2" Height="200"/>
-                            <oxy:PlotView x:Name="metricPlot3" Height="200"/>
-                        </StackPanel>
-                        <StackPanel Width="300">
-                            <oxy:PlotView x:Name="metricPlot4" Height="200"/>
-                            <oxy:PlotView x:Name="metricPlot5" Height="200"/>
-                            <oxy:PlotView x:Name="metricPlot6" Height="200"/>
-                        </StackPanel>
-                        <StackPanel Width="300">
-                            <oxy:PlotView x:Name="metricPlot7" Height="200"/>
-                            <oxy:PlotView x:Name="metricPlot8" Height="200"/>
-                            <oxy:PlotView x:Name="metricPlot9" Height="200"/>
-                        </StackPanel>
-                    </StackPanel>
-                    <RadioButton Content="Guide" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked"/>
-                    <RadioButton Content="Composed piece" HorizontalAlignment="Left" Margin="91,0,0,0" VerticalAlignment="Top" Checked="RadioButton_Checked_1"/>
-                </Grid>
-            </TabItem>
         </TabControl>
 
     </Grid>

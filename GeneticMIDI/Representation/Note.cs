@@ -110,6 +110,13 @@ namespace GeneticMIDI.Representation
             return (int)((double)delta_ticks_qn * (double)note_length / (int)Durations.qn / (60 / tempo));
         }
 
+        public bool IsRest()
+        {
+            if (this.Pitch == -1 || this.Velocity < 0)
+                return true;
+            return false;
+        }
+
 
         private static readonly string[] NoteNames = new string[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 

@@ -78,6 +78,16 @@
     <Reference Include="AForge.Neuro">
       <HintPath>..\packages\AForge.Neuro.2.2.5\lib\AForge.Neuro.dll</HintPath>
     </Reference>
+    <Reference Include="IKVM.OpenJDK.Core">
+      <HintPath>..\..\..\..\..\Downloads\ikvmbin-7.2.4630.5\ikvm-7.2.4630.5\bin\IKVM.OpenJDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.Runtime, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\IKVM.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="jannlab-0.10-alpha">
+      <HintPath>..\..\..\..\..\Downloads\ikvmbin-7.2.4630.5\ikvm-7.2.4630.5\bin\jannlab-0.10-alpha.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro">
       <HintPath>..\packages\MahApps.Metro.1.0.0.0\lib\net45\MahApps.Metro.dll</HintPath>
     </Reference>
@@ -122,19 +132,21 @@
     <Compile Include="FitnessFunctions\CrossCorrelation.cs" />
     <Compile Include="Generators\CompositionGenerator\CompositionGenerator.cs" />
     <Compile Include="Generators\CompositionGenerator\InstrumentalGenerator.cs" />
-    <Compile Include="Generators\CompositionGenerator\InstrumentalGenerator2.cs" />
     <Compile Include="Generators\Harmony\SimpleChord.cs" />
+    <Compile Include="Generators\Sequence\AccompanimentGenerator.cs" />
     <Compile Include="Markov\ChainState.cs" />
     <Compile Include="Markov\MarkovChain.cs" />
     <Compile Include="Markov\StaticRandom.cs" />
+    <Compile Include="Representation\CompositionCategory.cs" />
+    <Compile Include="Representation\Databank.cs" />
     <Compile Include="Representation\IPlayable.cs" />
     <Compile Include="Generators\INoteGenerator.cs" />
     <Compile Include="Generators\IPlaybackGenerator.cs" />
-    <Compile Include="Generators\Note\GeneticGenerator.cs" />
+    <Compile Include="Generators\Sequence\GeneticGenerator.cs" />
     <Compile Include="FitnessFunctions\NCD.cs" />
-    <Compile Include="Generators\Note\MarkovChainGenerator.cs" />
+    <Compile Include="Generators\Sequence\MarkovChainGenerator.cs" />
     <Compile Include="Generators\StochasticGenerator.cs" />
-    <Compile Include="Generators\Note\MarkovGenerator.cs" />
+    <Compile Include="Generators\Sequence\MarkovGenerator.cs" />
     <Compile Include="Genetic\GPCustomTree.cs" />
     <Compile Include="Genetic\GPCustomTreeNode.cs" />
     <Compile Include="Generators\ICompositionGenerator.cs" />

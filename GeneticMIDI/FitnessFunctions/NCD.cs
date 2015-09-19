@@ -17,46 +17,61 @@ namespace GeneticMIDI.FitnessFunctions
     {
         string[] songs;
         public static int MaxTracks = 0;
+
+        static string GetSavePath(CompositionCategory category)
+        {
+
+           return "save/" + category.CategoryName + "/ncdm.dat";
+
+        }
         
-        public static NCD FromMelodies(string path)
+        public static NCD FromMelodies(CompositionCategory category)
         {
             NCD ncd = new NCD();
-            MelodySequence[] seqs = Utils.LoadMelodySequencesFromDirectory(path);
 
-            string savepath = path + Path.DirectorySeparatorChar +  "ncdm_" + ".dat";
-            if(File.Exists(savepath))
+
+   
+
+            string savepath = GetSavePath(category);
+            if (File.Exists(savepath))
             {
-                ncd.Deserialize(savepath);
-                return ncd;
+                //ncd.Deserialize(savepath);
+               // return ncd;
             }
+
+            MelodySequence[] seqs = new MelodySequence[category.Compositions.Length];
+            for (int i = 0; i < category.Compositions.Length; i++)
+                seqs[i] = category.Compositions[i].GetLongestTrack().GetMainSequence() as MelodySequence;
 
 
             ncd.songs = new string[seqs.Count()];
             
-            int i = 0;
             int j = 0;
             foreach (MelodySequence m in seqs)
             {
-                ncd.songs[i++] = m.ToString();
+                ncd.songs[j++] = m.ToString();
             }
 
+            string root = System.IO.Path.GetDirectoryName(savepath);
+            if (!System.IO.Directory.Exists(root))
+                System.IO.Directory.CreateDirectory(root);
             ncd.Serialize(savepath);
 
             return ncd;
         }
 
-        public static NCD FromCompositions(string path)
+        public static NCD FromCompositions(CompositionCategory category)
         {
             NCD ncd = new NCD();
 
-            string savepath = path + Path.DirectorySeparatorChar + "ncdc" + ".dat";
+            string savepath = GetSavePath(category);
             if (File.Exists(savepath))
             {
                 ncd.Deserialize(savepath);
                 return ncd;
             }
 
-            Composition[] seqs = Utils.LoadCompositionsFromDirectory(path);
+            Composition[] seqs = category.Compositions;
 
             ncd.songs = new string[seqs.Count()];
 
@@ -78,6 +93,9 @@ namespace GeneticMIDI.FitnessFunctions
                 ncd.songs[i++] = c.ToString();
             }
 
+            string root = System.IO.Path.GetDirectoryName(savepath);
+            if (!System.IO.Directory.Exists(root))
+                System.IO.Directory.CreateDirectory(root);
             ncd.Serialize(savepath);
 
             return ncd;

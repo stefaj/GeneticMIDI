@@ -1,0 +1,27 @@
+﻿<Controls:MetroWindow x:Class="Visualizer.MetricWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls" 
+        xmlns:oxy="http://oxyplot.org/wpf"
+        Title="MetricWindow" Height="711" Width="912"
+                      ResizeMode="NoResize">
+    <Grid>
+        <StackPanel Orientation="Horizontal" Margin="0,32,0,0">
+            <StackPanel Width="300">
+                <oxy:PlotView x:Name="metricPlot1" Height="200"/>
+                <oxy:PlotView x:Name="metricPlot2" Height="200"/>
+                <oxy:PlotView x:Name="metricPlot3" Height="200"/>
+            </StackPanel>
+            <StackPanel Width="300">
+                <oxy:PlotView x:Name="metricPlot4" Height="200"/>
+                <oxy:PlotView x:Name="metricPlot5" Height="200"/>
+                <oxy:PlotView x:Name="metricPlot6" Height="200"/>
+            </StackPanel>
+            <StackPanel Width="300">
+                <oxy:PlotView x:Name="metricPlot7" Height="200"/>
+                <oxy:PlotView x:Name="metricPlot8" Height="200"/>
+                <oxy:PlotView x:Name="metricPlot9" Height="200"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Controls:MetroWindow>

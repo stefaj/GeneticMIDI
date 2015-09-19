@@ -1,0 +1,83 @@
+﻿<Custom:MetroWindow
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Custom="http://metro.mahapps.com/winfx/xaml/controls" xmlns:oxy="http://oxyplot.org/wpf" x:Class="Visualizer.TrackGenerator"
+        Title="TrackGenerator" Height="719" Width="588">
+    <Grid>
+
+        <TabControl x:Name="optionsTab" Margin="10,10,10,124" SelectedIndex="1" BorderThickness="1">
+            <TabItem x:Name="tabGA" Header="Genetic" Custom:ControlsHelper.HeaderFontSize="16">
+                <Grid Margin="0,0,18,12">
+                    <Label Content="Metrics:" HorizontalAlignment="Left" Margin="10,42,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricChromaticTone" Content="Chromatic Tone" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top" IsChecked="True"/>
+                    <CheckBox x:Name="metricChromaticToneDistance" Content="Chromatic Tone Distance" HorizontalAlignment="Left" Margin="202,73,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricChromaticToneDuration" Content="Chromatic Tone Duration" HorizontalAlignment="Left" Margin="10,96,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricMelodicBigram" Content="Melodic Bigram" HorizontalAlignment="Left" Margin="202,96,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricMelodicInterval" Content="Melodic Interval" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricPitch" Content="Pitch" HorizontalAlignment="Left" Margin="202,119,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricPitchDistance" Content="Pitch Distance" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricRhythm" Content="Rhythm" HorizontalAlignment="Left" Margin="202,142,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricRhythmicBigram" Content="Rhymthic Bigram" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricRhythmicInterval" Content="Rhythmic Interval" HorizontalAlignment="Left" Margin="202,165,0,0" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="fitnessFuncCombo" HorizontalAlignment="Left" Margin="132,10,0,0" VerticalAlignment="Top" Width="196" SelectedIndex="0">
+                        <ComboBoxItem Content="Cosine Similarity"/>
+                        <ComboBoxItem Content="Euclidian Similarity"/>
+                        <ComboBoxItem Content="Pearson Correlation"/>
+                        <ComboBoxItem Content="Cross Correlation"/>
+                        <ComboBoxItem Content="Normalized Compression Distance"/>
+                    </ComboBox>
+                    <Label Content="Fitness Function&#xA;" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26"/>
+                    <Label Content="Average Fitness" HorizontalAlignment="Left" Margin="10,191,0,0" VerticalAlignment="Top" Height="26"/>
+                    <Label Content="Maximum Iterations" HorizontalAlignment="Left" Margin="10,250,0,0" VerticalAlignment="Top"/>
+                    <Slider x:Name="maxGenerationSlider" HorizontalAlignment="Left" Margin="15,281,0,0" VerticalAlignment="Top" Width="290" Minimum="500" Maximum="12000" Value="2000"/>
+
+                    <oxy:PlotView x:Name="fitnessPlot" Margin="10,333,220,0" Height="122" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="tabInstru" Header="Instrumental" Custom:ControlsHelper.HeaderFontSize="16">
+                <Grid>
+                    <Label Content="Active Instruments" Margin="10,0,295,524"/>
+                    <Label Content="Available instruments" Margin="262,0,36,524"/>
+                    <Button Content="Random" HorizontalAlignment="Left" Margin="262,40,0,0" VerticalAlignment="Top" Width="75"/>
+                    <Label Content="Instrument" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" Width="84"/>
+                    <ComboBox x:Name="instrBox" HorizontalAlignment="Left" Margin="99,40,0,0" VerticalAlignment="Top" Width="150"/>
+                    <Button Content="Populate" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Width="73" Click="Button_Click_2"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="tabAccomp" Header="Accompaniment" Custom:ControlsHelper.HeaderFontSize="16" Margin="4,0,-4,0">
+                <Grid>
+                    <ComboBox x:Name="accompTrackBox" Margin="80,10,247,0" Height="26" VerticalAlignment="Top"/>
+                    <Label Content="Track" Margin="0,10,412,0" Height="28" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="accompInstruBox" Margin="80,43,247,0" Height="26" VerticalAlignment="Top"/>
+                    <Label Content="Instrument" Margin="0,43,412,0" Height="28" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="tabLoad" Header="Load" Custom:ControlsHelper.HeaderFontSize="16">
+                <Button Margin="196,0,195,4" VerticalAlignment="Bottom" Height="48" Click="Button_Click_3" >
+                    <Button.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform Angle="1.129"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Button.RenderTransform>
+                    <Image Width="16" Height="16" Source="Resources/glyphicons-145-folder-open.png"></Image>
+                </Button>
+            </TabItem>
+            <TabItem x:Name="tabRandom" Header="Random" Custom:ControlsHelper.HeaderFontSize="16">
+            </TabItem>
+
+
+
+        </TabControl>
+        <Button x:Name="btnClose" Content="Add" HorizontalAlignment="Right" Margin="0,0,90,21" VerticalAlignment="Bottom" Width="75" Click="btnClose_Click" />
+        <Button Content="Close" HorizontalAlignment="Right" Margin="0,0,10,21" VerticalAlignment="Bottom" Width="75" Click="Button_Click_1"/>
+        <Button  HorizontalAlignment="Left" Margin="13,0,0,11" VerticalAlignment="Bottom" Width="48" Height="48" Click="Button_Click">
+            <Image Width="16" Height="16" Source="Resources/Cogwheel_32.png"/>
+        </Button>
+        <ProgressBar x:Name="progressGenSlider" HorizontalAlignment="Left" Margin="66,0,0,22" VerticalAlignment="Bottom" Width="201" Height="24"/>
+        <Custom:ProgressRing x:Name="progressRing" IsActive="True" Margin="13,0,0,64" VerticalAlignment="Bottom" HorizontalAlignment="Left" />
+
+    </Grid>
+</Custom:MetroWindow>

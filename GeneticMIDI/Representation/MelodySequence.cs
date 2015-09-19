@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +7,14 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Representation
 {
+    [ProtoContract]
+    [Serializable]
     public class MelodySequence : ISequence, ICloneable, IPlayable
     {
+        [ProtoMember(1)]
         List<Note> sequence;
 
+        [ProtoMember(2)]
         public int Duration { get; private set; }
 
         public float RealDuration
@@ -78,6 +83,37 @@ namespace GeneticMIDI.Representation
             Duration += n.Duration;
         }
 
+        /// <summary>
+        /// Returns the total duration of all non silent notes
+        /// </summary>
+        /// <returns></returns>
+        public int TotalNoteDuration()
+        {
+            int sum = 0;
+            foreach(var n in sequence)
+            {
+                if (!n.IsRest())
+                    sum += n.Duration;
+            }
+            return sum;
+        }
+
+        /// <summary>
+        /// Returns the total duration of all rest notes
+        /// </summary>
+        /// <returns></returns>
+        public int TotalRestDuration()
+        {
+            int sum = 0;
+            foreach (var n in sequence)
+            {
+                if (n.IsRest())
+                    sum += n.Duration;
+            }
+            return sum;
+        }
+
+
         public void AddNotes(IEnumerable<Note> notes)
         {
             foreach (Note n in notes)
@@ -101,6 +137,12 @@ namespace GeneticMIDI.Representation
         {
             foreach (Note n in sequence)
                 n.Pitch+=ht;
+        }
+
+        public void ScaleVelocity(float scale)
+        {
+            foreach (Note n in sequence)
+                n.Velocity = (int)((float)n.Velocity * scale);
         }
 
         public string GetNoteStr()

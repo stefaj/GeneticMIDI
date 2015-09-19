@@ -49,10 +49,6 @@ namespace Visualizer
 
         Composition generated;
 
-        Composition loaded;
-
-        string guide;
-
         double prevTime = 0;
         double currentTime = 0;
 
@@ -62,13 +58,15 @@ namespace Visualizer
 
         NCD fitness = null;
 
+        Databank databank;
+
+        CompositionCategory selectedCategory;
+
         private Composition ActiveComposition
         {
             get
             {
-                if (playCompRad.IsChecked == true)
-                    return generated;
-                else return loaded;
+                return generated;
             }
         }
 
@@ -91,54 +89,19 @@ namespace Visualizer
             songUpdateTimer.Tick += songUpdateTimer_Tick;
             songUpdateTimer.Start();
 
-            SetupLinePlot(fitnessPlot, "Average Fitness");
         }
 
         void SetupCategories()
         {
-            StreamReader reader = new StreamReader("options.txt");
-            string dir = reader.ReadLine();
+            databank = new Databank(Visualizer.Properties.Settings.Default.LibraryPath);
+            foreach(var k in Databank.defaultPaths.Keys)
+            {
+                ComboBoxItem cb = new ComboBoxItem();
+                cb.Content = k;
+                cb.Tag = k;
+                guideCombo.Items.Add(cb);
+            }
 
-            ComboBoxItem classical = new ComboBoxItem();
-            classical.Content = "Classical";
-            classical.Tag = dir + @"\Classical\Mixed";
-
-            ComboBoxItem classicRock = new ComboBoxItem();
-            classicRock.Content = "Classic Rock";
-            classicRock.Tag = dir + @"\ClassicRock";
-
-            ComboBoxItem danceTechno = new ComboBoxItem();
-            danceTechno.Content = "Dance Techno";
-            danceTechno.Tag = dir + @"\Dance_Techno";
-
-            ComboBoxItem jazz = new ComboBoxItem();
-            jazz.Content = "Jazz";
-            jazz.Tag = dir + @"\Jazz";
-
-            ComboBoxItem pop = new ComboBoxItem();
-            pop.Content = "Pop";
-            pop.Tag = dir + @"\Pop_and_Top40";
-
-            ComboBoxItem videoGames = new ComboBoxItem();
-            videoGames.Content = "Video Games";
-            videoGames.Tag = dir + @"\Video_Games";
-
-            ComboBoxItem classicalPiano = new ComboBoxItem();
-            classicalPiano.Content = "Classical Piano";
-            classicalPiano.Tag = dir + @"\Classical Piano Midis";
-
-            ComboBoxItem test = new ComboBoxItem();
-            test.Content = "Test";
-            test.Tag = dir + @"\Test";
-            
-            guideCombo.Items.Add(classical);
-            guideCombo.Items.Add(classicRock);
-            guideCombo.Items.Add(danceTechno);
-            guideCombo.Items.Add(jazz);
-            guideCombo.Items.Add(pop);
-            guideCombo.Items.Add(videoGames);
-            guideCombo.Items.Add(classicalPiano);
-            guideCombo.Items.Add(test);
         }
 
         void setupMidiPlot()
@@ -194,21 +157,20 @@ namespace Visualizer
             songModel.Axes.Add(y_axes);
         }
 
-        void setupMidiPlotFull()
+        void setupTrackPlot(OxyPlot.Wpf.PlotView plot)
         {
-            var fullPlotModel = new PlotModel { };
+            var plotModel = new PlotModel { };
 
-            // this.songModel.Series.Add(new FunctionSeries(Math.Cos, 0, 10, 0.1, "Ellie(x)"));
-            this.midiPlotFull.Model = fullPlotModel;
+            plot.Model = plotModel;
 
             var songPointsFull = new List<ScatterPoint>();
 
             var songSeries = new ScatterSeries();
             songSeries.ItemsSource = songPointsFull;
-            songSeries.MarkerType = MarkerType.Diamond;
+            songSeries.MarkerType = MarkerType.Square;
             songSeries.MarkerSize = 0.1;
 
-            fullPlotModel.Series.Add(songSeries);
+            plotModel.Series.Add(songSeries);
 
             var x_axis = new OxyPlot.Axes.LinearAxis()
             {
@@ -230,12 +192,17 @@ namespace Visualizer
 
 
             };
-            midiPlotFull.ActualController.UnbindAll();
-            fullPlotModel.IsLegendVisible = false;
+            plot.ActualController.UnbindAll();
+            plotModel.IsLegendVisible = false;
 
 
-            fullPlotModel.Axes.Add(x_axis);
-            fullPlotModel.Axes.Add(y_axis);
+            plotModel.Axes.Add(x_axis);
+            plotModel.Axes.Add(y_axis);
+        }
+
+        void setupMidiPlotFull()
+        {
+            setupTrackPlot(this.midiPlotFull);
 
         }
 
@@ -401,29 +368,6 @@ namespace Visualizer
         {
         }
 
-        void GenerateMetrics(MelodySequence seq)
-        {
-            PlotMetric(metricPlot1, new ChromaticTone(), "Chromatic Tone", seq);
-            PlotMetric(metricPlot2, new ChromaticToneDistance(), "Chromatic Tone Distance", seq);
-            PlotMetric(metricPlot3, new ChromaticToneDuration(), "Chromatic Tone Duration", seq);
-            PlotMetric(metricPlot4, new MelodicBigram(), "Melodic Bigram", seq);
-            PlotMetric(metricPlot5, new MelodicInterval(), "Melodic Interval", seq);
-            PlotMetric(metricPlot6, new Pitch(), "Pitch", seq);
-            PlotMetric(metricPlot7, new Rhythm(), "Rhythm", seq);
-            PlotMetric(metricPlot8, new RhythmicBigram(), "Rhythmic Bigram", seq);
-            PlotMetric(metricPlot9, new RhythmicInterval(), "Rhythmic Interval", seq);
-
-            metricPlot1.InvalidatePlot(true);
-            metricPlot2.InvalidatePlot(true);
-            metricPlot3.InvalidatePlot(true);
-            metricPlot4.InvalidatePlot(true);
-            metricPlot5.InvalidatePlot(true);
-            metricPlot6.InvalidatePlot(true);
-            metricPlot7.InvalidatePlot(true);
-            metricPlot8.InvalidatePlot(true);
-            metricPlot9.InvalidatePlot(true);
-
-        }
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
@@ -431,308 +375,40 @@ namespace Visualizer
              //GenerateMetrics(seq);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            if(procedureCombo.SelectedIndex < 0)
-                return;
-            if(guideCombo.SelectedIndex < 0)
-                return;
-
-            progressGenSlider.Value = 0;
-            
-            guide = (guideCombo.SelectedItem as ComboBoxItem).Tag.ToString();
-
-            if(procedureCombo.SelectedIndex == 0)
-            {
-                //HMM
-
-                MelodySequence seq = Utils.GetRandomComposition(guide).GetLongestTrack().GetMainSequence() as MelodySequence;
-                MarkovChainGenerator gen = new MarkovChainGenerator();
-                gen.AddMelody(seq);
-                //gen.AddMelody("test/bach/bwv651.mid");
-
-                gen.OnPercentage += gen_OnPercentage;
-
-                lastGen = gen;
-                //gen.MaxGenerations = (int)maxGenerationSlider.Value*10;
-
-                new Thread(() =>
-                {
-                    var notes = gen.Generate();
-                    GeneticMIDI.Representation.Track track = new GeneticMIDI.Representation.Track(PatchNames.Acoustic_Grand, 1);
-                    var mel= notes;
-                    track.AddSequence(mel);
-                    generated = new Composition();
-                    generated.Add(track);
-
-                    progressGenSlider.Dispatcher.Invoke(() =>
-                        {
-                            progressGenSlider.Value = 100;
-                        });
-                }).Start();
-                
-            }
-            if(procedureCombo.SelectedIndex == 1)
-            {
-                
-                (fitnessPlot.Model.Series[0] as LineSeries).Points.Clear();
-                fitnessPlot.Model.Series[0].Unselect();
-                fitnessPlot.Model.Series.Clear();
-                SetupLinePlot(fitnessPlot, "Average Fitness");
-                fitnessPlot.ResetAllAxes();
-                fitnessPlot.InvalidatePlot();                
-
-                //GA    
-                IFitnessFunction fitness = null;
-
-                MelodySequence seq = Utils.GetRandomComposition(guide).GetLongestTrack().GetMainSequence() as MelodySequence;
-       
-                //Options
-                List<IMetric> activeMetrics = new List<IMetric>();
-                if (metricChromaticTone.IsChecked == true)
-                    activeMetrics.Add(new ChromaticTone());
-                if (metricChromaticToneDistance.IsChecked == true)
-                    activeMetrics.Add(new ChromaticToneDistance());
-                if (metricChromaticToneDuration.IsChecked == true)
-                    activeMetrics.Add(new ChromaticToneDuration());
-                if (metricMelodicBigram.IsChecked == true)
-                    activeMetrics.Add(new MelodicBigram());
-                if (metricMelodicInterval.IsChecked == true)
-                    activeMetrics.Add(new MelodicInterval());
-                if (metricPitch.IsChecked == true)
-                    activeMetrics.Add(new Pitch());
-                if (metricPitchDistance.IsChecked == true)
-                    activeMetrics.Add(new PitchDistance());
-                if (metricRhythm.IsChecked == true)
-                    activeMetrics.Add(new Rhythm());
-                if (metricRhythmicBigram.IsChecked == true)
-                    activeMetrics.Add(new RhythmicBigram());
-                if (metricRhythmicInterval.IsChecked == true)
-                    activeMetrics.Add(new RhythmicInterval());
-
-                if(fitnessFuncCombo.SelectedIndex == 0)
-                    fitness = new GeneticMIDI.FitnessFunctions.MetricSimilarity(seq, activeMetrics.ToArray(), GeneticMIDI.FitnessFunctions.SimilarityType.Cosine);
-                if (fitnessFuncCombo.SelectedIndex == 1)
-                    fitness = new GeneticMIDI.FitnessFunctions.MetricSimilarity(seq, activeMetrics.ToArray(), GeneticMIDI.FitnessFunctions.SimilarityType.Euclidian);
-                if (fitnessFuncCombo.SelectedIndex == 2)
-                    fitness = new GeneticMIDI.FitnessFunctions.MetricSimilarity(seq, activeMetrics.ToArray(), GeneticMIDI.FitnessFunctions.SimilarityType.Pearson);
-                if (fitnessFuncCombo.SelectedIndex == 3)
-                    fitness = new GeneticMIDI.FitnessFunctions.CrossCorrelation(seq);
-                if(fitnessFuncCombo.SelectedIndex == 4)
-                    fitness = GeneticMIDI.FitnessFunctions.NCD.FromMelodies(guide);
 
 
-                var gen = new GeneticGenerator(fitness, seq);
-                gen.OnPercentage += gen_OnPercentage;
 
-                gen.MaxGenerations = (int)maxGenerationSlider.Value;
-                lastGen = gen;
-
-                new Thread(() =>
-                    {
-                        var notes = gen.Generate();
-                        generated = new Composition();
-                        GeneticMIDI.Representation.Track track = new GeneticMIDI.Representation.Track(PatchNames.Acoustic_Grand, 1);
-                        
-                        var mel = notes;
-                        track.AddSequence(mel);
-                        generated.Add(track);
-                        progressGenSlider.Dispatcher.Invoke(() =>
-                        {
-                            progressGenSlider.Value = 100;
-                        });
-                    }).Start();
-            }
-            if(procedureCombo.SelectedIndex == 2)
-            {
-                CompositionGenerator gen = new CompositionGenerator(Utils.GetRandomComposition(guide));
-
-                lastGen = gen;
-               // gen.MaxGenerations = (int)maxGenerationSlider.Value*10;
-
-                new Thread(() =>
-                {
-                    generated = gen.Generate();
-                    progressGenSlider.Dispatcher.Invoke(() =>
-                    {
-                        progressGenSlider.Value = 100;
-                    });
-                }).Start();
-            }
-            if(procedureCombo.SelectedIndex == 3)
-            {
-                NCD.MaxTracks = 4;
-                fitness = NCD.FromCompositions(guide);
-
-                InstrumentalGenerator2 gen = null;
-                if (lastGen as InstrumentalGenerator2 == null)
-                {
-                    gen = new InstrumentalGenerator2(guide);
-                    gen.OnPercentage += gen_OnPercentage;
-                    lastGen = gen;
-                }
-                else
-                {
-                    gen = lastGen as InstrumentalGenerator2;
-                }
-
-
-                new Thread(() =>
-                {
-                    if (lastGen as InstrumentalGenerator2 != null)
-                    {
-                        var g = lastGen as InstrumentalGenerator2;
-                        if(g.IsInitialized)
-                        {
-                            List<PatchNames> instruments = new List<PatchNames>();
-                            activeInstrBox.Dispatcher.Invoke(() =>
-                                {
-                                    foreach(ListBoxItem i in activeInstrBox.Items)
-                                    {
-                                        instruments.Add((PatchNames)i.Tag);
-                                    }
-                                });
-
-                            if(instruments.Count > 0)
-                            {
-                                generated = gen.Generate(instruments);
-                            }
-                            else
-                            {
-                                generated = gen.GenerateComposition();
-                            }
-                        }
-                        else
-                        {
-                            gen.Initialize();
-                        }
-                    }
-                    else
-                    {
-                        gen.Initialize();
-                    }
-
-                    availableInstrBox.Dispatcher.Invoke(() =>
-                        {
-                            availableInstrBox.Items.Clear();
-                            foreach(var i in gen.Instruments)
-                            {
-                                ListBoxItem boxItem = new ListBoxItem();
-                                boxItem.Content = i.ToString();
-                                boxItem.Tag = i;
-                                availableInstrBox.Items.Add(boxItem);
-                            }
-                        });
-
-                    
-                    progressGenSlider.Dispatcher.Invoke(() =>
-                    {
-                        progressGenSlider.Value = 100;
-                    });
-                    midiPlotFull.Dispatcher.Invoke(() =>
-                        {
-                            if(generated != null)
-                                generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
-                        });
-                }).Start();
-
-            }
-        }
-
-        void gen_OnPercentage(object sender, int percentage, double fitness)
-        {
-            progressGenSlider.Dispatcher.Invoke(() =>
-                {
-                    progressGenSlider.Value += 1;
-                });
-
-            fitnessPlot.Dispatcher.Invoke(() =>
-                {
-                    ((fitnessPlot.Model.Series[0] as LineSeries).ItemsSource as List<DataPoint>).Add(new DataPoint(percentage, fitness));
-                    fitnessPlot.InvalidatePlot();
-                });
-        }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             player.Stop();
             // Play button
 
-           // if (comp == null)
-           //     return;
-            if (playCompRad.IsChecked == true)
-            {
-                if (generated == null)
-                    return;
-                currentTime = 0;
-                SongPoints.Clear();
-                prevTime = 0;
-                player.Play(generated);
-                generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
-            }
-            if (playCompRad.IsChecked == false)
-            {
-                if (loaded == null)
-                    return;
-                currentTime = 0;
-                SongPoints.Clear();
-                prevTime = 0;
-                player.Play(loaded);
-                generateSongPlotFull(midiPlotFull.Model, loaded.GeneratePlaybackInfo());
-            }
+            // if (comp == null)
+            //     return;
+
+            if (generated == null)
+                return;
+            currentTime = 0;
+            SongPoints.Clear();
+            prevTime = 0;
+            player.Play(generated);
+            generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
+
             songUpdateTimer.Stop();
             songUpdateTimer.Start();
 
-            
+
         }
 
         private void RadioButton_Checked_1(object sender, RoutedEventArgs e)
         {
-            if (generated == null)
-                return;
-            GenerateMetrics(generated.GetLongestTrack().GetMainSequence() as MelodySequence);
+
         }
 
         private void guideCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            guide = (guideCombo.SelectedItem as ComboBoxItem).Tag.ToString();
-        }
-
-        private void procedureCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (optionsTab == null)
-                return;
-            if (tabGA == null)
-                return;
-            foreach(TabItem tab in optionsTab.Items)
-            {
-                tab.Visibility = System.Windows.Visibility.Collapsed;
-                tab.IsEnabled = false;
-            }
-
-            /*                        <ComboBoxItem>Markov Chain</ComboBoxItem>
-                        <ComboBoxItem>Genetic Algorithm</ComboBoxItem>
-             * 
-                        <ComboBoxItem>Composition Test</ComboBoxItem>*/
-
-  
-            if (procedureCombo.SelectedIndex == 0)
-            {
-                tabMC.IsEnabled = true;
-                tabMC.Visibility = System.Windows.Visibility.Visible;
-            }
-            if (procedureCombo.SelectedIndex == 1)
-            {
-                tabGA.IsEnabled = true;
-                tabGA.Visibility = System.Windows.Visibility.Visible;
-            }
-            if (procedureCombo.SelectedIndex == 2)
-            {
-                tabGA.IsEnabled = true;
-                tabGA.Visibility = System.Windows.Visibility.Visible;
-            }
-            optionsTab.SelectedIndex = procedureCombo.SelectedIndex;
-
+            selectedCategory = databank.Load((guideCombo.SelectedItem as ComboBoxItem).Tag.ToString());
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
@@ -757,10 +433,8 @@ namespace Visualizer
             generated = new Composition();
 
             Composition best = generated;
-            float highest_fit = 0;
 
-            for (int i = 0; i < 2; i++)
-            {
+
                 var mel = lastGen.Next() as MelodySequence;
                 if (mel != null)
                 {
@@ -773,21 +447,10 @@ namespace Visualizer
                     generated = lastGen.Next() as Composition;
                 }
 
-                float fitn = fitness.ComputeFitness(generated);
-                if(fitn > highest_fit)
-                {
-                    best = generated;
-                    highest_fit = fitn;
-                }
-            }
-
-
-            fitnessLabelTest.Content = highest_fit;
            
 
             generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
 
-            playCompRad.IsChecked = true;
         }
 
         private void MetroWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -803,8 +466,7 @@ namespace Visualizer
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            playCompRad.IsChecked = false;
-
+  
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
             dlg.DefaultExt = ".mid";
@@ -815,8 +477,15 @@ namespace Visualizer
 
             if (result == true)
             {
-                loaded = Composition.LoadFromMIDI(dlg.FileName);
-                generateSongPlotFull(midiPlotFull.Model, loaded.GeneratePlaybackInfo());
+                generated = Composition.LoadFromMIDI(dlg.FileName);
+                generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
+                itemsBox.Items.Clear();
+
+                foreach(var track in generated.Tracks)
+                {
+                    
+                    AddTrackPlot(track.GetMainSequence() as MelodySequence, track.Instrument);
+                }
 
             }
 
@@ -845,28 +514,99 @@ namespace Visualizer
 
         private void availableInstrBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+   
+            
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            btn_Click(sender, e);
+        }
+
+        private void AddTrackPlot(MelodySequence seq, PatchNames instr)
+        {
+
+
+
+            /*<Grid Height="107">
+                                <oxy:Plot Margin="0,0,82,10"></oxy:Plot>
+                                <Button HorizontalAlignment="Right" Width="48" Height="48" Margin="0,32,0,0" VerticalAlignment="Top" Click="Button_Click_4">
+                                    <Image Width="16" Height="16" Source="Resources/glyphicons-208-remove-2.png"></Image>
+                                </Button>
+                            </Grid>*/
+            ListBoxItem listBoxItem = new ListBoxItem();
+            OxyPlot.Wpf.PlotView plotView = new OxyPlot.Wpf.PlotView();
+            plotView.Margin = new Thickness(0, 0, 82, 10);
+            Button btn = new Button(); btn.Width = 48; btn.Height = 48; btn.Margin = new Thickness(0, 32, 0, 0); btn.HorizontalAlignment = System.Windows.HorizontalAlignment.Right; btn.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            btn.Click += btn_Click;
+            setupTrackPlot(plotView);
+            generateSongPlotFull(plotView.Model, seq.GeneratePlaybackInfo(0));
+
+            Grid grid = new Grid();
+            grid.Height = 128;
+            grid.Children.Add(plotView); grid.Children.Add(btn);
+            listBoxItem.Content = grid;
+            listBoxItem.Tag = seq;
+            listBoxItem.MouseDoubleClick += listBoxItem_MouseDoubleClick;
+            btn.Tag = listBoxItem;
+
+            itemsBox.Items.Add(listBoxItem);
 
         }
 
-        private void availableInstrBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        void listBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var item = availableInstrBox.SelectedItem as ListBoxItem;
-            if(item == null)
-                return;
-            if (activeInstrBox.Items.Count >= 4)
-                return;
-            ListBoxItem newitem = new ListBoxItem();
-            newitem.Content = item.Content;
-            newitem.Tag = item.Tag;
-            activeInstrBox.Items.Add(newitem);
+            MelodySequence seq = (sender as ListBoxItem).Tag as MelodySequence;
+            if (seq != null)
+            {
+                MetricWindow metric = new MetricWindow(seq);
+                metric.Title = "Metrics " + seq.ToString();
+                metric.Show();
+            }
         }
 
-        private void activeInstrBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        void btn_Click(object sender, RoutedEventArgs e)
         {
-            var item = activeInstrBox.SelectedItem as ListBoxItem;
-            if (item == null)
-                return;
-            activeInstrBox.Items.Remove(item);
+            ListBoxItem item = (sender as Button).Tag as ListBoxItem;
+
+            try
+            {
+                int index = itemsBox.Items.IndexOf(item);
+                generated.Tracks.RemoveAt(index);
+            }
+            catch
+            {
+
+            }
+            itemsBox.Items.Remove(item);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            TrackGenerator g = new TrackGenerator(selectedCategory, generated);
+            g.ShowDialog();
+
+            if (g.GeneratedSequence != null)
+            {
+                AddTrackPlot(g.GeneratedSequence, g.Instrument);
+                if (generated == null)
+                    generated = new Composition();
+
+
+                byte channel = 1;
+                if (generated != null)
+                    channel = (byte)(generated.Tracks.Count + 1);
+                var track = new GeneticMIDI.Representation.Track(g.Instrument, channel);
+                track.AddSequence(g.GeneratedSequence);
+
+                generated.Tracks.Add(track);
+            }
+        }
+
+        private void clearBtn_Click(object sender, RoutedEventArgs e)
+        {
+            itemsBox.Items.Clear();
+            generated = new Composition();
         }
     }
 }

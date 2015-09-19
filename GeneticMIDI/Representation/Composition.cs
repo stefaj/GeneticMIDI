@@ -1,4 +1,5 @@
 ﻿using NAudio.Midi;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +8,20 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Representation
 {
+    [Serializable]
+    [ProtoContract]
     public class Composition : IPlayable
     {
+        [ProtoMember(1)]
         public List<Track> Tracks { get; private set; }
+
+        [ProtoMember(2)]
+        public string NameTag { get; private set; }
 
         public Composition()
         {
             this.Tracks = new List<Track>();
+            this.NameTag = "";
         }
 
         public void Add(Track track)
@@ -48,6 +56,8 @@ namespace GeneticMIDI.Representation
         public override string ToString()
         {
             string str = "";
+            if (NameTag != "")
+                str = NameTag + " ";
             for (int i = 0; i < Tracks.Count; i++ )
             {
                 str += "(" + Tracks[i].ToString() + ")";
@@ -112,7 +122,7 @@ namespace GeneticMIDI.Representation
                     comp.Tracks.Add(tracks[i]);
                 }
             }
-
+            comp.NameTag = System.IO.Path.GetFileNameWithoutExtension(filename);
             return comp;
         }
 

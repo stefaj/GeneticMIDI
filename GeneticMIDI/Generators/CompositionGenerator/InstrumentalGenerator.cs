@@ -1,4 +1,5 @@
 ﻿using GeneticMIDI.Representation;
+using MachineLearningTestEnvironment;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -11,25 +12,24 @@ namespace GeneticMIDI.Generators.CompositionGenerator
 {
     [Serializable]
     [ProtoContract]
-    public class InstrumentalGenerator : IPlaybackGenerator, ICompositionGenerator
+    public class InstrumentalGenerator : INoteGenerator
     {
-        const string SAVE_FILE = "instrumental.dat";
+        const string SAVE_FILE = "instrumental2.dat";
 
         [ProtoMember(1)]
-        Dictionary<PatchNames, Markov.MarkovChain<Note>> instruments = new Dictionary<PatchNames, Markov.MarkovChain<Note>>();
+        Dictionary<PatchNames, MarkovChain<Note>> instruments = new Dictionary<PatchNames, MarkovChain<Note>>();
 
-        //[ProtoMember(2)]
-        Markov.MarkovChain<ActivityColumn> activityGenerator;
+        [ProtoMember(2)]
+        Dictionary<PatchNames, int> instrument_tracker = new Dictionary<PatchNames, int>();
 
-        [ProtoMember(3)]
-        Markov.MarkovChain<int> instrumentGenerator;
-        
+        int last_next = 0;
+
         public event OnFitnessUpdate OnPercentage;
 
-        string path = "";
+        CompositionCategory category;
 
-        private IEnumerable<PatchNames> lastInstruments = null;
-        
+        private PatchNames lastInstrument;
+
         public IEnumerable<PatchNames> Instruments
         {
             get
@@ -43,22 +43,23 @@ namespace GeneticMIDI.Generators.CompositionGenerator
         {
             get
             {
-                return path + System.IO.Path.DirectorySeparatorChar + SAVE_FILE;
+                return "save" + System.IO.Path.DirectorySeparatorChar + category.CategoryName + System.IO.Path.DirectorySeparatorChar + SAVE_FILE;
             }
         }
 
-        public InstrumentalGenerator(string path)
+        public InstrumentalGenerator(CompositionCategory category)
         {
-            activityGenerator = new Markov.MarkovChain<ActivityColumn>(3);
-            instrumentGenerator = new Markov.MarkovChain<int>(2);
-            this.path = path;            
+            this.category = category;
         }
 
         public InstrumentalGenerator()
         {
-            activityGenerator = new Markov.MarkovChain<ActivityColumn>(3);
-            instrumentGenerator = new Markov.MarkovChain<int>(2);
-            this.path = ""; 
+                
+        }
+
+        public void AssignCategory(CompositionCategory category)
+        {
+            this.category = category;
         }
 
         public void Initialize()
@@ -71,77 +72,70 @@ namespace GeneticMIDI.Generators.CompositionGenerator
             else
             {
                 Console.WriteLine("Generating from library");
-                GenerateFromFiles(path);
+                GenerateFromFiles(category.Compositions);
             }
             IsInitialized = true;
         }
 
-
         public void GenerateFromFiles(string path)
         {
-            instruments = new Dictionary<PatchNames, Markov.MarkovChain<Note>>();
-            Dictionary<PatchNames, List<string>> instrument_tracker = new Dictionary<PatchNames, List<string>>();
-            //BinaryFormatter serializer = new BinaryFormatter();
-            
-            //System.IO.Compression.GZipStream gz = new System.IO.Compression.GZipStream(fs, System.IO.Compression.CompressionMode.Compress);
+            var comps = Utils.LoadCompositionsParallel(path);
+            GenerateFromFiles(comps);
+        }
+
+
+        public void GenerateFromFiles(Composition[] compositions)
+        {
+            instruments = new Dictionary<PatchNames, MarkovChain<Note>>();
+            instrument_tracker = new Dictionary<PatchNames, int>();
+
             int i = 0;
-            var files = Utils.GetFiles(path);
-            int percentage = files.Length / 100;
+
+            int percentage = compositions.Length / 100;
             //foreach (string f in files)
-            Parallel.For(0, files.Length, j =>
+            for(int j = 0; j < compositions.Length; j++)//Parallel.For(0, compositions.Length, j =>
             {
-                bool continue_ = true;
-                var f = files[j];
-                if (System.IO.Path.GetExtension(f) != ".mid")
-                    continue_ = false;
-                var filename = System.IO.Path.GetFileNameWithoutExtension(f);
-                Composition comp = new Composition();
-                Console.WriteLine("{0:00.00}%\t Adding {1}", (float)i / files.Length * 100.0f, filename);
-                try
-                {
-                    comp = Composition.LoadFromMIDI(f);
-                }
-                catch
-                {
-                    Console.WriteLine("Skipping {0}", filename);
-                    continue_ = false;
-                }
+                Composition comp = compositions[j];
+                Console.WriteLine("{0:00.00}%\t Adding {1}", (float)i / compositions.Length * 100.0f, comp.NameTag);
+
                 List<int> instruments_ints = new List<int>();
-                if(continue_)
+
                 foreach (var track in comp.Tracks)
                 {
                     instruments_ints.Add((int)track.Instrument);
                     var mel = track.GetMainSequence() as MelodySequence;
                     if (!instruments.ContainsKey(track.Instrument))
                     {
-                        instruments[track.Instrument] = new Markov.MarkovChain<Note>(3);
-                        instrument_tracker[track.Instrument] = new List<string>();
+                        instruments[track.Instrument] = new MarkovChain<Note>(3);
+                        instrument_tracker[track.Instrument] = 1;
                     }
-                    lock (instrument_tracker[track.Instrument])
+                    lock (instruments[track.Instrument])
                     {
-                        instrument_tracker[track.Instrument].Add(filename);
+                        try
+                        {
+                            instrument_tracker[track.Instrument]++;
+                        }
+                        catch
+                        { }
                         instruments[track.Instrument].Add(mel.ToArray());
                     }
                 }
-                instrumentGenerator.Add(instruments_ints);
+
 
                 //Report progress
                 if (i > percentage)
                 {
                     if (OnPercentage != null)
                         OnPercentage(this, i, 0);
-                    percentage += files.Length / 100;
+                    percentage += compositions.Length / 100;
                 }
 
-                ActivityMatrix matrix = ActivityMatrix.GenerateFromComposition(comp);
-                activityGenerator.Add(matrix.ActivityColumns);
-
                 i++;
-            });
+            }//);
 
             foreach (var k in instrument_tracker.Keys)
             {
-                Console.WriteLine("Instrument {0} with count {1}", k, instrument_tracker[k].Count);
+                Console.WriteLine("Instrument {0} with count {1}", k, instrument_tracker[k]);
             }
 
             Save();
@@ -151,6 +145,12 @@ namespace GeneticMIDI.Generators.CompositionGenerator
 
         private void Save()
         {
+            return;
+
+            string root = System.IO.Path.GetDirectoryName(SavePath);
+            if (!System.IO.Directory.Exists(root))
+                System.IO.Directory.CreateDirectory(root);
+
             System.IO.FileStream fs = new System.IO.FileStream(SavePath, System.IO.FileMode.Create);
 
             ProtoBuf.Serializer.PrepareSerializer<InstrumentalGenerator>();
@@ -162,7 +162,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
 
         public void LoadFromFile()
         {
-            InstrumentalGenerator gen = new InstrumentalGenerator(path);
+            InstrumentalGenerator gen = new InstrumentalGenerator();
 
             ProtoBuf.Serializer.PrepareSerializer<InstrumentalGenerator>();
 
@@ -171,26 +171,37 @@ namespace GeneticMIDI.Generators.CompositionGenerator
             gen = ProtoBuf.Serializer.Deserialize<InstrumentalGenerator>(fs);
 
             instruments = gen.instruments;
-            instrumentGenerator = gen.instrumentGenerator;
-            activityGenerator = gen.activityGenerator;
+            //Might give problems
+            instrument_tracker = gen.instrument_tracker;
 
             fs.Close();
         }
 
-        MelodySequence GenerateInstrument(PatchNames patch, int seed)
+        public MelodySequence GenerateInstrument(PatchNames patch, int seed)
         {
+            lastInstrument = patch;
             var chain = instruments[patch];
-            return new MelodySequence(chain.Chain(seed));
+            return new MelodySequence(chain.Chain(100,seed));
         }
 
-        public Composition Generate(IEnumerable<PatchNames> instrs, int seed = 0)
+        public MelodySequence GenerateInstrument(PatchNames patch)
+        {
+            Random r = new Random();
+            int randomSeed = r.Next();
+            return GenerateInstrument(patch, randomSeed);
+        }
+
+
+
+
+      /*  public Composition Generate(IEnumerable<PatchNames> instrs, int seed = 0)
         {
             lastInstruments = instrs;
             int i = 1;
             Composition comp = new Composition();
-            foreach(PatchNames instrument in instrs)
+            foreach (PatchNames instrument in instrs)
             {
-                if(instruments.ContainsKey(instrument))
+                if (instruments.ContainsKey(instrument))
                 {
                     Track t = new Track(instrument, (byte)(i++));
                     t.AddSequence(GenerateInstrument(instrument, seed));
@@ -199,74 +210,32 @@ namespace GeneticMIDI.Generators.CompositionGenerator
             }
             return comp;
         }
+        */
 
-        public Composition Generate(int seed = 0)
-        {
-            lastInstruments = null;
-            Composition comp = new Composition();
-            /*Random ra = new Random(seed);
-            for(int i = 0; i < 4; i++)
-            {
-                var keys = instruments.Keys.ToArray();
-                PatchNames instrument = keys[ra.Next(0, instruments.Keys.Count)];
 
-                Track track = new Track(instrument, (byte)(i + 1));
-                track.AddSequence(GenerateInstrument(instrument, seed));
-                comp.Add(track);
-            }*/
-
-            Random rand = new Random(seed);
-            var keys = instruments.Keys.ToArray();
-            PatchNames instrument = keys[rand.Next(0, instruments.Keys.Count)];
-
-            var instruments_ = instrumentGenerator.Chain(new int[]{(int)instrument}, seed);
-            Track track = new Track(instrument, 1);
-            track.AddSequence(GenerateInstrument(instrument, seed++));
-            comp.Add(track);
-
-            int j = 2;
-            foreach(var i in instruments_)
-            {
-                var instr = (PatchNames)i;
-                track = new Track(instr, (byte)(j));
-                track.AddSequence(GenerateInstrument(instr, seed++));
-                comp.Add(track);
-                if (j > 3)
-                    break;
-                j++;
-            }
-
-            return comp;
-        }
-
-        public Representation.PlaybackInfo GeneratePlayback()
-        {
-            return Generate().GeneratePlaybackInfo();
-        }
-
-        public Composition GenerateComposition()
-        {
-            return Generate();
-        }
-        
-
-        IPlayable IPlaybackGenerator.Generate()
-        {
-            return Generate();
-        }
-
-        int last_next = 0;
-        IPlayable IPlaybackGenerator.Next()
-        {
-            if (lastInstruments == null)
-                return Generate(last_next++);
-            else
-                return Generate(lastInstruments, last_next++);
-        }
-
-        bool IPlaybackGenerator.HasNext
+        public bool HasNext
         {
             get { return true; }
+        }
+
+        MelodySequence Generate()
+        {
+            return this.GenerateInstrument(lastInstrument,last_next++);
+        }
+
+        MelodySequence Next()
+        {
+            return Generate();
+        }
+
+        MelodySequence INoteGenerator.Generate()
+        {
+            return this.GenerateInstrument(lastInstrument, last_next++);
+        }
+
+        MelodySequence INoteGenerator.Next()
+        {
+            return Generate();
         }
     }
 }

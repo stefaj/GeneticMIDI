@@ -35,6 +35,32 @@ namespace GeneticMIDI
             return comps.ToArray();
         }
 
+        public static Composition[] LoadCompositionsParallel(string path)
+        {
+            var files = GetFiles(path);
+            List<Composition> comps = new List<Composition>(files.Length);
+         
+            Parallel.For(0, files.Length, i =>
+                {
+                    string s = files[i];
+                    if (Path.GetExtension(s).ToLower() == ".mid")
+                    {
+
+                        try
+                        {
+                            Console.WriteLine("{0:00.00}%\t Loading {1}", (float)(i++) / files.Length * 100.0f, s);
+                            Composition comp = Composition.LoadFromMIDI(s);
+                            comps.Add(comp);
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                });
+            return comps.ToArray();
+        }
+
         public static MelodySequence[] LoadMelodySequencesFromDirectory(string path)
         {
             var comps = LoadCompositionsFromDirectory(path);
@@ -76,6 +102,46 @@ namespace GeneticMIDI
             }
             return f;
         }
+
+        public static double[] GetDoublesFromNotes(Note[] notes, int max_length = 200)
+        {
+            int length = notes.Length > max_length ? max_length : notes.Length;
+            double[] outarr = new double[max_length];
+            int max = 128 * 128 + 64;
+
+            int i = 0;
+            for (i = 0; i < length; i++)
+            {
+                int o = notes[i].Pitch * 128 + notes[i].Duration;
+                outarr[i] = (double)o / (double)max;
+            }
+
+            for (; i < max_length; i++)
+                outarr[i] = 0;
+            return outarr;
+        }
+
+        public static MelodySequence GetMelodyFromDoubles(double[] arr)
+        {
+            int max = 128 * 128 + 64;
+            Note[] notes = new Note[arr.Length];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                int num = (int)(arr[i] * max);
+                notes[i] = new Note(num / 128, num % 128);
+            }
+            return new MelodySequence(notes);
+        }
+
+        public static Dictionary<A, B> ReverseDictionary<A, B>(Dictionary<B, A> dictionary)
+        {
+            Dictionary<A, B> reverse_note_map = new Dictionary<A, B>();
+
+            foreach (var k in dictionary.Keys)
+                reverse_note_map[dictionary[k]] = k;
+            return reverse_note_map;
+        }
+
 
         public static Composition GetRandomComposition(string path)
         {

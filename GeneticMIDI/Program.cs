@@ -8,6 +8,7 @@ using GeneticMIDI.Generators;
 using GeneticMIDI.Generators.CompositionGenerator;
 using GeneticMIDI.Generators.Harmony;
 using GeneticMIDI.Generators.NoteGenerators;
+using GeneticMIDI.Generators.Sequence;
 using GeneticMIDI.Metrics;
 using GeneticMIDI.Metrics.Features;
 using GeneticMIDI.Metrics.Frequency;
@@ -28,18 +29,38 @@ namespace GeneticMIDI
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Please enter library path: ");
-            string path = Console.ReadLine();
-            Console.WriteLine("Please enter a seed: ");
-            int seed = int.Parse(Console.ReadLine());
-            InstrumentalGenerator2 gen = new InstrumentalGenerator2(path + @"\Classical\Mixed");
+
+          /*  Databank saver = Databank.GenerateCategories(@"D:\Sync\4th year\Midi\Library2", "lib");
+
+            Console.ReadLine();
+            return;*/
+
+
+            Databank db = new Databank("lib");
+            var cat = db.Load("Classical");
+            //db.LoadAll();
+
+            AccompanimentGenerator gen = new AccompanimentGenerator(cat, PatchNames.Orchestral_Strings);
             gen.Initialize();
-            var comp = gen.Generate(new PatchNames[] { PatchNames.Orchestral_Strings }, seed);
-            var str = comp.ToString();
-            Console.WriteLine(str);
-            Console.WriteLine(str.GetHashCode());
+
+            //
+            Composition comp = Composition.LoadFromMIDI(@"D:\Sync\4th year\Midi\Library2\Classical\Mixed\bach.mid");
+            gen.SetSequence(comp.Tracks[0].GetMainSequence() as MelodySequence);
+
+            var mel = gen.Generate();
+
+            
+            Composition newComp = new Composition();
+            Track newTrack = new Track(PatchNames.Acoustic_Grand, 2);
+            newTrack.AddSequence(mel);
+            newComp.Add(newTrack);
+
+           // newComp.Tracks.Add(comp.Tracks[0]);
+
             MusicPlayer player = new MusicPlayer();
-            player.Play(comp);
+            player.Play(newComp);
+
+
 
             Console.ReadLine();
         }
