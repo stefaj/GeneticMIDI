@@ -55,6 +55,8 @@ namespace GeneticMIDI
 
             }
 
+            // Synchronize with melody track, every 50 notes after a rest or so
+
             var targetSeq = (cat.Compositions[5].GetLongestTrack().GetMainSequence() as MelodySequence); 
 
             var test = tableGen.Chain(targetSeq.ToArray());
