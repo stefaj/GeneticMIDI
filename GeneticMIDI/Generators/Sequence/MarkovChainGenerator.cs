@@ -1,5 +1,5 @@
-﻿using GeneticMIDI.Representation;
-using Markov;
+﻿using DotNetLearn.Markov;
+using GeneticMIDI.Representation;
 using System;
 using System.Collections.Generic;
 using System.Linq;

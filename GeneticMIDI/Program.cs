@@ -1,4 +1,5 @@
-﻿using Accord.Neuro.Learning;
+﻿using Accord.MachineLearning.Bayes;
+using Accord.Neuro.Learning;
 using Accord.Statistics.Models.Markov.Learning;
 using AForge.Genetic;
 using AForge.Neuro;
@@ -30,19 +31,49 @@ namespace GeneticMIDI
         static void Main(string[] args)
         {
 
-          /*  Databank saver = Databank.GenerateCategories(@"D:\Sync\4th year\Midi\Library2", "lib");
-
-            Console.ReadLine();
-            return;*/
 
 
+
+            MusicPlayer player = new MusicPlayer();
             Databank db = new Databank("lib");
             var cat = db.Load("Classical");
             //db.LoadAll();
 
-            AccompanimentGenerator gen = new AccompanimentGenerator(cat, PatchNames.Orchestral_Strings);
-            gen.Initialize();
 
+            DotNetLearn.Markov.MarkovTable<Note> tableGen = new DotNetLearn.Markov.MarkovTable<Note>(2);
+            foreach(var c in cat.Compositions)
+            {
+                // Standardize notes. Set to specific octave. Set constant velocity
+                try
+                {
+                    tableGen.Add((c.Tracks[0].GetMainSequence() as MelodySequence).ToArray(), (c.Tracks[1].GetMainSequence() as MelodySequence).ToArray()); 
+                }
+                catch
+                {
+
+                }
+
+            }
+
+            var targetSeq = (cat.Compositions[5].GetLongestTrack().GetMainSequence() as MelodySequence); 
+
+            var test = tableGen.Chain(targetSeq.ToArray());
+            MelodySequence seqTest = new MelodySequence(test);
+            Track trackTest = new Track(PatchNames.Orchestral_Strings, 2); trackTest.AddSequence(seqTest);
+
+            Track targetTrack = new Track(PatchNames.Acoustic_Grand, 3); targetTrack.AddSequence(targetSeq);
+
+            Composition comp = new Composition(); comp.Add(trackTest);
+            comp.Add(targetTrack);
+
+            player.Play(comp);
+
+            return;
+            
+
+            //AccompanimentGenerator2 Test
+           /* AccompanimentGenerator2 gen = new AccompanimentGenerator2(cat, PatchNames.Orchestral_Strings);
+            gen.Train();
             //
             Composition comp = Composition.LoadFromMIDI(@"D:\Sync\4th year\Midi\Library2\Classical\Mixed\bach.mid");
             gen.SetSequence(comp.Tracks[0].GetMainSequence() as MelodySequence);
@@ -54,11 +85,11 @@ namespace GeneticMIDI
             Track newTrack = new Track(PatchNames.Acoustic_Grand, 2);
             newTrack.AddSequence(mel);
             newComp.Add(newTrack);
+            comp.Tracks[0].Instrument = PatchNames.Orchestral_Strings; (comp.Tracks[0].GetMainSequence() as MelodySequence).ScaleVelocity(0.8f);
+            newComp.Tracks.Add(comp.Tracks[0]);
 
-           // newComp.Tracks.Add(comp.Tracks[0]);
-
-            MusicPlayer player = new MusicPlayer();
-            player.Play(newComp);
+            
+            player.Play(newComp);*/
 
 
 

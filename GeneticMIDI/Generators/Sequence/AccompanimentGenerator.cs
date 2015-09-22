@@ -23,7 +23,7 @@ namespace GeneticMIDI.Generators.Sequence
         const int MAX_OUTPUTS = 100;
         const int MAX_INPUTS = 2;
         const int MAX_HIDDEN = 10;
-        const int epochs = 20000;
+        const int epochs = 100;
         const double learningrate = 0.01;
         const double momentum = 0.4;
         const double filterThreshold = 0.1;

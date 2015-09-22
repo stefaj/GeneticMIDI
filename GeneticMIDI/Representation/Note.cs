@@ -203,6 +203,25 @@ namespace GeneticMIDI.Representation
             return notes.ToArray();
         }
 
+        public void StandardizeDuration()
+        {
+            var durations = Enum.GetValues(typeof(Durations)).Cast<Durations>().ToArray();
+
+            int index = 0;
+            double smallestError = int.MaxValue - 1;
+            for(int i = 0; i < durations.Length; i++)
+            {
+                double error = (Duration - (int)durations[i]) * (Duration - (int)durations[i]);
+                if(error < smallestError)
+                {
+                    smallestError = error;
+                    index = i;
+                }   
+            }
+
+            Duration = (int)durations[index];
+        }
+
         public static Note[] LoadFromFileSampled(string filename)
         {
             List<Note> notes = new List<Note>();

@@ -1,5 +1,5 @@
-﻿using GeneticMIDI.Representation;
-using MachineLearningTestEnvironment;
+﻿using DotNetLearn.Markov;
+using GeneticMIDI.Representation;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;

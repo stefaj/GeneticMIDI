@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MachineLearningTestEnvironment
+namespace DotNetLearn.Markov
 {
     [Serializable]
     [ProtoContract]
-    class MarkovChain<T> where T : IEquatable<T>
+    public class MarkovTable<T> where T : IEquatable<T>
     {
 
         [ProtoMember(1)]
@@ -19,40 +19,44 @@ namespace MachineLearningTestEnvironment
         [ProtoMember(2)]
         public int Order { get; private set; }
      
-        public MarkovChain()
+        public MarkovTable()
         {
             this.Order = 2;
             this.frequencyTable = new Dictionary<ChainState<T>, Dictionary<T, int>>();
         }
-   
-        public MarkovChain(int order)
+
+        public MarkovTable(int order)
         {
             this.Order = order; 
             this.frequencyTable = new Dictionary<ChainState<T>, Dictionary<T, int>>();
         }
 
-        public void Add(IEnumerable<T> items)
+        public void Add(IEnumerable<T> items_input, IEnumerable<T> items_output)
         {
             //int i = 0;
 
-            List<T> items_list = new List<T>();
+            List<T> items_list_input = new List<T>();
+            List<T> items_list_output = new List<T>();
 
-            foreach (var it in items)
-                items_list.Add(it);
+            foreach (var it in items_list_input)
+                items_list_input.Add(it);
+            foreach (var it in items_list_output)
+                items_list_output.Add(it);
 
-            T[] items_arr = items_list.ToArray();
-            for (int i = Order; i < items_arr.Length; i++ )
+            T[] items_arr_input = items_list_input.ToArray();
+            T[] items_arr_output = items_list_output.ToArray();
+            for (int i = Order; i < items_arr_input.Length; i++)
             {
      
                 T[] temp_arr = new T[Order];
                 for(int j = Order; j > 0; j--)
                 {
-                    temp_arr[Order-j] = items_arr[i - (j)];
+                    temp_arr[Order - j] = items_arr_input[i - (j)];
                     //key.Add(items_arr[i - (j)]);
                 }
                 ChainState<T> key = new ChainState<T>(temp_arr);
 
-                var next_item = items_arr[i];
+                var output_item = items_arr_input[i];
 
 
                 if (frequencyTable.ContainsKey(key))
@@ -62,13 +66,13 @@ namespace MachineLearningTestEnvironment
                 {
                     frequencyTable[key] = new Dictionary<T, int>();
                 }
-                if (frequencyTable[key].ContainsKey(next_item))
+                if (frequencyTable[key].ContainsKey(output_item))
                 {
-                    frequencyTable[key][next_item]++;
+                    frequencyTable[key][output_item]++;
                 }
                 else
                 {
-                    frequencyTable[key][next_item] = 1;
+                    frequencyTable[key][output_item] = 1;
                 }
 
             }
@@ -115,43 +119,33 @@ namespace MachineLearningTestEnvironment
             return items[index];
         }
 
-        public T[] Chain(int MAX_LENGTH = 100, int seed=0)
-        {
-            Random random = new Random(seed);
 
-            var keys = frequencyTable.Keys.ToArray();
-            var randomKey = keys[random.Next(0, keys.Length)];
-            return Chain(randomKey.GetItems(), MAX_LENGTH, seed);
-        }
-
-        public T[] Chain(T[] start, int MAX_LENGTH = 100, int seed=0)
+        public T[] Chain(T[] start, int seed=0)
         {
             
             List<T> ze_items = new List<T>();
-            Queue<T> last_words = new Queue<T>();
-
-            int max_key_items = Order;
-            foreach (var item in start)
-            {
-                ze_items.Add(item);
-                if (max_key_items > 0)
-                {
-                    last_words.Enqueue(item);
-                    max_key_items--;
-                }
-            }
-
-            int iterations = 0;
 
             Random random = new Random(seed);
 
-            while (iterations < MAX_LENGTH)
+            for (int i = 0; i < start.Length - Order; i++ )
             {
-
+                int max_key_items = Order;
+                Queue<T> last_words = new Queue<T>();
+                for(int j = 0; j < Order; j++)
+                {
+                    if (max_key_items > 0)
+                    {
+                        last_words.Enqueue(start[j+i]);
+                        ze_items.Add(start[j + i]);
+                        max_key_items--;
+                    }
+                    else
+                        break;
+                }
                 ChainState<T> item_key = new ChainState<T>(last_words);
 
                 if (!frequencyTable.ContainsKey(item_key))
-                    break;
+                    continue;
 
                 T[] words_arr = frequencyTable[item_key].Keys.ToArray();
 
@@ -165,39 +159,9 @@ namespace MachineLearningTestEnvironment
 
                 T next_word_ = RouletteSelection<T>(words_arr, frequencies, random);
                 ze_items.Add(next_word_);
-
-                last_words.Dequeue();
-                last_words.Enqueue(next_word_);
-
-                iterations++;
             }
             
             return ze_items.ToArray();
         }
     }
 }
-
-
-/*Complete start
-i<1000
---
-His
-Time 5142
-Length 147110
-
-Mine
-Time 2871
-Length 201000
-
---
-Declaration done
-i<10000
---
-His
-Time  10075
-Length 5 075 135
-
-Mine
-Time 10054
-Length 2 210 000
-*/

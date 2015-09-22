@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MachineLearningTestEnvironment
+namespace DotNetLearn.Markov
 {
     [Serializable]
     [ProtoContract]
