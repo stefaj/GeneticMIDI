@@ -20,7 +20,7 @@
                     <Button x:Name="stopBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="374,0,478,10" Click="Button_Click_2" Grid.Row="1">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-176-stop.png"></Image>
                     </Button>
-                    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Visible" Margin="0,10">
+                    <ScrollViewer x:Name="playScroll" ScrollViewer.HorizontalScrollBarVisibility="Visible" Margin="0,10">
                         <StackPanel x:Name="playPanel" Orientation="Vertical">
                             <Visualizer:MusicSheet x:Name="viewer" HorizontalAlignment="Left" VerticalAlignment="Top" Height="180"/>
                         </StackPanel>

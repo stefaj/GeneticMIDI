@@ -85,10 +85,10 @@ namespace Visualizer
             {
                 MelodySequence seq = t.GetMainSequence() as MelodySequence;
                 DotNetMusic.WPF.MusicSheet sheet = new DotNetMusic.WPF.MusicSheet();
-                sheet.Height = 150;
+                sheet.Height = 200;
                 sheet.SetNotes(seq.ToArray());
-                sheet.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-
+                sheet.HorizontalAlignment = System.Windows.HorizontalAlignment.Left; sheet.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                
 
                 playPanel.Children.Add(sheet);            
 
@@ -155,7 +155,8 @@ namespace Visualizer
 
             //songModel.Axes[0].IsPanEnabled = false;
 
-
+            playScroll.ScrollToHorizontalOffset(playScroll.HorizontalOffset + increment);
+            increment *= 0.95;
 
            // x_axes.Minimum = prevTime - 16;
            // x_axes.Maximum = prevTime + 4;
@@ -173,13 +174,12 @@ namespace Visualizer
 
         }
 
-        int last_index = 0;
+        Dictionary<int, int> lastIndex = new Dictionary<int, int>();
+        double increment = 0;
         void player_OnMessageSent(object sender, int key, PlaybackMessage msg)
         {
 
             currentTime = key / 1000.0f;
-
-            double duration = Math.Log(msg.Duration + 1, 2) * 2;
 
             var tag = msg.Tag as Tuple<byte, Note>;
             if(tag != null)
@@ -199,7 +199,7 @@ namespace Visualizer
                     return;
                 var seq = track.GetMainSequence() as MelodySequence;
                 var notes = seq.ToArray();
-                for(int i = last_index; i < notes.Length; i++)
+                /*for(int i = last_index; i < notes.Length; i++)
                 {
                     if(notes[i] == tag.Item2)
                     {
@@ -214,9 +214,55 @@ namespace Visualizer
                             });
                         break;
                     }
+                }*/
+                if (!lastIndex.ContainsKey(j))
+                    lastIndex[j] = 0;
+                double time = 0;
+                for(int i = 0; i < notes.Length; i++)
+                {
+                    Note n = notes[i];
+                    
+                    if(Math.Abs(time - currentTime) < 1 && n == tag.Item2 && i>=lastIndex[j])
+                    {
+                        playPanel.Dispatcher.Invoke(() =>
+                        {
+                            var sheet = (playPanel.Children[j] as DotNetMusic.WPF.MusicSheet);
+                            sheet.Dispatcher.Invoke(() =>
+                            {
+                                sheet.SetHighlightIndex(i);
+                            });
+                        });
+                        lastIndex[j] = i;
+                        break;
+                    }
+                    else if(n==tag.Item2)
+                    {
+                        int k = 10;
+                    }
+                    time += n.RealDuration;
                 }
+
             }
-            // Add new msg
+
+            int maxHighlightedWidth = 0;
+            DotNetMusic.WPF.MusicSheet maxHighlight;
+            playPanel.Dispatcher.Invoke(() =>
+                {
+                    foreach (DotNetMusic.WPF.MusicSheet sheet in playPanel.Children)
+                    {
+                        if (sheet.GetHighlightedWidth() > maxHighlightedWidth)
+                        {
+                            maxHighlightedWidth = sheet.GetHighlightedWidth();
+                            maxHighlight = sheet;
+                        }
+                    }
+                    double dreamOffset = maxHighlightedWidth - this.Width / 2.0;
+                    double currentOffset = playScroll.HorizontalOffset;
+                    increment = (dreamOffset - currentOffset) / 20.0;
+                    
+                });
+                    
+                    // Add new msg
             
             progressSongSlider.Dispatcher.Invoke(() =>
             {
@@ -248,7 +294,7 @@ namespace Visualizer
             if (generated == null)
                 return;
             currentTime = 0;
-            last_index = 0;
+            lastIndex = new Dictionary<int, int>();
 
             prevTime = 0;
             player.Play(generated);
@@ -335,7 +381,7 @@ namespace Visualizer
             if (result == true)
             {
 
-                last_index = 0;
+                lastIndex = new Dictionary<int, int>();
                 generated = Composition.LoadFromMIDI(dlg.FileName);
                // generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
                 itemsBox.Items.Clear();
@@ -413,7 +459,7 @@ namespace Visualizer
 
 
             DotNetMusic.WPF.MusicSheet sheet = new DotNetMusic.WPF.MusicSheet();
-            sheet.Height = 150;
+            sheet.Height = 200;
             sheet.SetNotes(seq.ToArray());
             sheet.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             ListBoxItem listBoxItem = new ListBoxItem();
