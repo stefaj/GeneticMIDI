@@ -41,6 +41,19 @@ namespace DotNetLearn.Markov
             return items;
         }
 
+        public double Difference(ChainState <T> other)
+        {
+            if (!typeof(IDifference<T>).IsAssignableFrom(typeof(T)))
+                throw new Exception("lololol type does not implement IDifference");
+            double sum = 0;
+            for(int i = 0; i < items.Length; i++)
+            {
+                var item = this.items[i];
+                var other_item = other.items[i];
+                sum += Math.Pow(((IDifference<T>)item).GetDifference(other_item),2);
+            }
+            return Math.Sqrt(sum);
+        }
 
         public bool Equals(ChainState<T> other)
         {

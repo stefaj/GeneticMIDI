@@ -38,9 +38,9 @@ namespace DotNetLearn.Markov
             List<T> items_list_input = new List<T>();
             List<T> items_list_output = new List<T>();
 
-            foreach (var it in items_list_input)
+            foreach (var it in items_input)
                 items_list_input.Add(it);
-            foreach (var it in items_list_output)
+            foreach (var it in items_output)
                 items_list_output.Add(it);
 
             T[] items_arr_input = items_list_input.ToArray();
@@ -136,7 +136,7 @@ namespace DotNetLearn.Markov
                     if (max_key_items > 0)
                     {
                         last_words.Enqueue(start[j+i]);
-                        ze_items.Add(start[j + i]);
+                        //ze_items.Add(start[j + i]);
                         max_key_items--;
                     }
                     else
@@ -145,7 +145,26 @@ namespace DotNetLearn.Markov
                 ChainState<T> item_key = new ChainState<T>(last_words);
 
                 if (!frequencyTable.ContainsKey(item_key))
-                    continue;
+                {
+                    if (!typeof(T).GetInterfaces().Contains(typeof(IDifference<T>)))
+                        continue;
+                    double smallestDistance = double.MaxValue - 1;
+                     var smallest_key = frequencyTable.Keys.First();
+                    foreach(var key in frequencyTable.Keys)
+                    {
+                        double diff = key.Difference(item_key);
+                        if(diff < smallestDistance)
+                        {
+                            smallestDistance = diff;
+                            smallest_key = key;
+                        }
+                    }
+                    item_key = smallest_key;
+                    //  continue;
+                    // Rather get closest key
+                    
+                }
+                   
 
                 T[] words_arr = frequencyTable[item_key].Keys.ToArray();
 

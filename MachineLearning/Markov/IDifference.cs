@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GeneticMIDI.Representation
+namespace DotNetLearn.Markov
 {
-    class LFO
+    public interface IDifference<T>
     {
-        //Implement Low frequency oscillator
+        double GetDifference(T other);
     }
 }

@@ -113,19 +113,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="alglib\alglibinternal.cs" />
-    <Compile Include="alglib\alglibmisc.cs" />
-    <Compile Include="alglib\ap.cs" />
-    <Compile Include="alglib\dataanalysis.cs" />
-    <Compile Include="alglib\diffequations.cs" />
-    <Compile Include="alglib\fasttransforms.cs" />
-    <Compile Include="alglib\integration.cs" />
-    <Compile Include="alglib\interpolation.cs" />
-    <Compile Include="alglib\linalg.cs" />
-    <Compile Include="alglib\optimization.cs" />
-    <Compile Include="alglib\solvers.cs" />
-    <Compile Include="alglib\specialfunctions.cs" />
-    <Compile Include="alglib\statistics.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="FitnessFunctions\MetricSimilarity.cs" />
@@ -135,15 +122,23 @@
     <Compile Include="Generators\Harmony\SimpleChord.cs" />
     <Compile Include="Generators\Sequence\AccompanimentGenerator.cs" />
     <Compile Include="Generators\Sequence\AccompanimentGenerator2.cs" />
-    <Compile Include="ML\Markov\ChainState.cs" />
-    <Compile Include="ML\Markov\MarkovTable.cs" />
-    <Compile Include="ML\Markov\MarkovChain.cs" />
-    <Compile Include="ML\Markov\StaticRandom.cs" />
-    <Compile Include="ML\SampleSet.cs" />
-    <Compile Include="ML\Sample.cs" />
-    <Compile Include="Representation\CompositionCategory.cs" />
-    <Compile Include="Representation\Databank.cs" />
-    <Compile Include="Representation\IPlayable.cs" />
+    <Compile Include="Generators\Sequence\AccompanyGeneratorMarkov.cs" />
+    <Compile Include="Metrics\Features\DurationSim.cs" />
+    <Compile Include="Metrics\Features\KeyPrevalence.cs" />
+    <Compile Include="Metrics\Features\PitchSim.cs" />
+    <Compile Include="Metrics\Frequency\ChromaticTone.cs" />
+    <Compile Include="Metrics\Frequency\ChromaticToneDistance.cs" />
+    <Compile Include="Metrics\Frequency\ChromaticToneDuration.cs" />
+    <Compile Include="Metrics\Frequency\MelodicBigram.cs" />
+    <Compile Include="Metrics\Frequency\MelodicInterval.cs" />
+    <Compile Include="Metrics\Frequency\Pitch.cs" />
+    <Compile Include="Metrics\Frequency\PitchDistance.cs" />
+    <Compile Include="Metrics\Frequency\Rhythm.cs" />
+    <Compile Include="Metrics\Frequency\RhythmicBigram.cs" />
+    <Compile Include="Metrics\Frequency\RhythmicInterval.cs" />
+    <Compile Include="Metrics\IMetricFreq.cs" />
+    <Compile Include="Metrics\MetricFrequency.cs" />
+    <Compile Include="Metrics\Pair.cs" />
     <Compile Include="Generators\INoteGenerator.cs" />
     <Compile Include="Generators\IPlaybackGenerator.cs" />
     <Compile Include="Generators\Sequence\GeneticGenerator.cs" />
@@ -154,42 +149,9 @@
     <Compile Include="Genetic\GPCustomTree.cs" />
     <Compile Include="Genetic\GPCustomTreeNode.cs" />
     <Compile Include="Generators\ICompositionGenerator.cs" />
-    <Compile Include="Metrics\Features\DurationSim.cs" />
-    <Compile Include="Metrics\Features\KeyPrevalence.cs" />
-    <Compile Include="Metrics\Features\PitchSim.cs" />
-    <Compile Include="Metrics\IMetricFreq.cs" />
-    <Compile Include="Metrics\MetricFrequency.cs" />
-    <Compile Include="Metrics\Pair.cs" />
-    <Compile Include="Metrics\Frequency\ChromaticTone.cs" />
-    <Compile Include="Metrics\Frequency\MelodicBigram.cs" />
-    <Compile Include="Metrics\Frequency\MelodicInterval.cs" />
-    <Compile Include="Metrics\Frequency\PitchDistance.cs" />
-    <Compile Include="Metrics\Frequency\ChromaticToneDuration.cs" />
-    <Compile Include="Metrics\Frequency\Pitch.cs" />
-    <Compile Include="Metrics\Frequency\ChromaticToneDistance.cs" />
-    <Compile Include="Metrics\Frequency\Rhythm.cs" />
-    <Compile Include="Metrics\Frequency\RhythmicBigram.cs" />
-    <Compile Include="Metrics\Frequency\RhythmicInterval.cs" />
-    <Compile Include="Representation\ActivityColumn.cs" />
-    <Compile Include="Representation\ActivityMatrix.cs" />
-    <Compile Include="Representation\Chord.cs" />
-    <Compile Include="Representation\Composition.cs" />
-    <Compile Include="Representation\HarmonySequence.cs" />
-    <Compile Include="Representation\ISequence.cs" />
-    <Compile Include="Representation\LFO.cs" />
-    <Compile Include="Output\MusicPlayer.cs" />
-    <Compile Include="Representation\Note.cs" />
     <Compile Include="Genetic\NoteGene.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Representation\MelodySequence.cs" />
-    <Compile Include="Representation\PlaybackInfo.cs" />
-    <Compile Include="Representation\PlaybackMessage.cs" />
-    <Compile Include="Representation\StandardChord.cs" />
-    <Compile Include="Representation\StandardKeys.cs" />
-    <Compile Include="Representation\Structure.cs" />
-    <Compile Include="Representation\Track.cs" />
-    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -206,6 +168,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DotNetMusic\DotNetMusic\DotNetMusic.csproj">
+      <Project>{7f114af7-08e3-4de3-bae5-37ae43c451ed}</Project>
+      <Name>DotNetMusic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MachineLearning\MachineLearning.csproj">
+      <Project>{913d8218-67dc-4b47-95e7-2f80e0e8e097}</Project>
+      <Name>MachineLearning</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

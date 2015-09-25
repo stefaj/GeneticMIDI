@@ -3,29 +3,35 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls" 
         xmlns:oxy="http://oxyplot.org/wpf"
+        xmlns:Visualizer="clr-namespace:DotNetMusic.WPF;assembly=WPFMusicSheet"
         Title="Ancestral Tunes" Height="739" Width="934" Closing="MetroWindow_Closing">
     <Grid>
         <TabControl Margin="10">
             <TabItem Header="Play">
                 <Grid>
-                    <oxy:PlotView x:Name="midiPlot" Margin="-1,38,1,0" Height="243" VerticalAlignment="Top"/>
-                    <Button x:Name="playBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="427,0,425,10" Click="Button_Click_1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="549*"/>
+                        <RowDefinition Height="94*"/>
+                    </Grid.RowDefinitions>
+                    <Button x:Name="playBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="427,0,425,10" Click="Button_Click_1" Grid.Row="1">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-174-play.png"></Image>
                     </Button>
-                    <Slider x:Name="progressSongSlider" Margin="10,0,10,68" VerticalAlignment="Bottom" Thumb.DragCompleted ="Slider_DragCompleted"></Slider>
-                    <Button x:Name="stopBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="374,0,478,10" Click="Button_Click_2">
+                    <Slider x:Name="progressSongSlider" Margin="10,0,10,68" VerticalAlignment="Bottom" Thumb.DragCompleted ="Slider_DragCompleted" Grid.Row="1"></Slider>
+                    <Button x:Name="stopBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="374,0,478,10" Click="Button_Click_2" Grid.Row="1">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-176-stop.png"></Image>
                     </Button>
-                    <oxy:PlotView x:Name="midiPlotFull" Margin="10,0,10,91" Height="111" VerticalAlignment="Bottom"/>
-                    <Button x:Name="randomizeBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="480,0,372,10" Click="randomizeBtn_Click">
+                    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Visible" Margin="0,10">
+                        <StackPanel x:Name="playPanel" Orientation="Vertical">
+                            <Visualizer:MusicSheet x:Name="viewer" HorizontalAlignment="Left" VerticalAlignment="Top" Height="180"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                    <Button x:Name="randomizeBtn" VerticalAlignment="Bottom" Height="48" Width="48" Margin="480,0,372,10" Click="randomizeBtn_Click" Grid.Row="1">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-323-playing-dices.png"></Image>
                     </Button>
-                    <Button HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Height="48" Width="48" Click="Button_Click_3">
+                    <Button HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Height="48" Width="48" Click="Button_Click_3" Grid.Row="1">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-145-folder-open.png"></Image>
                     </Button>
-
-                    <Label x:Name="fitnessLabelTest" Content="Label" HorizontalAlignment="Left" Margin="533,607,0,0" VerticalAlignment="Top"/>
-                    <Button x:Name="saveBtn" HorizontalAlignment="Right" Margin="0,0,63,10" VerticalAlignment="Bottom" Height="48" Width="48" Click="saveBtn_Click">
+                    <Button x:Name="saveBtn" HorizontalAlignment="Right" Margin="0,0,63,10" VerticalAlignment="Bottom" Height="48" Width="48" Click="saveBtn_Click" Grid.Row="1">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-445-floppy-saved.png"/>
                     </Button>
                 </Grid>
@@ -43,7 +49,7 @@
 
                     </ComboBox>
                     <Label Content="Guide" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top"/>
-                    <ListBox x:Name="itemsBox" Margin="10,60,10,73"/>
+                    <ListBox x:Name="itemsBox" Margin="10,60,10,73" SelectionChanged="itemsBox_SelectionChanged"/>
                 </Grid>
 
             </TabItem>

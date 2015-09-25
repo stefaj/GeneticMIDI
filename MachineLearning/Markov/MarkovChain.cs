@@ -9,7 +9,7 @@ namespace DotNetLearn.Markov
 {
     [Serializable]
     [ProtoContract]
-    class MarkovChain<T> where T : IEquatable<T>
+    public class MarkovChain<T> where T : IEquatable<T>
     {
 
         [ProtoMember(1)]

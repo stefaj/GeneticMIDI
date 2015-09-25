@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticMIDI", "GeneticMIDI\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualizer", "Visualizer\Visualizer.csproj", "{CFD5D1FF-C134-409F-9C55-D3E5512CB617}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MachineLearning", "MachineLearning\MachineLearning.csproj", "{913D8218-67DC-4B47-95E7-2F80E0E8E097}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFMusicSheet", "..\DotNetMusic\WPFMusicSheet\WPFMusicSheet.csproj", "{432468CD-2FC6-4FFA-95B1-3FCFE513B74B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetMusic", "..\DotNetMusic\DotNetMusic\DotNetMusic.csproj", "{7F114AF7-08E3-4DE3-BAE5-37AE43C451ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +35,24 @@ Global
 		{CFD5D1FF-C134-409F-9C55-D3E5512CB617}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFD5D1FF-C134-409F-9C55-D3E5512CB617}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CFD5D1FF-C134-409F-9C55-D3E5512CB617}.Release|x64.ActiveCfg = Release|Any CPU
+		{913D8218-67DC-4B47-95E7-2F80E0E8E097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{913D8218-67DC-4B47-95E7-2F80E0E8E097}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{913D8218-67DC-4B47-95E7-2F80E0E8E097}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{913D8218-67DC-4B47-95E7-2F80E0E8E097}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{913D8218-67DC-4B47-95E7-2F80E0E8E097}.Release|Any CPU.Build.0 = Release|Any CPU
+		{913D8218-67DC-4B47-95E7-2F80E0E8E097}.Release|x64.ActiveCfg = Release|Any CPU
+		{432468CD-2FC6-4FFA-95B1-3FCFE513B74B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{432468CD-2FC6-4FFA-95B1-3FCFE513B74B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{432468CD-2FC6-4FFA-95B1-3FCFE513B74B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{432468CD-2FC6-4FFA-95B1-3FCFE513B74B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{432468CD-2FC6-4FFA-95B1-3FCFE513B74B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{432468CD-2FC6-4FFA-95B1-3FCFE513B74B}.Release|x64.ActiveCfg = Release|Any CPU
+		{7F114AF7-08E3-4DE3-BAE5-37AE43C451ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F114AF7-08E3-4DE3-BAE5-37AE43C451ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F114AF7-08E3-4DE3-BAE5-37AE43C451ED}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7F114AF7-08E3-4DE3-BAE5-37AE43C451ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F114AF7-08E3-4DE3-BAE5-37AE43C451ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F114AF7-08E3-4DE3-BAE5-37AE43C451ED}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

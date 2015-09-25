@@ -152,9 +152,21 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DotNetMusic\DotNetMusic\DotNetMusic.csproj">
+      <Project>{7f114af7-08e3-4de3-bae5-37ae43c451ed}</Project>
+      <Name>DotNetMusic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DotNetMusic\WPFMusicSheet\WPFMusicSheet.csproj">
+      <Project>{432468cd-2fc6-4ffa-95b1-3fcfe513b74b}</Project>
+      <Name>WPFMusicSheet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GeneticMIDI\GeneticMIDI.csproj">
       <Project>{8f0794a6-48b2-404a-a36f-451cb0e91c96}</Project>
       <Name>GeneticMIDI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MachineLearning\MachineLearning.csproj">
+      <Project>{913d8218-67dc-4b47-95e7-2f80e0e8e097}</Project>
+      <Name>MachineLearning</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

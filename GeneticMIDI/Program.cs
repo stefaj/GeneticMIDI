@@ -32,44 +32,26 @@ namespace GeneticMIDI
         {
 
 
-
-
             MusicPlayer player = new MusicPlayer();
             Databank db = new Databank("lib");
             var cat = db.Load("Classical");
             //db.LoadAll();
 
+            AccompanyGeneratorMarkov genMark = new AccompanyGeneratorMarkov(cat);
+            var targetSeq = cat.Compositions[2].GetLongestTrack().GetMainSequence() as MelodySequence;
+            var seqTest = genMark.Generate(targetSeq,5);
 
-            DotNetLearn.Markov.MarkovTable<Note> tableGen = new DotNetLearn.Markov.MarkovTable<Note>(2);
-            foreach(var c in cat.Compositions)
-            {
-                // Standardize notes. Set to specific octave. Set constant velocity
-                try
-                {
-                    tableGen.Add((c.Tracks[0].GetMainSequence() as MelodySequence).ToArray(), (c.Tracks[1].GetMainSequence() as MelodySequence).ToArray()); 
-                }
-                catch
-                {
-
-                }
-
-            }
-
-            // Synchronize with melody track, every 50 notes after a rest or so
-
-            var targetSeq = (cat.Compositions[5].GetLongestTrack().GetMainSequence() as MelodySequence); 
-
-            var test = tableGen.Chain(targetSeq.ToArray());
-            MelodySequence seqTest = new MelodySequence(test);
             Track trackTest = new Track(PatchNames.Orchestral_Strings, 2); trackTest.AddSequence(seqTest);
 
             Track targetTrack = new Track(PatchNames.Acoustic_Grand, 3); targetTrack.AddSequence(targetSeq);
 
-            Composition comp = new Composition(); comp.Add(trackTest);
+            Composition comp = new Composition(); 
+            comp.Add(trackTest);
             comp.Add(targetTrack);
 
             player.Play(comp);
 
+            
             return;
             
 
@@ -96,6 +78,15 @@ namespace GeneticMIDI
 
 
             Console.ReadLine();
+        }
+
+        /// <summary>
+        /// Generates a category and saves to a file
+        /// </summary>
+        /// <param name="categoryName"></param>
+        static void GenerateCategories()
+        {
+            Databank.GenerateCategories(@"D:\Sync\4th year\Midi\Library2", "lib");
         }
 
         static void NeuralNetworkAccompanimentTest()
