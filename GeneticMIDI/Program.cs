@@ -31,8 +31,16 @@ namespace GeneticMIDI
         static void Main(string[] args)
         {
 
-
+            Composition comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\other\twinkle.mid");
+            float time = Note.ToRealDuration(comp.GetLongestTrack().Duration);
+            Console.WriteLine("Total time: {0}", time);
             MusicPlayer player = new MusicPlayer();
+            player.Play(comp);
+            Console.ReadLine();
+
+
+
+          /*  MusicPlayer player = new MusicPlayer();
             Databank db = new Databank("lib");
             var cat = db.Load("Classical");
             //db.LoadAll();
@@ -52,7 +60,9 @@ namespace GeneticMIDI
             player.Play(comp);
 
             
-            return;
+            return;*/
+
+
             
 
             //AccompanimentGenerator2 Test
@@ -64,6 +74,7 @@ namespace GeneticMIDI
 
             var mel = gen.Generate();
 
+            * 
             
             Composition newComp = new Composition();
             Track newTrack = new Track(PatchNames.Acoustic_Grand, 2);

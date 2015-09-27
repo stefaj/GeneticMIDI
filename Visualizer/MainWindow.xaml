@@ -34,6 +34,7 @@
                     <Button x:Name="saveBtn" HorizontalAlignment="Right" Margin="0,0,63,10" VerticalAlignment="Bottom" Height="48" Width="48" Click="saveBtn_Click" Grid.Row="1">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-445-floppy-saved.png"/>
                     </Button>
+                    <TextBlock x:Name="txtCurrentTime" HorizontalAlignment="Left" Margin="10,31,0,0" Grid.Row="1" TextWrapping="Wrap" Text="0/0" VerticalAlignment="Top"/>
                 </Grid>
 
             </TabItem>
