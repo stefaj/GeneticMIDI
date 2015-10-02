@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticMIDI", "GeneticMIDI\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualizer", "Visualizer\Visualizer.csproj", "{CFD5D1FF-C134-409F-9C55-D3E5512CB617}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MachineLearning", "MachineLearning\MachineLearning.csproj", "{913D8218-67DC-4B47-95E7-2F80E0E8E097}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetLearn", "MachineLearning\DotNetLearn.csproj", "{913D8218-67DC-4B47-95E7-2F80E0E8E097}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFMusicSheet", "..\DotNetMusic\WPFMusicSheet\WPFMusicSheet.csproj", "{432468CD-2FC6-4FFA-95B1-3FCFE513B74B}"
 EndProject

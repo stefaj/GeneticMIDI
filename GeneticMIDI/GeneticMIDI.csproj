@@ -123,6 +123,7 @@
     <Compile Include="Generators\Sequence\AccompanimentGenerator.cs" />
     <Compile Include="Generators\Sequence\AccompanimentGenerator2.cs" />
     <Compile Include="Generators\Sequence\AccompanyGeneratorMarkov.cs" />
+    <Compile Include="Generators\Sequence\HMMGenerator.cs" />
     <Compile Include="Metrics\Features\DurationSim.cs" />
     <Compile Include="Metrics\Features\KeyPrevalence.cs" />
     <Compile Include="Metrics\Features\PitchSim.cs" />
@@ -174,9 +175,9 @@
       <Project>{7f114af7-08e3-4de3-bae5-37ae43c451ed}</Project>
       <Name>DotNetMusic</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MachineLearning\MachineLearning.csproj">
+    <ProjectReference Include="..\MachineLearning\DotNetLearn.csproj">
       <Project>{913d8218-67dc-4b47-95e7-2f80e0e8e097}</Project>
-      <Name>MachineLearning</Name>
+      <Name>DotNetLearn</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

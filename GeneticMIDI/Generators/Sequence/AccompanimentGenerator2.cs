@@ -19,7 +19,7 @@ namespace GeneticMIDI.Generators.Sequence
         ActivationNetwork network;
         Dictionary<Note, int> noteHashes = new Dictionary<Note, int>();
         int hash;
-        const int INPUT_NOTES = 4;
+        const int INPUT_NOTES = 1;
         const int MAX_INPUTS = INPUT_NOTES * 2;
         const int MAX_OUTPUTS = 2;
         MelodySequence sequence;
@@ -44,10 +44,10 @@ namespace GeneticMIDI.Generators.Sequence
                 outputs[i] = samples[i].Outputs;
             }
             // Create a Bernoulli activation function
-            var function = new BernoulliFunction(alpha: 0.5);
-            //function = new SigmoidFunction(2)
+            //var function = new BernoulliFunction(alpha: 0.5);
+            var function = new SigmoidFunction(2);
             // Create a Restricted Boltzmann Machine for 6 inputs and with 1 hidden neuron
-            network = new RestrictedBoltzmannMachine(function, inputsCount: MAX_INPUTS, hiddenNeurons: MAX_OUTPUTS);
+            //network = new RestrictedBoltzmannMachine(function, inputsCount: MAX_INPUTS, hiddenNeurons: MAX_OUTPUTS);
             network = new ActivationNetwork(function, MAX_INPUTS, 11, MAX_OUTPUTS); 
 
             // Create the learning algorithm for RBMs

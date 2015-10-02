@@ -7,8 +7,8 @@
     <ProjectGuid>{913D8218-67DC-4B47-95E7-2F80E0E8E097}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MachineLearning</RootNamespace>
-    <AssemblyName>MachineLearning</AssemblyName>
+    <RootNamespace>DotNetLearn</RootNamespace>
+    <AssemblyName>DotNetLearn</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -55,6 +55,7 @@
     <Compile Include="alglib\solvers.cs" />
     <Compile Include="alglib\specialfunctions.cs" />
     <Compile Include="alglib\statistics.cs" />
+    <Compile Include="Data\Codebook.cs" />
     <Compile Include="Data\Sample.cs" />
     <Compile Include="Data\SampleSet.cs" />
     <Compile Include="Markov\ChainState.cs" />
