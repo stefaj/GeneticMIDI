@@ -79,6 +79,7 @@ namespace GeneticMIDI.FitnessFunctions
             int j = 0;
             foreach (var comp in seqs)
             {
+                Console.WriteLine("NCD: {0}", j++ / seqs.Length);
                 var c = comp;
                 if (MaxTracks > 0)
                 {
@@ -105,13 +106,23 @@ namespace GeneticMIDI.FitnessFunctions
         {
             string indi2str = individual;
             float sum = 0;
-            foreach (string str in songs)
+
+           /* foreach (string str in songs)
             {
                 if (str == null)
                     continue;
                 float ncd = ComputeNCD(str, indi2str);
                 sum += ncd;
-            }
+            }*/
+            Parallel.ForEach(songs, str =>
+                {
+                    if (str != null)
+                    {
+                        float ncd = ComputeNCD(str, indi2str);
+                        sum += ncd;
+                    }
+                });
+
             return 1 / sum;
         }
 
@@ -243,6 +254,7 @@ namespace GeneticMIDI.FitnessFunctions
 
         public void Deserialize(string filename)
         {
+            Console.WriteLine("Loading from file " + filename);
             FileStream fs = new FileStream(filename, FileMode.Open);
             try
             {
