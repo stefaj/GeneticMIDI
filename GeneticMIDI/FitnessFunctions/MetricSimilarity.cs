@@ -9,7 +9,12 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.FitnessFunctions
 {
+
     public enum SimilarityType { Cosine, Euclidian, Pearson}
+    
+    /// <summary>
+    /// Computes similarity according to the given metrics against a single melody sequence
+    /// </summary>
     public class MetricSimilarity : IFitnessFunction
     {
         IMetric[] metrics;
@@ -34,6 +39,20 @@ namespace GeneticMIDI.FitnessFunctions
             this.type = type;
             for (int i = 0; i < metrics.Length; i++)
                 target_metrics[i] = this.metrics[i].Generate(this.target);
+        }
+
+
+        public static MetricSimilarity GenerateMetricSimilarityMulti(IEnumerable<Composition> comps, IMetric[] metrics, SimilarityType type = SimilarityType.Cosine)
+        {
+            List<Note> notes = new List<Note>();
+            foreach(var comp in comps)
+            {
+                var seq = comp.Tracks[0].GetMainSequence() as MelodySequence;
+                foreach (var n in seq.Notes)
+                    notes.Add(n);
+            }
+
+            return new MetricSimilarity(new MelodySequence(notes), metrics, type);
         }
 
         public double Evaluate(IChromosome chromosome)

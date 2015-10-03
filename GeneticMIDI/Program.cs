@@ -63,16 +63,19 @@ namespace GeneticMIDI
 
             
             return;*/
+            MetricSimilarity cosine =  MetricSimilarity.GenerateMetricSimilarityMulti(cat.Compositions, new IMetric[]{ new ChromaticToneDuration(), new MelodicBigram(), new RhythmicBigram()});
+            GeneticGenerator gen = new GeneticGenerator(cosine, cat);
+            gen.OnPercentage += (sender, percentage, fitness) => { Console.WriteLine("{0}: {1}", percentage, fitness); };
+            gen.MaxGenerations = 20000;
+            var outMel = gen.Generate();
 
-            HMMGenerator gen = new HMMGenerator(PatchNames.Orchestral_Strings);
-            Console.WriteLine("Training");
-            gen.Train(cat);
-            Console.WriteLine("Done training");
-            Composition comp = Composition.LoadFromMIDI(@"D:\Sync\4th year\Midi\Library2\Classical\Mixed\dvorak.mid");
-            var inputSeq = comp.GetLongestTrack().GetMainSequence() as MelodySequence;
-            var outMel = gen.Generate(inputSeq);
             MusicPlayer player = new MusicPlayer();
             player.Play(outMel);
+
+            Composition comp = new Composition();
+            Track t = new Track(PatchNames.Acoustic_Grand, 3);
+            t.AddSequence(outMel);
+            comp.WriteToMidi("genetic_cosine.mid");
 
 
          /*   Databank db = new Databank("lib");
@@ -98,7 +101,7 @@ namespace GeneticMIDI
                 Track newTrack = new Track(PatchNames.Orchestral_Strings , 2);
                 newTrack.AddSequence(mel);
                 newComp.Add(newTrack);
-                /*comp.Tracks[0].Instrument = PatchNames.Acoustic_Grand;*/ (comp.Tracks[0].GetMainSequence() as MelodySequence).ScaleVelocity(0.8f);
+                /*comp.Tracks[0].Instrument = PatchNames.Acoustic_Grand; (comp.Tracks[0].GetMainSequence() as MelodySequence).ScaleVelocity(0.8f);
                 /* newComp.Tracks.Add(comp.Tracks[0]);
 
 
@@ -244,45 +247,6 @@ namespace GeneticMIDI
             player.Play(comp);
             return;
 
-        }
-
-        static void Test1()
-        {
-            /*Console.WriteLine("Hidden Markov Model");
-            MarkovGenerator markov = new MarkovGenerator(@"test");
-            var notes3 = markov.Generate();
-            Play(notes3);*/
-        }
-
-        static void Test2()
-        {
-            /*Console.WriteLine("Normalized Compression Distance");
-            NCD ncd = new NCD(@"test");
-            GeneticGenerator evolver = new GeneticGenerator(ncd);
-            var notes = evolver.Generate();
-            Play(notes);*/
-        }
-
-        static void CosineChromaticTest()
-        {
-            Console.WriteLine("Chromatic Tone and Duration");
-            //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
-            var mel = GetMelodySequence(@"test\harry.mid");
-            MetricSimilarity cosine = new MetricSimilarity(mel, new IMetric[]{new ChromaticToneDuration(), new DurationSim()});
-            GeneticGenerator evolver = new GeneticGenerator(cosine, mel);
-            var notes = evolver.Generate();
-            Play(notes, PatchNames.Music_Box);
-        }
-        static void CosineTest()
-        {
-            Console.WriteLine("Chromatic Tone and Duration");
-            //ChromaticToneDuration, ChromaticTone, MelodicBigram, RhythmicBigram
-            MetricSimilarity cosine = new MetricSimilarity(GetMelodySequence(@"test\frere.mid"),
-                new IMetric[] { new ChromaticToneDuration(), new MelodicBigram(), new RhythmicBigram() });
-            GeneticGenerator evolver = new GeneticGenerator(cosine);
-            var notes = evolver.Generate();
-            Console.ReadLine();
-            Play(notes);
         }
 
 

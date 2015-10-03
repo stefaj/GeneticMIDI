@@ -104,29 +104,42 @@ namespace GeneticMIDI.Generators.Sequence
         public void Train(CompositionCategory cat)
         {
             Accord.Math.Tools.SetupGenerator(42);    
-            List<int[]> sequences = new List<int[]>();
+            List<int[]> inputSequences = new List<int[]>();
+            List<int[]> outputSequences = new List<int[]>();
             foreach(Composition comp in cat.Compositions)
             {
-                foreach(var track in comp.Tracks)
-                {
-                    if (track.Instrument != instrument)
-                        continue;
-                    var mel = track.GetMainSequence() as MelodySequence;
+                if (comp.Tracks.Count < 2)
+                    continue;
 
-                    book.Add(mel.Notes);
-                    sequences.Add(book.ToCodes(mel.ToArray()));
-                    break;
-                }
-                
+                var melInput = comp.Tracks[0].GetMainSequence() as MelodySequence; melInput.Trim(100); melInput.NormalizeNotes(4);
+                var melOutput = comp.Tracks[1].GetMainSequence() as MelodySequence; melOutput.Trim(100); melOutput.NormalizeNotes(4);
+                if (melInput.Length > melOutput.Length)
+                    melInput.Trim(melOutput.Length);
+                else if (melOutput.Length > melInput.Length)
+                    melOutput.Trim(melInput.Length);
+
+                book.Add(melInput.Notes); book.Add(melOutput.Notes);
+                inputSequences.Add(book.ToCodes(melInput.ToArray()));
+                outputSequences.Add(book.ToCodes(melOutput.ToArray()));
             }
 
-            var topology = new Ergodic(states: 10);
+            if (outputSequences.Count != inputSequences.Count)
+                throw new Exception("MSP");
+            for(int i = 0; i < outputSequences.Count; i++)
+            {
+                if (outputSequences[i].Length != inputSequences[i].Length)
+                    throw new Exception("MSP 2");
+            }
 
-            hmm = new HiddenMarkovModel(topology, book.TotalUniqueSymbols + 1);
-            var teacher = new BaumWelchLearning(hmm) { Tolerance = 0.001, Iterations = 0 };
+            var topology = new Forward(states: 50);
+
+            hmm = new HiddenMarkovModel(20, book.TotalUniqueSymbols + 1);
+            var teacher = new Accord.Statistics.Models.Markov.Learning.MaximumLikelihoodLearning(hmm) {UseLaplaceRule=false /*Tolerance = 0.1, Iterations=0*/};
             //var teacher = new ViterbiLearning(hmm);
-
-            double ll = teacher.Run(sequences.ToArray());
+            
+                double ll = teacher.Run(outputSequences.ToArray(), inputSequences.ToArray());
+                Console.WriteLine("Error: {0}", ll);
+ 
         }
     }
 }
