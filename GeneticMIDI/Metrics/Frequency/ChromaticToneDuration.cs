@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Metrics.Frequency
 {
+    /// <summary>
+    /// Chromatic tone and duration pairs
+    /// </summary>
     public class ChromaticToneDuration : MetricFrequency
     {
 

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Metrics.Frequency
 {
+    /// <summary>
+    /// |pi - p_{i-1}|
+    /// </summary>
     public class MelodicInterval : MetricFrequency
     {
         public override void GenerateFrequencies(Note[] notes)

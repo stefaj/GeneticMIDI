@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Metrics.Frequency
 {
+    /// <summary>
+    /// Time intervals between pitch repetitions
+    /// </summary>
     public class PitchDistance : MetricFrequency
     {
         public override void GenerateFrequencies(Note[] notes)
@@ -18,7 +21,7 @@ namespace GeneticMIDI.Metrics.Frequency
                 for(int j = i+1; j < notes.Count(); j++)
                 {
                     distance += notes[j].Duration;
-                    if(notes[i].Pitch == notes[j].Pitch)
+                    if(notes[i].Pitch == notes[j].Pitch && !notes[i].IsRest())
                     {
                         Add(new Pair(distance));
                         break;

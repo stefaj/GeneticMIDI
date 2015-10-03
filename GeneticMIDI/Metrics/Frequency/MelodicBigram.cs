@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Metrics.Frequency
 {
+    /// <summary>
+    /// Pairs of adjacent music intervals
+    /// </summary>
     public class MelodicBigram : MetricFrequency
     {
         public override void GenerateFrequencies(Note[] notes)

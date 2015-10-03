@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Metrics.Frequency
 {
+    /// <summary>
+    /// Note pitches modulo 12
+    /// </summary>
     public class ChromaticTone : MetricFrequency
     {
-
         public override void GenerateFrequencies(Note[] notes)
         {
             foreach (Note n in notes)
