@@ -17,58 +17,68 @@ namespace GeneticMIDI.Generators
         public int MaxGenerations { get; set; }
 
         IFitnessFunction fitnessFunction;
-        MelodySequence base_seq = null;
+
 
         Population pop = null;
 
         public event OnFitnessUpdate OnPercentage;
 
-        public GeneticGenerator(IFitnessFunction fitnessFunction, MelodySequence base_seq = null)
+        CompositionCategory cat;
+        int avgLength = 0;
+
+        public GeneticGenerator(IFitnessFunction fitnessFunction, CompositionCategory cat=null)
         {
             this.fitnessFunction = fitnessFunction;
-            this.base_seq = base_seq;
-            this.MaxGenerations = 2000;
+            this.cat = cat;
+            this.MaxGenerations = 1000;
 
-            if (base_seq != null)
-                CreateUniques();
-
-            if (base_seq != null)
+            if (cat != null)
             {
+                // Markov generator
                 var mark = new MarkovChainGenerator(2);
-                mark.AddMelody(base_seq);
+
+                // Allowed notes
+                HashSet<Durations> durs = new HashSet<Durations>();
+                HashSet<int> fullPitches = new HashSet<int>();
+
+                foreach(var c in cat.Compositions)
+                {
+                    var cloneMel = (c.Tracks[0].GetMainSequence() as MelodySequence).Clone() as MelodySequence;
+                    
+                    cloneMel.StandardizeDuration();
+                    mark.AddMelody(cloneMel);
+
+                    foreach (var n in cloneMel.Notes)
+                    {
+                        durs.Add(NoteGene.GetClosestDuration(n.Duration));
+                        fullPitches.Add(n.Pitch);
+                    }
+
+                    avgLength += cloneMel.Length;
+                }
+                avgLength /= cat.Compositions.Length;
                 GPCustomTree.generator = mark;
+
+                NoteGene.AllowedDurations = durs.ToArray();
+                NoteGene.AllowedFullPitches = fullPitches.ToArray();
+               
             }
         }
 
-        private void CreateUniques()
-        {
-            HashSet<Durations> durs = new HashSet<Durations>();
-            HashSet<int> fullPitches = new HashSet<int>();
-            foreach(Note n in base_seq.ToArray())
-            {
-                durs.Add(NoteGene.GetClosestDuration(n.Duration));
-                fullPitches.Add(n.Pitch);
-            }
 
-            NoteGene.AllowedDurations = durs.ToArray();
-            NoteGene.AllowedFullPitches = fullPitches.ToArray();
-        }
 
         public MelodySequence Generate()
         {
             NoteGene baseGene = new NoteGene(GPGeneType.Function);
             baseGene.Function = NoteGene.FunctionTypes.Concatenation;
             GPCustomTree tree = new GPCustomTree(baseGene);
-            if (base_seq != null)
+            if (cat != null)
             {
-                tree.Generate(base_seq.ToArray());
-                tree.Mutate();
-                tree.Crossover(tree);
        
-                int length = base_seq.Length;
+                int length = avgLength;
                 int depth = (int)Math.Ceiling(Math.Log(length, 2));
                 GPCustomTree.MaxInitialLevel = depth - 2;
-                GPCustomTree.MaxLevel = depth + 5;
+                GPCustomTree.MaxLevel = depth + 3;
             }
             var selection = new EliteSelection();
             pop = new Population(30, tree, fitnessFunction, selection);
