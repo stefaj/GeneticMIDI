@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators.Sequence
 {
-    public class AccompanimentGenerator2
+    public class AccompanimentGeneratorANNFF
     {
         PatchNames instrument;
-        ActivationNetwork network;
+        Network network;
         Dictionary<Note, int> noteHashes = new Dictionary<Note, int>();
         int hash;
         const int INPUT_NOTES = 1;
@@ -25,13 +25,57 @@ namespace GeneticMIDI.Generators.Sequence
         MelodySequence sequence;
         CompositionCategory category;
 
+        string SAVE_FILE
+        {
+            get
+            {
+                return "accomp_ann_ff_" + ((int)instrument).ToString() + ".dat";
+            }
+        }
 
-        public AccompanimentGenerator2(CompositionCategory category, PatchNames instrument)
+        private string SavePath
+        {
+            get
+            {
+                return "save" + System.IO.Path.DirectorySeparatorChar + category.CategoryName + System.IO.Path.DirectorySeparatorChar + SAVE_FILE;
+            }
+        }
+
+
+        public AccompanimentGeneratorANNFF(CompositionCategory category, PatchNames instrument)
         {
             this.category = category;
             this.instrument = instrument;
         }
 
+        public void Save()
+        {
+            string root = System.IO.Path.GetDirectoryName(SavePath);
+            if (!System.IO.Directory.Exists(root))
+                System.IO.Directory.CreateDirectory(root);
+
+            
+            network.Save(SavePath);
+        }
+
+        public void Load()
+        {
+            this.network = ActivationNetwork.Load(SavePath);
+        }
+
+        public void Initialize()
+        {
+             if (System.IO.File.Exists(SavePath + "1"))
+      {
+          Console.WriteLine("Loading from file");
+          Load();
+      }
+      else
+            {
+                Console.WriteLine("Generating from library");
+                Train();
+            }
+        }
 
         public void Train()
         {
@@ -67,19 +111,18 @@ namespace GeneticMIDI.Generators.Sequence
                 2 ); // one neuron in the second layer*/
 
 
-            var teacher = new ResilientBackpropagationLearning(network);
+            var teacher = new ResilientBackpropagationLearning(network as ActivationNetwork);
 
             // learn 5000 iterations
             int epochs = 50000;
             for (int i = 0; i < epochs; i++)
             {
-           
                 var e = teacher.RunEpoch(inputs,outputs);
 
                 Console.WriteLine("{0} : {1}", i / (double)epochs * 100, e);
-
-
             }
+
+            Save();
 
         }
 
@@ -215,7 +258,6 @@ namespace GeneticMIDI.Generators.Sequence
 
         public Sample GetSample(Note input, Note output)
         {
-
             Sample s = new Sample(GetNoteRepresentation(input), GetNoteRepresentation(output));
 
             return s;

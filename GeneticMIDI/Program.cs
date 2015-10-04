@@ -67,7 +67,7 @@ namespace GeneticMIDI
             Composition inputComp = cat.Compositions[6];
             MelodySequence inputSeq = inputComp.Tracks[0].GetMainSequence() as MelodySequence;
 
-            AccompanimentGenerator2 gen = new AccompanimentGenerator2(cat, PatchNames.Acoustic_Grand);
+            AccompanimentGeneratorANNFF gen = new AccompanimentGeneratorANNFF(cat, PatchNames.Acoustic_Grand);
             //gen.Initialize();
             gen.SetSequence(inputSeq);
             gen.Train();

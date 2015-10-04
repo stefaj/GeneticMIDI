@@ -217,23 +217,45 @@ namespace Visualizer
             {
                 if (accompInstruBox.Items.Count == 0 || accompTrackBox.Items.Count == 0)
                     return;
-                PatchNames instrument = (PatchNames)(accompInstruBox.SelectedItem as ListBoxItem).Tag;
+                PatchNames instrument = (PatchNames)(accompInstruBox.SelectedItem);
                 Track track = (accompTrackBox.SelectedItem as ListBoxItem).Tag as Track;
-                AccompanimentGenerator gen = new AccompanimentGenerator(category, instrument);
 
-                new Thread(() =>
-               {
-                   StartSpinner();
-                   gen.Initialize();
-                   gen.SetSequence(track.GetMainSequence() as MelodySequence);
-                   GeneratedSequence = gen.Generate();
-                   StopSpinner();
-                   progressGenSlider.Dispatcher.Invoke(() =>
-                   {
-                       progressGenSlider.Value = 100;
-                   });
+                var melSeq = track.GetMainSequence() as MelodySequence;
+                Random rnd = new Random();
+                if(accompMethoBox.SelectedIndex == 0)
+                {
+                    AccompanyGeneratorMarkov gen = new AccompanyGeneratorMarkov(category);
+                    new Thread(() =>
+                        {
 
-               }).Start();
+                            StartSpinner();
+                            GeneratedSequence = gen.Generate(melSeq,rnd.Next());
+                            StopSpinner();
+                            progressGenSlider.Dispatcher.Invoke(() =>
+                            {
+                                progressGenSlider.Value = 100;
+                            });
+                        }).Start();
+                }
+                else if (accompMethoBox.SelectedIndex == 1)
+                {
+                    AccompanimentGeneratorANNFF gen = new AccompanimentGeneratorANNFF(category, instrument);
+                    
+                    gen.SetSequence(melSeq);
+                    new Thread(() =>
+                        {
+
+                            StartSpinner();
+                            gen.Train();
+                            GeneratedSequence = gen.Generate();
+                            StopSpinner();
+                            progressGenSlider.Dispatcher.Invoke(() =>
+                                {
+                                    progressGenSlider.Value = 100;
+                                });
+
+                        }).Start();
+                }
                 
                 Instrument = instrument;
             }
@@ -371,6 +393,15 @@ namespace Visualizer
             }
 
             
+        }
+
+        private void accompMethoBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            accompInstruBox.Items.Clear();
+            accompInstruBox.Items.Add(PatchNames.Acoustic_Grand);
+            accompInstruBox.Items.Add(PatchNames.Orchestral_Strings);
+            accompInstruBox.Items.Add(PatchNames.Flute);
+            accompInstruBox.Items.Add(PatchNames.Music_Box);
         }
     }
 

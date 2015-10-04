@@ -46,10 +46,15 @@
             </TabItem>
             <TabItem x:Name="tabAccomp" Header="Accompaniment" Custom:ControlsHelper.HeaderFontSize="16" Margin="4,0,-4,0">
                 <Grid>
-                    <ComboBox x:Name="accompTrackBox" Margin="80,10,247,0" Height="26" VerticalAlignment="Top"/>
-                    <Label Content="Track" Margin="0,10,412,0" Height="28" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="accompInstruBox" Margin="80,43,247,0" Height="26" VerticalAlignment="Top"/>
-                    <Label Content="Instrument" Margin="0,43,412,0" Height="28" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="accompTrackBox" Margin="80,44,247,0" Height="26" VerticalAlignment="Top"/>
+                    <Label Content="Track" Margin="0,44,412,0" Height="28" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="accompInstruBox" Margin="80,77,247,0" Height="26" VerticalAlignment="Top"/>
+                    <Label Content="Instrument" Margin="0,77,412,0" Height="28" VerticalAlignment="Top"/>
+                    <Label Content="Method" Margin="0,11,492,0" Height="28" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="accompMethoBox" Margin="80,11,247,0" Height="26" VerticalAlignment="Top" SelectionChanged="accompMethoBox_SelectionChanged">
+                        <ComboBoxItem>Hidden Markov Model</ComboBoxItem>
+                        <ComboBoxItem>Neural Network</ComboBoxItem>
+                    </ComboBox>
                 </Grid>
             </TabItem>
             <TabItem x:Name="tabLoad" Header="Load" Custom:ControlsHelper.HeaderFontSize="16">

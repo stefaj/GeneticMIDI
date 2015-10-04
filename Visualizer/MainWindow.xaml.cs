@@ -517,6 +517,8 @@ namespace Visualizer
 
                 generated.Tracks.Add(track);
             }
+
+            SetupPlayPlot(generated);
         }
 
         private void clearBtn_Click(object sender, RoutedEventArgs e)
