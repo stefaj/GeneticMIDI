@@ -9,13 +9,13 @@ namespace GeneticMIDI.Metrics.Features
 {
     class DurationSim : IMetric
     {
-        public Dictionary<object, float> Generate(Representation.Note[] notes)
+        public Dictionary<Pair, float> Generate(Representation.Note[] notes)
         {
-            Dictionary<object, float> dic = new Dictionary<object, float>();
+            Dictionary<Pair, float> dic = new Dictionary<Pair, float>();
             float time = 0;
             foreach(Note n in notes)
             {
-                dic[time] = n.Duration;
+                dic[new Pair(time)] = n.Duration;
                 time += n.Duration;
             }
             return dic;

@@ -70,7 +70,7 @@ namespace GeneticMIDI.Generators.Sequence
             var teacher = new ResilientBackpropagationLearning(network);
 
             // learn 5000 iterations
-            int epochs = 1000;
+            int epochs = 50000;
             for (int i = 0; i < epochs; i++)
             {
            
@@ -194,6 +194,8 @@ namespace GeneticMIDI.Generators.Sequence
                     while (accompTime < mainTime)
                     {
                         accompIndex = j + (++accompOff);
+                        if (accompIndex >= notes.Length - 1)
+                            break;
                         accompTime += notes[accompIndex].Duration;
                     }
                 }

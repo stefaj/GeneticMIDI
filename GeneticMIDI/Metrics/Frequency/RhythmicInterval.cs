@@ -35,6 +35,10 @@ namespace GeneticMIDI.Metrics.Frequency
                         duration2 += notes[j].Duration;
                 }
                 float rel = duration1 / duration2;
+
+                if (float.IsInfinity(rel) || float.IsNaN(rel))
+                    continue;
+
                 Add(new Pair(rel));
 
                 if (j >= notes.Length - 1)

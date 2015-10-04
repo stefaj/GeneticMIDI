@@ -9,9 +9,9 @@ namespace GeneticMIDI.Metrics.Features
 {
     class KeyPrevalence : IMetric
     {
-        public Dictionary<object, float> Generate(Note[] notes)
+        public Dictionary<Pair, float> Generate(Note[] notes)
         {
-            Dictionary<object, float> dic = new Dictionary<object, float>();
+            Dictionary<Pair, float> dic = new Dictionary<Pair, float>();
            for(int i = 0; i < 12; i++)
            {
                int[] chords = StandardKeys.MAJOR_KEYS[i];
@@ -19,7 +19,7 @@ namespace GeneticMIDI.Metrics.Features
                foreach(Note n in notes)
                     if(chords.Contains(n.NotePitch))
                         sum+=1;
-               dic[i] = sum / notes.Length;
+               dic[new Pair(i)] = sum / notes.Length;
                               
            }
            return dic;

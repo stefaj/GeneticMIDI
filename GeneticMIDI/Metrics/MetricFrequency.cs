@@ -9,21 +9,21 @@ namespace GeneticMIDI.Metrics
 {
     public abstract class MetricFrequency : IMetric
     {
-        private Dictionary<object, float> frequencies;
+        private Dictionary<Pair, float> frequencies;
         protected const float p = 0.02f;
 
         public MetricFrequency()
         {
-            frequencies = new Dictionary<object, float>();
+            frequencies = new Dictionary<Pair, float>();
         }
-        public Dictionary<object, float> Frequencies
+        public Dictionary<Pair, float> Frequencies
         {
             get { return frequencies; }
         }
 
-        public Dictionary<object, float> Generate(Note[] notes)
+        public Dictionary<Pair, float> Generate(Note[] notes)
         {
-            frequencies = new Dictionary<object, float>();
+            frequencies = new Dictionary<Pair, float>();
             frequencies.Clear();
             GenerateFrequencies(notes);
             Filter();
@@ -36,9 +36,11 @@ namespace GeneticMIDI.Metrics
         {
             int N = frequencies.Keys.Count;
             var keys = frequencies.Keys.ToArray();
-            for (int i = 0; i < keys.Length; i++ )
+            for (int i = 0; i < N; i++ )
             {
                 var k = keys[i];
+                if (!frequencies.ContainsKey(k))
+                    continue;
                 if (frequencies[k] / (float)N < p)
                 {
                     frequencies.Remove(k);
@@ -51,7 +53,7 @@ namespace GeneticMIDI.Metrics
             var list = frequencies.Keys.ToList();
             list.Sort();
 
-            Dictionary<object, float> frequencies2 = new Dictionary<object,float>();
+            Dictionary<Pair, float> frequencies2 = new Dictionary<Pair,float>();
             
             // Loop through keys.
             foreach (var key in list)
@@ -64,6 +66,11 @@ namespace GeneticMIDI.Metrics
 
         public void Add(Pair p)
         {
+            if (float.IsNaN(p.Comp1) || float.IsNaN(p.Comp2) || float.IsInfinity(p.Comp1) || float.IsInfinity(p.Comp2))
+                return;
+            p.Comp1 = (float)Math.Round(p.Comp1, 2);
+            p.Comp2 = (float)Math.Round(p.Comp2, 2);
+
             if (frequencies.ContainsKey(p))
                 frequencies[p]++;
             else

@@ -29,6 +29,9 @@ namespace GeneticMIDI.Metrics.Frequency
                         duration1 += notes[j].Duration;
                 }
 
+                if (j >= notes.Length - 1)
+                    break;
+
                 float duration2 = notes[j].Duration;
                 j++;
                 for (; j < notes.Length; j++)
@@ -44,8 +47,7 @@ namespace GeneticMIDI.Metrics.Frequency
                 if (j >= notes.Length - 1)
                     break;
             }
-
-
+            
 
             for (int i = 0; i < intervals.Count-2; i += 2)
             {

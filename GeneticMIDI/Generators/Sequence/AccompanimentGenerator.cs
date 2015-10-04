@@ -20,11 +20,11 @@ namespace GeneticMIDI.Generators.Sequence
         java.util.Random rnd = new java.util.Random(0);
 
         // Constant stuff
-        const int MAX_OUTPUTS = 100;
+        const int MAX_OUTPUTS = 2;
         const int MAX_INPUTS = 2;
-        const int MAX_HIDDEN = 10;
+        const int MAX_HIDDEN = 5;
         const int epochs = 100;
-        const double learningrate = 0.01;
+        const double learningrate = 0.05;
         const double momentum = 0.4;
         const double filterThreshold = 0.1;
         string SAVE_FILE
@@ -111,7 +111,7 @@ namespace GeneticMIDI.Generators.Sequence
                     else frequencies[notes[j]] += 1;
                 }
 
-                // Filtering
+               /* // Filtering
                 for (int j = 0; j < max; j++)
                 {
                     double normalizedFrequency = frequencies[notes[j]] / (double)max;
@@ -123,7 +123,7 @@ namespace GeneticMIDI.Generators.Sequence
 
                     if (!noteHashes.ContainsKey(notes[j]))
                         noteHashes[notes[j]] = hash++;
-                }
+                }*/
                 
 
                 int mainTrackTime = 0;
@@ -148,12 +148,13 @@ namespace GeneticMIDI.Generators.Sequence
                     if (j + incr > max - 1)
                         break;
 
-                    if (!noteHashes.ContainsKey(notes[j + incr]))
+/*                    if (!noteHashes.ContainsKey(notes[j + incr]))
                         continue;
 
                     // caching notes
                     if (noteHashes[notes[j + incr]] > MAX_OUTPUTS - 1)
                         continue;
+                    */
 
                     Sample s = GetSample(mainNotes[j],notes[j+incr]);
 
@@ -167,12 +168,16 @@ namespace GeneticMIDI.Generators.Sequence
 
         public Sample GetSample(Note input, Note output)
         {
-            var outputs = new double[MAX_OUTPUTS];
+          /*  var outputs = new double[MAX_OUTPUTS];
             
             if(output != null)
-                outputs[noteHashes[output]] = 1;
+                outputs[noteHashes[output]] = 1;*/
 
-            Sample s = new Sample(new double[] { (double)input.Pitch / 128.0, (double)input.Duration / 64.0 },
+
+            var outputs = new double[]{0,0};
+            if (output != null)
+                outputs = new double[] { (double)output.NotePitch / 12.0, (double)output.Duration / 64.0 };
+            Sample s = new Sample(new double[] { (double)input.NotePitch / 12.0, (double)input.Duration / 64.0 },
                outputs);
 
             return s;
@@ -268,10 +273,15 @@ namespace GeneticMIDI.Generators.Sequence
             foreach (Sample sample in set)
             {
                 var res = ComputeNetworkOutput(sample);
-                var maxIndex = GetMaxIndex(res);
-
-                Note outputNote = new Note();
-                if (reverseHashes.ContainsKey(maxIndex))
+                //var maxIndex = GetMaxIndex(res);
+                Note outputNote = null;
+                if(res[0] <= 0.05)
+                    outputNote = new Note(-1, (int)(res[1] * 64.0),0);
+                else
+                    outputNote = new Note((NoteNames)(res[0] * 12), 4, (Durations)(res[1] * 64.0));
+                outputNote.StandardizeDuration();
+                notes.Add(outputNote);
+             /*   if (reverseHashes.ContainsKey(maxIndex))
                 {
                     outputNote = reverseHashes[maxIndex];
                     notes.Add(outputNote);
@@ -282,7 +292,7 @@ namespace GeneticMIDI.Generators.Sequence
                         accompTime += mainTime - accompTime;
                     }
                     mainTime += (int)(sample.getInput()[1] * 64.0);*/
-                }
+                //}
             }
 
             return notes.ToArray();
@@ -321,12 +331,12 @@ namespace GeneticMIDI.Generators.Sequence
 
         public void Initialize()
         {
-            if (System.IO.File.Exists(SavePath + "1"))
+          /*  if (System.IO.File.Exists(SavePath + "1"))
             {
                 Console.WriteLine("Loading from file");
                 LoadFromFile();
             }
-            else
+            else*/
             {
                 Console.WriteLine("Generating from library");
                 TrainNetwork();

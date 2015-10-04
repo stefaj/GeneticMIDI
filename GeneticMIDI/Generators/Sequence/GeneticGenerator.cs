@@ -105,10 +105,36 @@ namespace GeneticMIDI.Generators
             
             GPCustomTree best = pop.BestChromosome as GPCustomTree;
             var notes = best.GenerateNotes();
-            return new MelodySequence(notes);
+            return FixMelodySequence(new MelodySequence(notes));
         }
 
+        private MelodySequence FixMelodySequence(MelodySequence seq)
+        {
+            var newNotes = new List<Note>();
+            var notes = seq.ToArray();
+            if (notes.Length > 1)
+                newNotes.Add(notes[0]);
+            for(int i = 1; i < notes.Length; i++)
+            {
+                bool add = true;
 
+                var note = notes[i];
+                var prevNote = notes[i - 1];
+
+                if (!note.IsRest())
+                {
+
+                    if (Math.Abs(note.Pitch - prevNote.Pitch) > 24)
+                    {
+                        add = false;
+                    }
+                }
+
+                if (add)
+                    newNotes.Add(note);
+            }
+            return new MelodySequence(newNotes.ToArray());
+        }
 
         public MelodySequence Next()
         {
@@ -128,7 +154,7 @@ namespace GeneticMIDI.Generators
             
             GPCustomTree best = pop.BestChromosome as GPCustomTree;
             var notes = best.GenerateNotes();
-            return new MelodySequence(notes);
+            return FixMelodySequence(new MelodySequence(notes));
         }
 
 

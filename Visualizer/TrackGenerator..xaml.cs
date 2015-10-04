@@ -153,7 +153,7 @@ namespace Visualizer
                     fitness = GeneticMIDI.FitnessFunctions.NCD.FromMelodies(category);
 
 
-                var gen = new GeneticGenerator(fitness, seq);
+                var gen = new GeneticGenerator(fitness, category);
                 gen.OnPercentage += gen_OnPercentage;
 
                 gen.MaxGenerations = (int)maxGenerationSlider.Value;

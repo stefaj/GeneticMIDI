@@ -20,14 +20,14 @@ namespace GeneticMIDI.FitnessFunctions
         IMetric[] metrics;
         Note[] target;
 
-        Dictionary<object, float>[] target_metrics;
+        Dictionary<Pair, float>[] target_metrics;
         SimilarityType type;
         public MetricSimilarity(MelodySequence seq, IMetric metric, SimilarityType type = SimilarityType.Cosine)
         {
             this.metrics = new IMetric[]{metric};
             this.target = seq.ToArray();
             this.type = type;
-            this.target_metrics = new Dictionary<object, float>[] { this.metrics[0].Generate(this.target) };
+            this.target_metrics = new Dictionary<Pair, float>[] { this.metrics[0].Generate(this.target) };
            
         }
 
@@ -35,7 +35,7 @@ namespace GeneticMIDI.FitnessFunctions
         {
             this.metrics = metrics;
             this.target = seq.ToArray();
-            target_metrics = new Dictionary<object, float>[metrics.Length];
+            target_metrics = new Dictionary<Pair, float>[metrics.Length];
             this.type = type;
             for (int i = 0; i < metrics.Length; i++)
                 target_metrics[i] = this.metrics[i].Generate(this.target);
