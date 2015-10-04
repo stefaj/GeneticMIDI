@@ -63,19 +63,27 @@ namespace GeneticMIDI
 
             
             return;*/
-            MetricSimilarity cosine =  MetricSimilarity.GenerateMetricSimilarityMulti(cat.Compositions, new IMetric[]{ new ChromaticToneDuration(), new MelodicBigram(), new RhythmicBigram()});
-            GeneticGenerator gen = new GeneticGenerator(cosine, cat);
-            gen.OnPercentage += (sender, percentage, fitness) => { Console.WriteLine("{0}: {1}", percentage, fitness); };
-            gen.MaxGenerations = 20000;
-            var outMel = gen.Generate();
 
+            Composition inputComp = cat.Compositions[6];
+            MelodySequence inputSeq = inputComp.Tracks[0].GetMainSequence() as MelodySequence;
+
+            AccompanimentGenerator2 gen = new AccompanimentGenerator2(cat, PatchNames.Acoustic_Grand);
+            //gen.Initialize();
+            gen.SetSequence(inputSeq);
+            gen.Train();
+
+            var outMel = gen.Generate();
+            
             MusicPlayer player = new MusicPlayer();
-            player.Play(outMel);
+   
 
             Composition comp = new Composition();
-            Track t = new Track(PatchNames.Acoustic_Grand, 3);
+            Track t = new Track(PatchNames.Orchestral_Strings, 6);
             t.AddSequence(outMel);
-            comp.WriteToMidi("genetic_cosine.mid");
+            comp.Add(t);
+            comp.Add(inputComp.Tracks[0]);
+            player.Play(comp);
+            comp.WriteToMidi("ann_ff_accomp.mid");
 
 
          /*   Databank db = new Databank("lib");
@@ -119,6 +127,100 @@ namespace GeneticMIDI
         static void GenerateCategories()
         {
             Databank.GenerateCategories(@"D:\Sync\4th year\Midi\Library2", "lib");
+        }
+
+        static void LSTMAccompTest()
+        {
+
+            Databank db = new Databank("lib");
+            var cat = db.Load("Classical");
+
+            Composition inputComp = cat.Compositions[3];
+            MelodySequence inputSeq = inputComp.Tracks[0].GetMainSequence() as MelodySequence;
+
+            AccompanimentGenerator gen = new AccompanimentGenerator(cat, PatchNames.Acoustic_Grand);
+            gen.Initialize();
+            gen.SetSequence(inputSeq);
+
+            var outMel = gen.Generate();
+
+            MusicPlayer player = new MusicPlayer();
+
+
+            Composition comp = new Composition();
+            Track t = new Track(PatchNames.Orchestral_Strings, 6);
+            t.AddSequence(outMel);
+            comp.Add(t);
+            // comp.Add(inputComp.Tracks[0]);
+            player.Play(comp);
+            comp.WriteToMidi("lstm_accomp.mid");
+        }
+
+        static void MarkovAccompTest()
+        {
+            Databank db = new Databank("lib");
+            var cat = db.Load("Classical");
+
+
+            Composition inputComp = cat.Compositions[6];
+            MelodySequence inputSeq = inputComp.Tracks[0].GetMainSequence() as MelodySequence;
+
+            AccompanyGeneratorMarkov gen = new AccompanyGeneratorMarkov(cat);
+
+            var outMel = gen.Generate(inputSeq, 10);
+
+            MusicPlayer player = new MusicPlayer();
+
+
+            Composition comp = new Composition();
+            Track t = new Track(PatchNames.Orchestral_Strings, 6);
+            t.AddSequence(outMel);
+            comp.Add(t);
+            comp.Add(inputComp.Tracks[0]);
+            player.Play(comp);
+            comp.WriteToMidi("markov_model_accomp.mid");
+
+        }
+
+        static void GeneticTest()
+        {
+            Databank db = new Databank("lib");
+            var cat = db.Load("Classical");
+
+
+            MetricSimilarity cosine = MetricSimilarity.GenerateMetricSimilarityMulti(cat.Compositions, new IMetric[] { new ChromaticToneDistance(), new MelodicInterval(), new ChromaticToneDuration(), new RhythmicBigram() });
+            GeneticGenerator gen = new GeneticGenerator(cosine, cat);
+            gen.OnPercentage += (sender, percentage, fitness) => { Console.WriteLine("{0}: {1}", percentage, fitness); };
+            gen.MaxGenerations = 1000;
+            var outMel = gen.Generate();
+
+            MusicPlayer player = new MusicPlayer();
+            player.Play(outMel);
+
+            Composition comp = new Composition();
+            Track t = new Track(PatchNames.Acoustic_Grand, 3);
+            t.AddSequence(outMel);
+            comp.Add(t);
+            comp.WriteToMidi("genetic_cosine_all.mid");
+        }
+
+        static void InstrumentalTest()
+        {
+            Databank db = new Databank("lib");
+            var cat = db.Load("Classical");
+
+            InstrumentalGenerator gen = new InstrumentalGenerator(cat);
+            gen.Initialize();
+            var outMel = gen.GenerateInstrument(PatchNames.Acoustic_Grand, 40);
+
+            MusicPlayer player = new MusicPlayer();
+            player.Play(outMel);
+
+            Composition comp = new Composition();
+            Track t = new Track(PatchNames.Acoustic_Grand, 3);
+            t.AddSequence(outMel);
+            comp.Add(t);
+            comp.WriteToMidi("instrumental_acousticgrand.mid");
         }
 
         static void NeuralNetworkAccompanimentTest()
