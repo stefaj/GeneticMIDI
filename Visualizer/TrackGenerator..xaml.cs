@@ -342,7 +342,8 @@ namespace Visualizer
                     instrBox.Dispatcher.Invoke(() =>
                     {
                         instrBox.Items.Clear();
-                        foreach (var i in g.Instruments)
+                        var instrs = g.GetInstruments(7);
+                        foreach (var i in instrs)
                         {
                             ListBoxItem boxItem = new ListBoxItem();
                             boxItem.Content = i.ToString();

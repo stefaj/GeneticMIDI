@@ -118,10 +118,10 @@
     <Compile Include="FitnessFunctions\MetricSimilarity.cs" />
     <Compile Include="FitnessFunctions\CrossCorrelation.cs" />
     <Compile Include="Generators\CompositionGenerator\CompositionGenerator.cs" />
-    <Compile Include="Generators\CompositionGenerator\InstrumentalGenerator.cs" />
+    <Compile Include="Generators\Sequence\InstrumentalGenerator.cs" />
     <Compile Include="Generators\Harmony\SimpleChord.cs" />
     <Compile Include="Generators\Sequence\AccompanimentGenerator.cs" />
-    <Compile Include="Generators\Sequence\AccompanimentGenerator2.cs" />
+    <Compile Include="Generators\Sequence\AccompanimentGeneratorANNFF.cs" />
     <Compile Include="Generators\Sequence\AccompanyGeneratorMarkov.cs" />
     <Compile Include="Generators\Sequence\HMMGenerator.cs" />
     <Compile Include="Metrics\Features\DurationSim.cs" />

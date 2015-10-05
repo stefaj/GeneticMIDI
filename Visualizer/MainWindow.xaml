@@ -50,7 +50,17 @@
 
                     </ComboBox>
                     <Label Content="Guide" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top"/>
-                    <ListBox x:Name="itemsBox" Margin="10,60,10,73" SelectionChanged="itemsBox_SelectionChanged"/>
+                    <ListBox x:Name="itemsBox" Margin="10,60,10,73" SelectionChanged="itemsBox_SelectionChanged">
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Delete" Click="MenuItem_Click">
+                              <MenuItem.Icon>
+                                        <Image Source="Resources/glyphicons-208-remove-2.png" />
+                                    </MenuItem.Icon>      
+                                </MenuItem>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                    </ListBox>
                 </Grid>
 
             </TabItem>

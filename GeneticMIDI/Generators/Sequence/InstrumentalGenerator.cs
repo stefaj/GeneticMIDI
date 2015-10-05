@@ -83,6 +83,24 @@ namespace GeneticMIDI.Generators.CompositionGenerator
             GenerateFromFiles(comps);
         }
 
+        public PatchNames[] GetInstruments(int n)
+        {
+            var myList = instrument_tracker.ToList();
+
+            myList.Sort((firstPair, nextPair) =>
+            {
+                return firstPair.Value.CompareTo(nextPair.Value);
+            }
+            );
+
+            List<PatchNames> instrs = new List<PatchNames>();
+            for(int i = 0; i < n; i++)
+            {
+                instrs.Add(myList[myList.Count - i - 1].Key);
+            }
+            return instrs.ToArray();
+        }
+
 
         public void GenerateFromFiles(Composition[] compositions)
         {
@@ -145,8 +163,6 @@ namespace GeneticMIDI.Generators.CompositionGenerator
 
         private void Save()
         {
-            return;
-
             string root = System.IO.Path.GetDirectoryName(SavePath);
             if (!System.IO.Directory.Exists(root))
                 System.IO.Directory.CreateDirectory(root);

@@ -531,5 +531,23 @@ namespace Visualizer
         {
            
         }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ListBoxItem item = itemsBox.SelectedItem as ListBoxItem;
+
+            try
+            {
+                int index = itemsBox.Items.IndexOf(item);
+                generated.Tracks.RemoveAt(index);
+            }
+            catch
+            {
+
+            }
+            itemsBox.Items.Remove(item);
+
+            SetupPlayPlot(generated);
+        }
     }
 }
