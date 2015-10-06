@@ -2,6 +2,6 @@
 .NET application to algorithmically generate music using Genetic Algorithms, Markov Chains and Neural Networks.
 
 ## Requires
-[Dot Net Music](https://github.com/stefan-j/DotNetMusic)
-[Dot Net Learn](https://github.com/stefan-j/DotNetLearn)
+* [Dot Net Music](https://github.com/stefan-j/DotNetMusic)
+* [Dot Net Learn](https://github.com/stefan-j/DotNetLearn)
 
