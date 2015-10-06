@@ -78,16 +78,6 @@
     <Reference Include="AForge.Neuro">
       <HintPath>..\packages\AForge.Neuro.2.2.5\lib\AForge.Neuro.dll</HintPath>
     </Reference>
-    <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>..\..\..\..\..\Downloads\ikvmbin-7.2.4630.5\ikvm-7.2.4630.5\bin\IKVM.OpenJDK.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.Runtime, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\IKVM.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="jannlab-0.10-alpha">
-      <HintPath>..\..\..\..\..\Downloads\ikvmbin-7.2.4630.5\ikvm-7.2.4630.5\bin\jannlab-0.10-alpha.dll</HintPath>
-    </Reference>
     <Reference Include="MahApps.Metro">
       <HintPath>..\packages\MahApps.Metro.1.0.0.0\lib\net45\MahApps.Metro.dll</HintPath>
     </Reference>
@@ -117,6 +107,14 @@
     <Compile Include="Constants.cs" />
     <Compile Include="FitnessFunctions\MetricSimilarity.cs" />
     <Compile Include="FitnessFunctions\CrossCorrelation.cs" />
+    <Compile Include="Random\BrownNoiseGenerator.cs" />
+    <Compile Include="Random\DiceCounter.cs" />
+    <Compile Include="Random\DiceUtil.cs" />
+    <Compile Include="Random\IDice.cs" />
+    <Compile Include="Random\NoteRangeRestrictor.cs" />
+    <Compile Include="Generators\Sequence\ReflectingBrownGenerator.cs" />
+    <Compile Include="Random\ScaleType.cs" />
+    <Compile Include="Random\SidedDice.cs" />
     <Compile Include="Generators\CompositionGenerator\CompositionGenerator.cs" />
     <Compile Include="Generators\Sequence\InstrumentalGenerator.cs" />
     <Compile Include="Generators\Harmony\SimpleChord.cs" />
@@ -171,13 +169,13 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DotNetLearn\DotNetLearn.csproj">
+      <Project>{913d8218-67dc-4b47-95e7-2f80e0e8e097}</Project>
+      <Name>DotNetLearn</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DotNetMusic\DotNetMusic\DotNetMusic.csproj">
       <Project>{7f114af7-08e3-4de3-bae5-37ae43c451ed}</Project>
       <Name>DotNetMusic</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MachineLearning\DotNetLearn.csproj">
-      <Project>{913d8218-67dc-4b47-95e7-2f80e0e8e097}</Project>
-      <Name>DotNetLearn</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

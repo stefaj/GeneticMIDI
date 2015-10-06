@@ -5,6 +5,7 @@ using AForge.Genetic;
 using AForge.Neuro;
 using AForge.Neuro.Learning;
 using GeneticMIDI.FitnessFunctions;
+using GeneticMIDI.Fractal;
 using GeneticMIDI.Generators;
 using GeneticMIDI.Generators.CompositionGenerator;
 using GeneticMIDI.Generators.Harmony;
@@ -64,60 +65,49 @@ namespace GeneticMIDI
             
             return;*/
 
-            Composition inputComp = cat.Compositions[6];
-            MelodySequence inputSeq = inputComp.Tracks[0].GetMainSequence() as MelodySequence;
+            var gen = new ReflectingBrownNoteGenerator(new NoteRangeRestrictor(48, 72, 2, 16, Scales.ScaleTypes[5]), new Random(), -1, 1, -1, 1);
 
-            AccompanimentGeneratorANNFF gen = new AccompanimentGeneratorANNFF(cat, PatchNames.Acoustic_Grand);
-            //gen.Initialize();
-            gen.SetSequence(inputSeq);
-            gen.Train();
 
-            var outMel = gen.Generate();
-            
+            MelodySequence seq = gen.Generate();
+            Console.WriteLine(seq.ToString());
             MusicPlayer player = new MusicPlayer();
-   
-
-            Composition comp = new Composition();
-            Track t = new Track(PatchNames.Orchestral_Strings, 6);
-            t.AddSequence(outMel);
-            comp.Add(t);
-            comp.Add(inputComp.Tracks[0]);
-            player.Play(comp);
-            comp.WriteToMidi("ann_ff_accomp.mid");
-
-
-         /*   Databank db = new Databank("lib");
-            var cat = db.Load("Classical");
-            //AccompanimentGenerator2 Test
-            AccompanimentGenerator2 gen = new AccompanimentGenerator2(cat, PatchNames.Orchestral_Strings);
-            gen.Train();
-            //
-            Composition comp = Composition.LoadFromMIDI(@"D:\Sync\4th year\Midi\Library2\Classical\Mixed\dvorak.mid");
-            //var comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\ff7tifa.mid");
-            gen.SetSequence(comp.Tracks[0].GetMainSequence() as MelodySequence);
-
-            
-
-            MusicPlayer player = new MusicPlayer();
-
-      
-                Console.WriteLine("Press enter to listen");
-                Console.ReadLine();
-
-                var mel = gen.Generate();
-                Composition newComp = new Composition();
-                Track newTrack = new Track(PatchNames.Orchestral_Strings , 2);
-                newTrack.AddSequence(mel);
-                newComp.Add(newTrack);
-                /*comp.Tracks[0].Instrument = PatchNames.Acoustic_Grand; (comp.Tracks[0].GetMainSequence() as MelodySequence).ScaleVelocity(0.8f);
-                /* newComp.Tracks.Add(comp.Tracks[0]);
-
-
-                player.Play(newComp);*/
-            
-
+            player.Play(seq);
 
             Console.ReadLine();
+
+
+                /*   Databank db = new Databank("lib");
+                   var cat = db.Load("Classical");
+                   //AccompanimentGenerator2 Test
+                   AccompanimentGenerator2 gen = new AccompanimentGenerator2(cat, PatchNames.Orchestral_Strings);
+                   gen.Train();
+                   //
+                   Composition comp = Composition.LoadFromMIDI(@"D:\Sync\4th year\Midi\Library2\Classical\Mixed\dvorak.mid");
+                   //var comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\ff7tifa.mid");
+                   gen.SetSequence(comp.Tracks[0].GetMainSequence() as MelodySequence);
+
+            
+
+                   MusicPlayer player = new MusicPlayer();
+
+      
+                       Console.WriteLine("Press enter to listen");
+                       Console.ReadLine();
+
+                       var mel = gen.Generate();
+                       Composition newComp = new Composition();
+                       Track newTrack = new Track(PatchNames.Orchestral_Strings , 2);
+                       newTrack.AddSequence(mel);
+                       newComp.Add(newTrack);
+                       /*comp.Tracks[0].Instrument = PatchNames.Acoustic_Grand; (comp.Tracks[0].GetMainSequence() as MelodySequence).ScaleVelocity(0.8f);
+                       /* newComp.Tracks.Add(comp.Tracks[0]);
+
+
+                       player.Play(newComp);*/
+
+
+
+                Console.ReadLine();
         }
 
         /// <summary>
@@ -129,10 +119,38 @@ namespace GeneticMIDI
             Databank.GenerateCategories(@"D:\Sync\4th year\Midi\Library2", "lib");
         }
 
+        static void ANNFFNAccomp()
+        {
+            Databank db = new Databank("lib");
+            var cat = db.Load("Classical");
+
+            Composition inputComp = cat.Compositions[6];
+            MelodySequence inputSeq = inputComp.Tracks[0].GetMainSequence() as MelodySequence;
+
+            AccompanimentGeneratorANNFF gen = new AccompanimentGeneratorANNFF(cat, PatchNames.Acoustic_Grand);
+            //gen.Initialize();
+            gen.SetSequence(inputSeq);
+            gen.Train();
+
+            var outMel = gen.Generate();
+
+            MusicPlayer player = new MusicPlayer();
+
+
+            Composition comp = new Composition();
+            Track t = new Track(PatchNames.Orchestral_Strings, 6);
+            t.AddSequence(outMel);
+            comp.Add(t);
+            comp.Add(inputComp.Tracks[0]);
+            player.Play(comp);
+            comp.WriteToMidi("ann_ff_accomp.mid");
+
+        }
+
         static void LSTMAccompTest()
         {
 
-            Databank db = new Databank("lib");
+       /*     Databank db = new Databank("lib");
             var cat = db.Load("Classical");
 
             Composition inputComp = cat.Compositions[3];
@@ -153,7 +171,7 @@ namespace GeneticMIDI
             comp.Add(t);
             // comp.Add(inputComp.Tracks[0]);
             player.Play(comp);
-            comp.WriteToMidi("lstm_accomp.mid");
+            comp.WriteToMidi("lstm_accomp.mid");*/
         }
 
         static void MarkovAccompTest()

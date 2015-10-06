@@ -3,7 +3,7 @@ using Accord.Neuro.Learning;
 using Accord.Neuro.Networks;
 using AForge.Neuro;
 using AForge.Neuro.Learning;
-using GeneticMIDI.ML;
+using DotNetLearn.Data;
 using GeneticMIDI.Representation;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,7 @@ namespace GeneticMIDI.Generators.Sequence
 {
     public class AccompanimentGeneratorANNFF
     {
+        
         PatchNames instrument;
         Network network;
         Dictionary<Note, int> noteHashes = new Dictionary<Note, int>();
@@ -27,8 +28,10 @@ namespace GeneticMIDI.Generators.Sequence
 
         string SAVE_FILE
         {
+
             get
             {
+                
                 return "accomp_ann_ff_" + ((int)instrument).ToString() + ".dat";
             }
         }

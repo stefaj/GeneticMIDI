@@ -164,10 +164,6 @@
       <Project>{8f0794a6-48b2-404a-a36f-451cb0e91c96}</Project>
       <Name>GeneticMIDI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MachineLearning\DotNetLearn.csproj">
-      <Project>{913d8218-67dc-4b47-95e7-2f80e0e8e097}</Project>
-      <Name>DotNetLearn</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\back.png" />

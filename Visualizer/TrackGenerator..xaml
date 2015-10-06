@@ -71,7 +71,24 @@
                 </Button>
             </TabItem>
             <TabItem x:Name="tabRandom" Header="Random" Custom:ControlsHelper.HeaderFontSize="16">
+                <Grid>
+                    <ComboBox x:Name="randomScale" Margin="112,10,280,485">
+                        <Label Content="Label"/>
+                    </ComboBox>
+                    <Label Content="Scale" HorizontalAlignment="Left" Margin="10,12,0,0" VerticalAlignment="Top"/>
+                    <Custom:RangeSlider x:Name="randomDurationRange" Margin="112,60,272,444" Minimum="1" Maximum="6" MinRangeWidth="1" LowerValue="2" UpperValue="4"></Custom:RangeSlider>
+                    <Label Content="Duration" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top"/>
+                    <Slider x:Name="randomPitchVar" HorizontalAlignment="Left" Height="26" Margin="112,95,0,0" VerticalAlignment="Top" Width="170" Minimum="1" Maximum="36" Value="12"/>
+                    <Label Content="Pitch variation" HorizontalAlignment="Left" Margin="9,95,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Center octave" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top"/>
+                    <Custom:NumericUpDown x:Name="randomOctave" Margin="112,142,272,355" Maximum="11" Minimum="1" Value="4"/>
+                    <ComboBox x:Name="randomInstrument" HorizontalAlignment="Left" Margin="112,187,0,0" VerticalAlignment="Top" Width="170"/>
+                    <Label Content="Instrument" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Length" HorizontalAlignment="Left" Margin="9,234,0,0" VerticalAlignment="Top"/>
+                    <Slider x:Name="randomLength" HorizontalAlignment="Left" Margin="112,234,0,0" VerticalAlignment="Top" Width="162" Minimum="50" Maximum="400" Value="200"/>
+                </Grid>
             </TabItem>
+
 
 
 

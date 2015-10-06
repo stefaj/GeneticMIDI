@@ -1,4 +1,5 @@
 ﻿using AForge.Genetic;
+using Alglib;
 using GeneticMIDI.Representation;
 using System;
 using System.Collections.Generic;

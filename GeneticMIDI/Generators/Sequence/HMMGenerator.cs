@@ -24,7 +24,7 @@ namespace GeneticMIDI.Generators.Sequence
             this.instrument = instrument;
 
 
-
+            DotNetLearn.Data.SampleSet asdasd;
 
 
 

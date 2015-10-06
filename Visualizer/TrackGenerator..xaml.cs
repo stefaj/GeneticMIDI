@@ -1,4 +1,5 @@
 ﻿using AForge.Genetic;
+using GeneticMIDI.Fractal;
 using GeneticMIDI.Generators;
 using GeneticMIDI.Generators.CompositionGenerator;
 using GeneticMIDI.Generators.Sequence;
@@ -83,7 +84,31 @@ namespace Visualizer
                     accompTrackBox.Items.Add(item);
                 }
 
+            randomScale.Items.Clear();
+            foreach(var s in Scales.ScaleTypes)
+            {
+                //ListBoxItem item = new ListBoxItem();
+                randomScale.Items.Add(s);
+            }
+
+            randomInstrument.Items.Clear();
+            var durations = Enum.GetValues(typeof(PatchNames)).Cast<PatchNames>().ToArray();
+            foreach (var d in durations)
+                randomInstrument.Items.Add(d);
+            
+            
+            
+            
+            
             StopSpinner();
+
+
+
+
+
+
+
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -258,6 +283,43 @@ namespace Visualizer
                 }
                 
                 Instrument = instrument;
+            }
+            if(index == 4)
+            {
+                int centralNotePitch = (int)randomOctave.Value * 12;
+                int noteShift = (int)randomPitchVar.Value;
+                int minNote = centralNotePitch - noteShift;
+                int maxNote = centralNotePitch + noteShift;
+                if (minNote <= 0)
+                    minNote = 1;
+                if (maxNote >= 127)
+                    maxNote = 126;
+                int durMin = (int)Math.Pow(randomDurationRange.LowerValue, 2);
+                int durMax = (int)Math.Pow(randomDurationRange.UpperValue, 2);
+                int length = (int)randomLength.Value;
+
+                ScaleType scale = randomScale.SelectedItem as ScaleType;
+
+                var gen = new ReflectingBrownNoteGenerator(new NoteRangeRestrictor(minNote, maxNote, durMin, durMax, scale), new Random(), -2, 2, -1, 1);
+                Generator = gen;
+                gen.MaxNotes = length;
+                Instrument = (PatchNames)randomInstrument.SelectedItem;
+                if (Instrument == null)
+                    return;
+
+                new Thread(() =>
+                {
+                    StartSpinner();
+                    GeneratedSequence = gen.Generate();
+                    StopSpinner();
+                    progressGenSlider.Dispatcher.Invoke(() =>
+                    {
+                        progressGenSlider.Value = 100;
+                    });
+
+                }).Start();
+
+                Console.ReadLine();
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using de.jannlab;
+﻿    #if LSTM
+using de.jannlab;
 using de.jannlab.core;
 using de.jannlab.data;
 using de.jannlab.generator;
@@ -14,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators.Sequence
 {
+
     [Serializable]
     public class AccompanimentGenerator : INoteGenerator
     {
@@ -416,4 +418,6 @@ namespace GeneticMIDI.Generators.Sequence
             get { return true; }
         }
     }
+
 }
+#endif

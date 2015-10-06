@@ -4,10 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotNetLearn.Markov
+namespace GeneticMIDI.Fractal
 {
-    public interface IDifference<T>
+    public interface IDice
     {
-        double GetDifference(T other);
+        void Roll();
+
+        int Get();
+
+        int MaximumRollableValue();
     }
 }

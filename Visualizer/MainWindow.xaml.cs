@@ -80,6 +80,8 @@ namespace Visualizer
 
         private void SetupPlayPlot(Composition comp)
         {
+            if (comp == null)
+                return;
             playPanel.Children.Clear();
             foreach(var t in comp.Tracks)
             {
