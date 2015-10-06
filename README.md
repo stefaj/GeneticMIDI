@@ -3,3 +3,5 @@
 
 ## Requires
 [Dot Net Music](https://github.com/stefan-j/DotNetMusic)
+[Dot Net Learn](https://github.com/stefan-j/DotNetLearn)
+
