@@ -55,14 +55,14 @@ namespace Visualizer
                     try
                     {
                         string filename = System.IO.Path.GetFileNameWithoutExtension(file);
+                        if (!filename.ToLower().Contains("accomp"))
+                            continue;
                         var sub = filename.Substring(6);
                     
                         PatchNames instrument = (PatchNames)(int.Parse(sub));
 
-                        ComboBoxItem item = new ComboBoxItem();
-                        item.Content = instrument.ToString();
-                        item.Tag = instrument;
-                        accompInstruBox.Items.Add(item);
+                        if(!accompInstruBox.Items.Contains(instrument))
+                            accompInstruBox.Items.Add(instrument);
                     }
                     catch
                     {
@@ -244,7 +244,7 @@ namespace Visualizer
             {
                 if (accompInstruBox.Items.Count == 0 || accompTrackBox.Items.Count == 0)
                     return;
-                PatchNames instrument = (PatchNames)(accompInstruBox.SelectedItem);
+                Instrument = (PatchNames)(accompInstruBox.SelectedItem);
                 Track track = (accompTrackBox.SelectedItem as ListBoxItem).Tag as Track;
 
                 var melSeq = track.GetMainSequence() as MelodySequence;
@@ -266,14 +266,14 @@ namespace Visualizer
                 }
                 else if (accompMethoBox.SelectedIndex == 1)
                 {
-                    AccompanimentGeneratorANNFF gen = new AccompanimentGeneratorANNFF(category, instrument);
+                    AccompanimentGeneratorANNFF gen = new AccompanimentGeneratorANNFF(category, Instrument);
                     
                     gen.SetSequence(melSeq);
                     new Thread(() =>
                         {
 
                             StartSpinner();
-                            gen.Train();
+                            gen.Load();
                             GeneratedSequence = gen.Generate();
                             StopSpinner();
                             progressGenSlider.Dispatcher.Invoke(() =>
@@ -284,7 +284,7 @@ namespace Visualizer
                         }).Start();
                 }
                 
-                Instrument = instrument;
+
             }
             if(index == 4)
             {
