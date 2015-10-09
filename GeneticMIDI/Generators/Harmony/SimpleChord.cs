@@ -116,6 +116,8 @@ new int[]{(int)NoteNames.B, (int)NoteNames.Cs, (int)NoteNames.Ds, (int)NoteNames
                     seq.AddPause(n.Duration);
             }
             return sequence;
+
+            
         }
         private Chord GetChord(Note n)
         {

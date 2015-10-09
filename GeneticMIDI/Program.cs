@@ -1,6 +1,7 @@
 ﻿using Accord.MachineLearning.Bayes;
 using Accord.Neuro.Learning;
 using Accord.Statistics.Models.Markov.Learning;
+using AForge;
 using AForge.Genetic;
 using AForge.Neuro;
 using AForge.Neuro.Learning;
@@ -34,15 +35,59 @@ namespace GeneticMIDI
 
             Databank db = new Databank("lib");
             var cat = db.Load("Classical");
+            var cat2 = db.Load("Jazz");
 
+            Dictionary<PatchNames, int> instrumentsCount = new Dictionary<PatchNames, int>();
+            
+            foreach(var c in cat.Compositions)
+            {
+                foreach(var t in c.Tracks)
+                {
+                    if (instrumentsCount.ContainsKey(t.Instrument))
+                        instrumentsCount[t.Instrument]++;
+                    else
+                        instrumentsCount[t.Instrument] = 1;
+                }
+            }
+            foreach (var c in cat2.Compositions)
+            {
+                foreach (var t in c.Tracks)
+                {
+                    if (instrumentsCount.ContainsKey(t.Instrument))
+                        instrumentsCount[t.Instrument]++;
+                    else
+                        instrumentsCount[t.Instrument] = 1;
+                }
+            }
+
+            int n = 10;
+            var myList = instrumentsCount.ToList();
+
+            myList.Sort((firstPair, nextPair) =>
+            {
+                return firstPair.Value.CompareTo(nextPair.Value);
+            }
+            );
+
+            List<PatchNames> instrs = new List<PatchNames>();
+            for (int i = 0; i < n; i++)
+            {
+                instrs.Add(myList[myList.Count - i - 1].Key);
+            }
+            instrs.ToArray();
+            Console.Write("var pop = new PatchNames[]{");
+            foreach(var i in instrs)
+                Console.Write("PatchNames." + i.ToString() + ",");
+            Console.Write("};");
+            Console.ReadLine();
             /*Composition comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\other\twinkle.mid");
             float time = Note.ToRealDuration(comp.GetLongestTrack().Duration);
             Console.WriteLine("Total time: {0}", time);
             MusicPlayer player = new MusicPlayer();
             player.Play(comp);
             Console.ReadLine();*/
-
-
+            
+           
 
           /*  MusicPlayer player = new MusicPlayer();
             
@@ -65,15 +110,7 @@ namespace GeneticMIDI
             
             return;*/
 
-            var gen = new ReflectingBrownNoteGenerator(new NoteRangeRestrictor(48, 72, 2, 16, Scales.ScaleTypes[5]), new Random(), -1, 1, -1, 1);
 
-
-            MelodySequence seq = gen.Generate();
-            Console.WriteLine(seq.ToString());
-            MusicPlayer player = new MusicPlayer();
-            player.Play(seq);
-
-            Console.ReadLine();
 
 
                 /*   Databank db = new Databank("lib");
@@ -119,6 +156,18 @@ namespace GeneticMIDI
             Databank.GenerateCategories(@"D:\Sync\4th year\Midi\Library2", "lib");
         }
 
+        static void BrownTest()
+        {
+            var gen = new ReflectingBrownNoteGenerator(new NoteRangeRestrictor(48, 72, 2, 16, Scales.ScaleTypes[1]), new Random(), -1, 1, -1, 1);
+
+
+            MelodySequence seq = gen.Generate();
+            Console.WriteLine(seq.ToString());
+            MusicPlayer player = new MusicPlayer();
+            player.Play(seq);
+
+            Console.ReadLine();
+        }
         static void ANNFFNAccomp()
         {
             Databank db = new Databank("lib");

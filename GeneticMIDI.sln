@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticMIDI", "GeneticMIDI\GeneticMIDI.csproj", "{8F0794A6-48B2-404A-A36F-451CB0E91C96}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualizer", "Visualizer\Visualizer.csproj", "{CFD5D1FF-C134-409F-9C55-D3E5512CB617}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFMusicSheet", "..\DotNetMusic\WPFMusicSheet\WPFMusicSheet.csproj", "{432468CD-2FC6-4FFA-95B1-3FCFE513B74B}"
@@ -23,14 +21,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8F0794A6-48B2-404A-A36F-451CB0E91C96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F0794A6-48B2-404A-A36F-451CB0E91C96}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F0794A6-48B2-404A-A36F-451CB0E91C96}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8F0794A6-48B2-404A-A36F-451CB0E91C96}.Debug|x64.Build.0 = Debug|Any CPU
-		{8F0794A6-48B2-404A-A36F-451CB0E91C96}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F0794A6-48B2-404A-A36F-451CB0E91C96}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8F0794A6-48B2-404A-A36F-451CB0E91C96}.Release|x64.ActiveCfg = Release|x64
-		{8F0794A6-48B2-404A-A36F-451CB0E91C96}.Release|x64.Build.0 = Release|x64
 		{CFD5D1FF-C134-409F-9C55-D3E5512CB617}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CFD5D1FF-C134-409F-9C55-D3E5512CB617}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFD5D1FF-C134-409F-9C55-D3E5512CB617}.Debug|x64.ActiveCfg = Debug|Any CPU

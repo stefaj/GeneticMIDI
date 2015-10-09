@@ -105,7 +105,7 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="FitnessFunctions\MetricSimilarity.cs" />
+    <Compile Include="Generators\CompositionGenerator\MetricSimilarity.cs" />
     <Compile Include="FitnessFunctions\CrossCorrelation.cs" />
     <Compile Include="Random\BrownNoiseGenerator.cs" />
     <Compile Include="Random\DiceCounter.cs" />
