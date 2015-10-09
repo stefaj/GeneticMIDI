@@ -91,9 +91,11 @@ namespace Visualizer
                 randomScale.Items.Add(s);
             }
 
-            randomInstrument.Items.Clear();
-            var durations = Enum.GetValues(typeof(PatchNames)).Cast<PatchNames>().ToArray();
-            foreach (var d in durations)
+            randomInstrument.Items.Clear(); 
+            var popularInstruments = new PatchNames[]{PatchNames.Acoustic_Grand,PatchNames.String_Ensemble_1,
+                PatchNames.Acoustic_Bass,PatchNames.Trumpet,PatchNames.Violin,PatchNames.Electric_Grand,
+                PatchNames.French_Horn,PatchNames.Flute,PatchNames.Trombone,PatchNames.Acoustic_Guitarnylon};
+            foreach (var d in popularInstruments)
                 randomInstrument.Items.Add(d);
             
             
