@@ -33,53 +33,52 @@ namespace GeneticMIDI
         static void Main(string[] args)
         {
 
+            Console.WriteLine("This application trains accompaniment neural networks");
+            var cats = Databank.GetCategories();
+
             Databank db = new Databank("lib");
-            var cat = db.Load("Classical");
-            var cat2 = db.Load("Jazz");
 
-            Dictionary<PatchNames, int> instrumentsCount = new Dictionary<PatchNames, int>();
-            
-            foreach(var c in cat.Compositions)
+            var popularInstruments = new PatchNames[]{PatchNames.Acoustic_Grand,PatchNames.String_Ensemble_1,
+                PatchNames.Acoustic_Bass,PatchNames.Trumpet,PatchNames.Vibraphone,PatchNames.Electric_Grand,
+                PatchNames.French_Horn,PatchNames.Flute,PatchNames.Trombone,PatchNames.Music_Box};
+
+            foreach (var catName in cats)
             {
-                foreach(var t in c.Tracks)
+
+                Console.WriteLine("Category {0}", catName);
+                var cat = db.Load(catName);
+
+                if (cat.Compositions.Length > 3000)
+                    Console.WriteLine("Skipping category {0} due to length", cat.CategoryName);
+
+                
+                foreach(var instr in popularInstruments)
                 {
-                    if (instrumentsCount.ContainsKey(t.Instrument))
-                        instrumentsCount[t.Instrument]++;
-                    else
-                        instrumentsCount[t.Instrument] = 1;
+                    Console.WriteLine("Training ANN for {0} - {1}, {2} epochs", cat.ToString(), instr.ToString(), 6000);
+
+                    try
+                    {
+                        AccompanimentGeneratorANNFF ann = new AccompanimentGeneratorANNFF(cat, instr);
+                        ann.Epochs = 5000;
+                        ann.Train();
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+
                 }
-            }
-            foreach (var c in cat2.Compositions)
-            {
-                foreach (var t in c.Tracks)
-                {
-                    if (instrumentsCount.ContainsKey(t.Instrument))
-                        instrumentsCount[t.Instrument]++;
-                    else
-                        instrumentsCount[t.Instrument] = 1;
-                }
+                
             }
 
-            int n = 10;
-            var myList = instrumentsCount.ToList();
-
-            myList.Sort((firstPair, nextPair) =>
-            {
-                return firstPair.Value.CompareTo(nextPair.Value);
-            }
-            );
-
-            List<PatchNames> instrs = new List<PatchNames>();
-            for (int i = 0; i < n; i++)
-            {
-                instrs.Add(myList[myList.Count - i - 1].Key);
-            }
-            instrs.ToArray();
-            Console.Write("var pop = new PatchNames[]{");
-            foreach(var i in instrs)
-                Console.Write("PatchNames." + i.ToString() + ",");
-            Console.Write("};");
             Console.ReadLine();
+
+            
+
+
+
+
+            
             /*Composition comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\other\twinkle.mid");
             float time = Note.ToRealDuration(comp.GetLongestTrack().Duration);
             Console.WriteLine("Total time: {0}", time);
@@ -154,6 +153,57 @@ namespace GeneticMIDI
         static void GenerateCategories()
         {
             Databank.GenerateCategories(@"D:\Sync\4th year\Midi\Library2", "lib");
+        }
+
+        static void GetPopularInstruments()
+        {
+            Databank db = new Databank("lib");
+            var cat = db.Load("Classical");
+            var cat2 = db.Load("Jazz");
+
+            Dictionary<PatchNames, int> instrumentsCount = new Dictionary<PatchNames, int>();
+
+            foreach (var c in cat.Compositions)
+            {
+                foreach (var t in c.Tracks)
+                {
+                    if (instrumentsCount.ContainsKey(t.Instrument))
+                        instrumentsCount[t.Instrument]++;
+                    else
+                        instrumentsCount[t.Instrument] = 1;
+                }
+            }
+            foreach (var c in cat2.Compositions)
+            {
+                foreach (var t in c.Tracks)
+                {
+                    if (instrumentsCount.ContainsKey(t.Instrument))
+                        instrumentsCount[t.Instrument]++;
+                    else
+                        instrumentsCount[t.Instrument] = 1;
+                }
+            }
+
+            int n = 10;
+            var myList = instrumentsCount.ToList();
+
+            myList.Sort((firstPair, nextPair) =>
+            {
+                return firstPair.Value.CompareTo(nextPair.Value);
+            }
+            );
+
+            List<PatchNames> instrs = new List<PatchNames>();
+            for (int i = 0; i < n; i++)
+            {
+                instrs.Add(myList[myList.Count - i - 1].Key);
+            }
+            instrs.ToArray();
+            Console.Write("var pop = new PatchNames[]{");
+            foreach (var i in instrs)
+                Console.Write("PatchNames." + i.ToString() + ",");
+            Console.Write("};");
+            Console.ReadLine();
         }
 
         static void BrownTest()
