@@ -26,6 +26,8 @@ namespace GeneticMIDI.Generators.Sequence
         MelodySequence sequence;
         CompositionCategory category;
 
+        public int Epochs { get; set; }
+
         string SAVE_FILE
         {
 
@@ -47,6 +49,7 @@ namespace GeneticMIDI.Generators.Sequence
 
         public AccompanimentGeneratorANNFF(CompositionCategory category, PatchNames instrument)
         {
+            this.Epochs = 50000;
             this.category = category;
             this.instrument = instrument;
         }
@@ -117,12 +120,12 @@ namespace GeneticMIDI.Generators.Sequence
             var teacher = new ResilientBackpropagationLearning(network as ActivationNetwork);
 
             // learn 5000 iterations
-            int epochs = 50000;
-            for (int i = 0; i < epochs; i++)
+
+            for (int i = 0; i < Epochs; i++)
             {
                 var e = teacher.RunEpoch(inputs,outputs);
 
-                Console.WriteLine("{0} : {1}", i / (double)epochs * 100, e);
+                Console.WriteLine("{0} : {1}", i / (double)Epochs * 100, e);
             }
 
             Save();
