@@ -514,6 +514,19 @@ namespace Visualizer
                 byte channel = 1;
                 if (generated != null)
                     channel = (byte)(generated.Tracks.Count + 1);
+                
+
+
+                foreach(var t in generated.Tracks)
+                {
+                    if(t.Channel == channel)
+                    {
+                        channel++;
+                        break;
+                    }
+                }
+
+
                 var track = new GeneticMIDI.Representation.Track(g.Instrument, channel);
                 track.AddSequence(g.GeneratedSequence);
 
