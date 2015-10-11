@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators.Sequence
 {
-    public class AccompanyGeneratorMarkov
+    public class AccompanyGeneratorMarkov : INoteGenerator
     {
         const int ORDER = 2;
         const int SYNC_AFTER_NOTES = 20;
         MarkovTable<Note> table;
+        MelodySequence sequence;
         public AccompanyGeneratorMarkov(CompositionCategory cat)
         {
             Add(cat);
@@ -29,6 +30,11 @@ namespace GeneticMIDI.Generators.Sequence
                 normalized.AddNote(copy);
             }
             return normalized;
+        }
+
+        public void SetSequence(MelodySequence seq)
+        {
+            this.sequence = seq;
         }
 
         public MelodySequence Generate(MelodySequence seq, int seed)
@@ -89,6 +95,22 @@ namespace GeneticMIDI.Generators.Sequence
             }
         }
 
+
+        public MelodySequence Generate()
+        {
+            Random random = new Random();
+            return Generate(sequence, random.Next());
+        }
+
+        public MelodySequence Next()
+        {
+            return Generate();
+        }
+
+        public bool HasNext
+        {
+            get { return true; }
+        }
     }
 
     
