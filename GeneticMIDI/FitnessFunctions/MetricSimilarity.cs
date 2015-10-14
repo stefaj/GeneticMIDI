@@ -162,5 +162,10 @@ namespace GeneticMIDI.FitnessFunctions
             }
             return weighted_sum / metrics.Length;
         }
+
+        public override string ToString()
+        {
+            return "MetricSimilarity";
+        }
     }
 }
