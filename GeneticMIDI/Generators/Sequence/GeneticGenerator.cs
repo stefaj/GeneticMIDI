@@ -26,11 +26,18 @@ namespace GeneticMIDI.Generators
         CompositionCategory cat;
         int avgLength = 0;
 
+        public float MaxFitness { get; private set; }
+
+        public float AvgFitness { get; private set; }
+
+        public bool PrintProgress { get; set; }
+
         public GeneticGenerator(IFitnessFunction fitnessFunction, CompositionCategory cat=null)
         {
             this.fitnessFunction = fitnessFunction;
             this.cat = cat;
             this.MaxGenerations = 1000;
+            this.PrintProgress = true;
 
             if (cat != null)
             {
@@ -77,8 +84,8 @@ namespace GeneticMIDI.Generators
        
                 int length = avgLength;
                 int depth = (int)Math.Ceiling(Math.Log(length, 2));
-                GPCustomTree.MaxInitialLevel = depth - 2;
-                GPCustomTree.MaxLevel = depth + 3;
+                GPCustomTree.MaxInitialLevel = depth - 3;
+                GPCustomTree.MaxLevel = depth+1;
             }
             var selection = new EliteSelection();
             pop = new Population(30, tree, fitnessFunction, selection);
@@ -99,9 +106,13 @@ namespace GeneticMIDI.Generators
                 }
                
                 pop.RunEpoch();
-                if ((int)(i) % 100 == 0)
+                
+                if ((int)(i) % 100 == 0 && PrintProgress)
                     Console.WriteLine(i / (float)MaxGenerations * 100 + "% : " + pop.FitnessAvg);
             }
+
+            MaxFitness = (float)pop.FitnessMax;
+            AvgFitness = (float)pop.FitnessAvg;
             
             GPCustomTree best = pop.BestChromosome as GPCustomTree;
             var notes = best.GenerateNotes();
