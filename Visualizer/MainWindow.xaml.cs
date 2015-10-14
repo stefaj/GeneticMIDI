@@ -478,8 +478,14 @@ namespace Visualizer
             if (seq != null)
             {
                 MetricWindow metric = new MetricWindow(seq);
-                metric.Title = "Metrics " + seq.ToString();
-                metric.Show();
+                int index = itemsBox.SelectedIndex;
+                if(generated != null && generated.Tracks.Count > index && index >= 0)
+                {
+                    string str = string.Format("Track {0} - {1}", index, generated.Tracks[index].Instrument);
+                    metric.Title = str;
+                    metric.Show();
+                }
+                
             }
         }
 
