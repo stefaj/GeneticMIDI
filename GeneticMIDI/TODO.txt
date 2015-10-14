@@ -1,0 +1,13 @@
+﻿Feed forward neural network
+Group notes into 3
+Classify all groups in existing songs as 1, all other combinations as 0.
+
+Use as fitness function
+
+
+Use HMM decode as fitness function GA
+
+Randomize and Next functionality
+
+Visualization
+
