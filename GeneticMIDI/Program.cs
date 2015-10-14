@@ -20,6 +20,7 @@ using GeneticMIDI.Representation;
 using NAudio.Midi;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -32,53 +33,20 @@ namespace GeneticMIDI
     {
         static void Main(string[] args)
         {
+            /*Feed forward neural network
+Group notes into 3
+Classify all groups in existing songs as 1, all other combinations as 0.
 
-            Console.WriteLine("This application trains accompaniment neural networks");
-            var cats = Databank.GetCategories();
+Use as fitness function
 
-            Databank db = new Databank("lib");
 
-            var popularInstruments = new PatchNames[]{PatchNames.Acoustic_Grand,PatchNames.String_Ensemble_1,
-                PatchNames.Acoustic_Bass,PatchNames.Trumpet,PatchNames.Vibraphone,PatchNames.Electric_Grand,
-                PatchNames.French_Horn,PatchNames.Flute,PatchNames.Trombone,PatchNames.Music_Box};
+Use HMM decode as fitness function GA*/
 
-            foreach (var catName in cats)
-            {
-
-                Console.WriteLine("Category {0}", catName);
-                var cat = db.Load(catName);
-
-                if (cat.Compositions.Length > 3000)
-                    Console.WriteLine("Skipping category {0} due to length", cat.CategoryName);
-
-                
-                foreach(var instr in popularInstruments)
-                {
-                    Console.WriteLine("Training ANN for {0} - {1}, {2} epochs", cat.ToString(), instr.ToString(), 6000);
-
-                    try
-                    {
-                        AccompanimentGeneratorANNFF ann = new AccompanimentGeneratorANNFF(cat, instr);
-                        ann.Epochs = 5000;
-                        ann.Train();
-                    }
-                    catch(Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
-
-                }
-                
-            }
-
-            Console.ReadLine();
-
+           Databank db = new Databank("lib");
+            var cat = db.Load("Classical");        
             
 
 
-
-
-            
             /*Composition comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\other\twinkle.mid");
             float time = Note.ToRealDuration(comp.GetLongestTrack().Duration);
             Console.WriteLine("Total time: {0}", time);
@@ -155,6 +123,40 @@ namespace GeneticMIDI
             Databank.GenerateCategories(@"D:\Sync\4th year\Midi\Library2", "lib");
         }
 
+        static void MetricTimingTest()
+        {
+
+            Databank db = new Databank("lib");
+            var cat = db.Load("Classical");        
+            
+
+            var fmets = new IMetric[]{new ChromaticTone(), new ChromaticToneDistance(), new ChromaticToneDuration(), new MelodicBigram(), new MelodicInterval()
+            , new Pitch(), new Rhythm(), new RhythmicBigram(), new RhythmicInterval()};
+
+
+            MusicPlayer player = new MusicPlayer();
+            foreach (var m in fmets)
+            {
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                var metric = MetricSimilarity.GenerateMetricSimilarityMulti(cat.Compositions, new IMetric[] { m });
+
+                GeneticGenerator gen = new GeneticGenerator(metric);
+                gen.PrintProgress = false;
+                gen.MaxGenerations = 1000;
+                var mel = gen.Generate();
+                mel.Trim(20);
+                watch.Stop();
+                var className = ((object)m).GetType().Name;
+                Console.WriteLine("{0} - MF: {1}, AF {2}, T {3}", className, gen.MaxFitness, gen.AvgFitness, watch.ElapsedMilliseconds);
+                Console.ReadLine();
+                player.Play(mel);
+
+            }
+
+            Console.ReadLine();
+        }
+
         static void GetPopularInstruments()
         {
             Databank db = new Databank("lib");
@@ -206,6 +208,49 @@ namespace GeneticMIDI
             Console.ReadLine();
         }
 
+
+        static void TrainANNFFAccomp()
+        {
+            Console.WriteLine("This application trains accompaniment neural networks");
+            var cats = Databank.GetCategories();
+
+            Databank db = new Databank("lib");
+
+            var popularInstruments = new PatchNames[]{PatchNames.Acoustic_Grand,PatchNames.String_Ensemble_1,
+                PatchNames.Acoustic_Bass,PatchNames.Trumpet,PatchNames.Vibraphone,PatchNames.Electric_Grand,
+                PatchNames.French_Horn,PatchNames.Flute,PatchNames.Trombone,PatchNames.Music_Box};
+
+            foreach (var catName in cats)
+            {
+
+                Console.WriteLine("Category {0}", catName);
+                var cat = db.Load(catName);
+
+                if (cat.Compositions.Length > 3000)
+                    Console.WriteLine("Skipping category {0} due to length", cat.CategoryName);
+
+
+                foreach (var instr in popularInstruments)
+                {
+                    Console.WriteLine("Training ANN for {0} - {1}, {2} epochs", cat.ToString(), instr.ToString(), 6000);
+
+                    try
+                    {
+                        AccompanimentGeneratorANNFF ann = new AccompanimentGeneratorANNFF(cat, instr);
+                        ann.Epochs = 5000;
+                        ann.Train();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+
+                }
+
+            }
+
+            Console.ReadLine();
+        }
         static void BrownTest()
         {
             var gen = new ReflectingBrownNoteGenerator(new NoteRangeRestrictor(48, 72, 2, 16, Scales.ScaleTypes[1]), new Random(), -1, 1, -1, 1);
