@@ -63,6 +63,30 @@ namespace GeneticMIDI.Generators.CompositionGenerator
             return t;
         }
 
+        public Track AddPercussionTrack(MelodySequence seq, INoteGenerator gen)
+        {
+            Track t = new Track(gen.Instrument, 10);
+
+            for(int i  = 0 ; i < ActiveComposition.Tracks.Count; i++)
+            {
+                var ctrack = ActiveComposition.Tracks[i];
+                if(ctrack.Channel == 10)
+                {
+                    ctrack.Clear();
+                    ActiveComposition.Tracks.RemoveAt(i);
+                    break;
+                }
+            }
+
+           
+            t.AddSequence(seq);
+            ActiveComposition.Tracks.Add(t);
+            generators.Add(gen);
+            if (OnCompositionChange != null)
+                OnCompositionChange(this, new EventArgs());
+            return t;           
+        }
+
         public void Remove(Track t)
         {
             int index = ActiveComposition.Tracks.IndexOf(t);
