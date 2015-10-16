@@ -1,4 +1,5 @@
-﻿using GeneticMIDI.Representation;
+﻿using GeneticMIDI.Generators.Sequence;
+using GeneticMIDI.Representation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +53,10 @@ namespace GeneticMIDI.Generators.CompositionGenerator
         /// <returns>Reference of added track</returns>
         public Track Add(MelodySequence seq, INoteGenerator gen)
         {
+
+            if (gen as DrumGenerator != null || gen.Instrument == PatchNames.Helicopter)
+                return AddPercussionTrack(seq, gen);
+
             Track t = new Track(gen.Instrument, (byte)channelIndex++);
             t.AddSequence(seq);
             ActiveComposition.Tracks.Add(t);
@@ -63,7 +68,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
             return t;
         }
 
-        public Track AddPercussionTrack(MelodySequence seq, INoteGenerator gen)
+        private Track AddPercussionTrack(MelodySequence seq, INoteGenerator gen)
         {
             Track t = new Track(gen.Instrument, 10);
 
@@ -127,11 +132,17 @@ namespace GeneticMIDI.Generators.CompositionGenerator
             int i = 1;
             foreach(var gen in generators)
             {
-                Track t = new Track(gen.Instrument, (byte)i++);
+                byte channel = (byte)i++;
+                if(gen as DrumGenerator != null)
+                    channel = 10;
+                Track t = new Track(gen.Instrument, channel);
                 MelodySequence seq = gen.Next();
                 t.AddSequence(seq);
                 ActiveComposition.Add(t); 
             }
+
+            if (OnCompositionChange != null)
+                OnCompositionChange(this, new EventArgs());
         }
 
     }

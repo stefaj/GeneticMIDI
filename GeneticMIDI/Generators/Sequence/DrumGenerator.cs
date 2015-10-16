@@ -43,12 +43,13 @@ namespace GeneticMIDI.Generators.Sequence
 
         public DrumGenerator()
         {
-            IsInitialized = false; 
+            IsInitialized = false;
+            this.chain = new DotNetLearn.Markov.MarkovChain<Note>(4);
         }
 
-        public DrumGenerator(Databank bank, int order = 3)
+        public DrumGenerator(int order)
         {
-            var chain = new DotNetLearn.Markov.MarkovChain<Note>(order);
+            this.chain = new DotNetLearn.Markov.MarkovChain<Note>(order);
 
             IsInitialized = false;
         }
@@ -83,7 +84,7 @@ namespace GeneticMIDI.Generators.Sequence
                     if (t.Channel == 10)
                     {
                         var mel = t.GetMainSequence() as MelodySequence;
-                        chain.Add(mel.ToArray());
+                        this.chain.Add(mel.ToArray());
                         percus++;
                     }
 
