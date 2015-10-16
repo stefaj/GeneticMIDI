@@ -528,15 +528,7 @@ namespace Visualizer
 
                 if (g.GeneratedSequence != null)
                 {
-                    if (g.Instrument == PatchNames.Helicopter)
-                    {
-                        // Add drum track
-                        generator.AddPercussionTrack(g.GeneratedSequence, g.Generator);
-                    }
-                    else
-                    {
-                        generator.Add(g.GeneratedSequence, g.Generator);
-                    }
+                    generator.Add(g.GeneratedSequence, g.Generator);
                 }
             }
 
@@ -565,6 +557,40 @@ namespace Visualizer
             {
                 index = itemsBox.Items.IndexOf(item);
                 generator.Remove(index);
+            }
+            catch
+            {
+
+            }
+
+        }
+
+        // Up octave
+        private void MenuItem_ClickUp(object sender, RoutedEventArgs e)
+        {
+
+            ListBoxItem item = itemsBox.SelectedItem as ListBoxItem;
+            try
+            {
+                MelodySequence seq = item.Tag as MelodySequence;
+                seq.OctaveUp();
+            }
+            catch
+            {
+
+            }
+
+        }
+
+        // Down octave
+        private void MenuItem_ClickDown(object sender, RoutedEventArgs e)
+        {
+
+            ListBoxItem item = itemsBox.SelectedItem as ListBoxItem;
+            try
+            {
+                MelodySequence seq = item.Tag as MelodySequence;
+                seq.OctaveDown();
             }
             catch
             {

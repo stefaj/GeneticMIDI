@@ -58,6 +58,16 @@
                                         <Image Source="Resources/glyphicons-208-remove-2.png" />
                                     </MenuItem.Icon>      
                                 </MenuItem>
+                                <MenuItem Header="Octave Up" Click="MenuItem_ClickUp">
+                                    <MenuItem.Icon>
+                                        <Image Source="Resources/glyphicons-601-chevron-up.png" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="Octave Down" Click="MenuItem_ClickDown">
+                                    <MenuItem.Icon>
+                                        <Image Source="Resources/glyphicons-602-chevron-down.png" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
                             </ContextMenu>
                         </ListBox.ContextMenu>
                     </ListBox>
