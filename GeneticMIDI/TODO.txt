@@ -11,3 +11,8 @@ Randomize and Next functionality
 
 Visualization
 
+Drums
+
+Only scroll to latest note if there was a change
+
+Saving, loading of instrumental generator
