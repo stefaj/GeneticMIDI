@@ -263,12 +263,13 @@ namespace Visualizer
                     return;
                 Instrument = (PatchNames)(accompInstruBox.SelectedItem);
                 Track track = (accompTrackBox.SelectedItem as ListBoxItem).Tag as Track;
-
+                
                 var melSeq = track.GetMainSequence() as MelodySequence;
                 Random rnd = new Random();
                 if(accompMethoBox.SelectedIndex == 0)
                 {
                     AccompanyGeneratorMarkov gen = new AccompanyGeneratorMarkov(category, Instrument);
+                    Generator = gen;
                     new Thread(() =>
                         {
 
@@ -284,7 +285,7 @@ namespace Visualizer
                 else if (accompMethoBox.SelectedIndex == 1)
                 {
                     AccompanimentGeneratorANNFF gen = new AccompanimentGeneratorANNFF(category, Instrument);
-                    
+                    Generator = gen;
                     gen.SetSequence(melSeq);
                     new Thread(() =>
                         {
@@ -292,6 +293,7 @@ namespace Visualizer
                             StartSpinner();
                             gen.Load();
                             GeneratedSequence = gen.Generate();
+                            
                             StopSpinner();
                             progressGenSlider.Dispatcher.Invoke(() =>
                                 {
@@ -472,8 +474,9 @@ namespace Visualizer
                 TrackSelector trackSel = new TrackSelector(comp);
                 if(trackSel.ShowDialog() == true)
                 {
-                    this.GeneratedSequence = trackSel.SelectedSequence;
+                    this.GeneratedSequence = trackSel.SelectedSequence;                    
                     this.Instrument = trackSel.SelectedInstrument;
+                    this.Generator = new ExistingSequenceGenerator(this.GeneratedSequence, this.Instrument);
                     this.DialogResult = true;
                     this.Close();
                 }
