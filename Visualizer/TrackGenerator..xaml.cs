@@ -180,7 +180,7 @@ namespace Visualizer
                     fitness = GeneticMIDI.FitnessFunctions.NCD.FromMelodies(category);
 
 
-                var gen = new GeneticGenerator(fitness, category);
+                var gen = new GeneticGenerator(fitness, Instrument, category);
                 gen.OnPercentage += gen_OnPercentage;
 
                 gen.MaxGenerations = (int)maxGenerationSlider.Value;
@@ -202,43 +202,60 @@ namespace Visualizer
             }
             if (index == 1)
             {
-                //NCD.MaxTracks = 4;
-                //fitness = NCD.FromCompositions(guide);
-
-                InstrumentalGenerator gen = null;
-                if (Generator as InstrumentalGenerator == null)
+                if (instrBox.SelectedItem as ListBoxItem == null || (instrBox.SelectedItem as ListBoxItem).Tag == null)
+                    return;
+                if ((int)((instrBox.SelectedItem as ListBoxItem).Tag) == -1)
                 {
-                    gen = new InstrumentalGenerator(category);
-                    gen.OnPercentage += gen_OnPercentage;
+                    // Drum Generator
+                    DrumGenerator gen = new DrumGenerator();
+
                     Generator = gen;
+
+                    Instrument = PatchNames.Helicopter;
+
+                    new Thread(() =>
+                    {
+                            StartSpinner();
+                            gen.Initialize(new Databank(GeneticMIDI.Constants.LOCAL_LIBRARY_PATH));
+                            GeneratedSequence = gen.Generate();
+                            StopSpinner();
+
+                        progressGenSlider.Dispatcher.Invoke(() =>
+                        {
+                            progressGenSlider.Value = 100;
+                        });
+
+                    }).Start();
+
+
                 }
                 else
                 {
-                    gen = Generator as InstrumentalGenerator;
-                }
+                    PatchNames instrument = (PatchNames)((instrBox.SelectedItem as ListBoxItem).Tag);
+                    Instrument = instrument;
 
-                PatchNames instrument = (PatchNames)((instrBox.SelectedItem as ListBoxItem).Tag);
-                Instrument = instrument;
-                new Thread(() =>
-                {
-                   
-                    if (Generator as InstrumentalGenerator != null)
+                    InstrumentalGenerator gen = Generator as InstrumentalGenerator;
+                    if (gen == null)
+                        return;
+
+                    gen.SetInstrument(Instrument);
+
+                    new Thread(() =>
                     {
-                        var g = Generator as InstrumentalGenerator;
-                        if (g.IsInitialized)
+                        if (gen.IsInitialized)
                         {
                             StartSpinner();
                             GeneratedSequence = gen.GenerateInstrument(instrument);
                             StopSpinner();
                         }
-                    }
-           
-                    progressGenSlider.Dispatcher.Invoke(() =>
-                    {
-                        progressGenSlider.Value = 100;
-                    });
 
-                }).Start();
+                        progressGenSlider.Dispatcher.Invoke(() =>
+                        {
+                            progressGenSlider.Value = 100;
+                        });
+
+                    }).Start();
+                }
             }
             if(index == 2)
             {
@@ -251,7 +268,7 @@ namespace Visualizer
                 Random rnd = new Random();
                 if(accompMethoBox.SelectedIndex == 0)
                 {
-                    AccompanyGeneratorMarkov gen = new AccompanyGeneratorMarkov(category);
+                    AccompanyGeneratorMarkov gen = new AccompanyGeneratorMarkov(category, Instrument);
                     new Thread(() =>
                         {
 
@@ -288,6 +305,11 @@ namespace Visualizer
             }
             if(index == 4)
             {
+                if (randomInstrument.SelectedItem == null)
+                    return;
+                Instrument = (PatchNames)randomInstrument.SelectedItem;
+                
+
                 int centralNotePitch = (int)randomOctave.Value * 12;
                 int noteShift = (int)randomPitchVar.Value;
                 int minNote = centralNotePitch - noteShift;
@@ -302,13 +324,10 @@ namespace Visualizer
 
                 ScaleType scale = randomScale.SelectedItem as ScaleType;
 
-                var gen = new ReflectingBrownNoteGenerator(new NoteRangeRestrictor(minNote, maxNote, durMin, durMax, scale), new Random(), -2, 2, -1, 1);
+                var gen = new ReflectingBrownNoteGenerator(new NoteRangeRestrictor(minNote, maxNote, durMin, durMax, scale), new Random(), -2, 2, -1, 1, Instrument);
                 Generator = gen;
                 gen.MaxNotes = length;
-                Instrument = (PatchNames)randomInstrument.SelectedItem;
-                if (Instrument == null)
-                    return;
-
+         
                 new Thread(() =>
                 {
                     StartSpinner();
@@ -386,45 +405,48 @@ namespace Visualizer
             plot.ActualController.UnbindAll();
         }
 
+        // Populate instrumental generator instruments
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            if (Generator as InstrumentalGenerator != null)
+            Generator = new InstrumentalGenerator(category);
+            new Thread(() =>
             {
-                new Thread(() =>
+                StartSpinner();
+                var g = Generator as InstrumentalGenerator;
+                g.OnPercentage += gen_OnPercentage;
+
+
+                instrBox.Dispatcher.Invoke(() =>
+              {
+                  instrBox.Items.Clear();
+                  ListBoxItem boxItem = new ListBoxItem();
+                  boxItem.Content = "Drums";
+                  boxItem.Tag = -1;
+                  instrBox.Items.Add(boxItem);
+              });
+
+
+
+                g.Initialize();
+
+
+                instrBox.Dispatcher.Invoke(() =>
                 {
-                    StartSpinner();
-                    var g = Generator as InstrumentalGenerator;
-                    if (g.IsInitialized)
+                    var instrs = g.GetInstruments(7);
+                    foreach (var i in instrs)
                     {
+                        ListBoxItem boxItem = new ListBoxItem();
+                        boxItem.Content = i.ToString();
+                        boxItem.Tag = i;
+                        instrBox.Items.Add(boxItem);
                     }
-                    else
-                    {
+                });
+                StopSpinner();
+            }).Start();
 
-                        g.Initialize();
-                    }
-
-                    instrBox.Dispatcher.Invoke(() =>
-                    {
-                        instrBox.Items.Clear();
-                        var instrs = g.GetInstruments(7);
-                        foreach (var i in instrs)
-                        {
-                            ListBoxItem boxItem = new ListBoxItem();
-                            boxItem.Content = i.ToString();
-                            boxItem.Tag = i;
-                            instrBox.Items.Add(boxItem);
-                        }
-                    });
-                    StopSpinner(); 
-                }).Start();
-
-            }
-            else
-            {
-                Generator = new InstrumentalGenerator(category);
-                Button_Click_2(sender, e);
-            }
         }
+    
+
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
