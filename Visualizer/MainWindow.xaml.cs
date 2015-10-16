@@ -40,26 +40,32 @@ namespace Visualizer
 
         MusicPlayer player;
 
-        Composition generated;
+        private Composition Generated
+        {
+            get
+            {
+                return generator.ActiveComposition;
+            }
+            set
+            {
+                generator.ActiveComposition = value;
+            }
+        }
+
+        CompositionRandomizer generator;
+
 
         double prevTime = 0;
         double currentTime = 0;
 
         DispatcherTimer songUpdateTimer;
 
-        IPlaybackGenerator lastGen = null;
+        
 
         Databank databank;
 
         CompositionCategory selectedCategory;
-
-        private Composition ActiveComposition
-        {
-            get
-            {
-                return generated;
-            }
-        }
+        
 
         public MainWindow()
         {
@@ -76,6 +82,16 @@ namespace Visualizer
             songUpdateTimer.Tick += songUpdateTimer_Tick;
             songUpdateTimer.Start();
 
+            generator = new CompositionRandomizer();
+            generator.OnCompositionChange += generator_OnCompositionChange;
+
+        }
+
+        // Update stuff when composition changes
+        void generator_OnCompositionChange(object sender, EventArgs e)
+        {
+            SetupPlayPlot(Generated);
+            SetupGenerationPlots(Generated);
         }
 
         private void SetupPlayPlot(Composition comp)
@@ -188,7 +204,7 @@ namespace Visualizer
             {
                 GeneticMIDI.Representation.Track track = null;
                 int j = 0;
-                foreach (var t in generated.Tracks)
+                foreach (var t in Generated.Tracks)
                 {
                     if (t.Channel == tag.Item1)
                     {
@@ -293,13 +309,13 @@ namespace Visualizer
             // if (comp == null)
             //     return;
 
-            if (generated == null)
+            if (Generated == null)
                 return;
             currentTime = 0;
             lastIndex = new Dictionary<int, int>();
 
             prevTime = 0;
-            player.Play(generated);
+            player.Play(Generated);
            // generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
 
             songUpdateTimer.Stop();
@@ -326,29 +342,12 @@ namespace Visualizer
 
         private void randomizeBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (lastGen == null)
+            if (generator == null)
                 return;
 
             // Randomize
-            generated = new Composition();
-
-            Composition best = generated;
-
-
-                var mel = lastGen.Next() as MelodySequence;
-                if (mel != null)
-                {
-                    GeneticMIDI.Representation.Track track = new GeneticMIDI.Representation.Track(PatchNames.Acoustic_Grand, 1);
-                    track.AddSequence(mel);
-                    generated.Add(track);
-                }
-                else
-                {
-                    generated = lastGen.Next() as Composition;
-                }
-
-           
-
+            generator.Next();
+          
             //generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
 
         }
@@ -384,24 +383,22 @@ namespace Visualizer
             {
 
                 lastIndex = new Dictionary<int, int>();
-                generated = Composition.LoadFromMIDI(dlg.FileName);
+                Generated = Composition.LoadFromMIDI(dlg.FileName);
                // generateSongPlotFull(midiPlotFull.Model, generated.GeneratePlaybackInfo());
                 itemsBox.Items.Clear();
 
-                foreach(var track in generated.Tracks)
+                foreach(var track in Generated.Tracks)
                 {
                     
                     AddTrackPlot(track.GetMainSequence() as MelodySequence, track.Instrument);
                 }
-
-                SetupPlayPlot(generated);
 
             }
         }
 
         private void saveBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (ActiveComposition == null)
+            if (Generated == null)
                 return;
 
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
@@ -414,7 +411,7 @@ namespace Visualizer
 
             if (result == true)
             {
-                ActiveComposition.WriteToMidi(dlg.FileName);
+                Generated.WriteToMidi(dlg.FileName);
             }
 
         }
@@ -472,6 +469,14 @@ namespace Visualizer
 
         }
 
+        private void SetupGenerationPlots(Composition comp)
+        {
+            itemsBox.Items.Clear();
+            foreach (var t in comp.Tracks)
+                AddTrackPlot(t.GetMainSequence() as MelodySequence, t.Instrument);
+        }
+
+        // New metric window
         void listBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             MelodySequence seq = (sender as ListBoxItem).Tag as MelodySequence;
@@ -479,9 +484,14 @@ namespace Visualizer
             {
                 MetricWindow metric = new MetricWindow(seq);
                 int index = itemsBox.SelectedIndex;
-                if(generated != null && generated.Tracks.Count > index && index >= 0)
+                if(Generated != null && Generated.Tracks.Count > index && index >= 0)
                 {
-                    string str = string.Format("Track {0} - {1}", index, generated.Tracks[index].Instrument);
+                    string instrument = Generated.Tracks[index].Instrument.ToString();
+                    instrument = instrument.Replace("_", " ");
+                    if(Generated.Tracks[index].Instrument == PatchNames.Helicopter)
+                        instrument  = "Drums";
+
+                    string str = string.Format("Track {0} - {1}", index, instrument);
                     metric.Title = str;
                     metric.Show();
                 }
@@ -489,6 +499,7 @@ namespace Visualizer
             }
         }
 
+        // Remove a track
         void btn_Click(object sender, RoutedEventArgs e)
         {
             ListBoxItem item = (sender as Button).Tag as ListBoxItem;
@@ -496,56 +507,46 @@ namespace Visualizer
             try
             {
                 int index = itemsBox.Items.IndexOf(item);
-                generated.Tracks.RemoveAt(index);
+                generator.Remove(index);
             }
             catch
             {
 
             }
             itemsBox.Items.Remove(item);
+
+            // TODO Remove track plot
         }
 
+        // New track
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            TrackGenerator g = new TrackGenerator(selectedCategory, generated);
-            g.ShowDialog();
+            TrackGenerator g = new TrackGenerator(selectedCategory, Generated);
 
-            if (g.GeneratedSequence != null)
+            if (g.ShowDialog() == true)
             {
-                AddTrackPlot(g.GeneratedSequence, g.Instrument);
-                if (generated == null)
-                    generated = new Composition();
 
-
-                byte channel = 1;
-                if (generated != null)
-                    channel = (byte)(generated.Tracks.Count + 1);
-                
-
-
-                foreach(var t in generated.Tracks)
+                if (g.GeneratedSequence != null)
                 {
-                    if(t.Channel == channel)
+                    if (g.Instrument == PatchNames.Helicopter)
                     {
-                        channel++;
-                        break;
+                        // Add drum track
+                        generator.AddPercussionTrack(g.GeneratedSequence, g.Generator);
+                    }
+                    else
+                    {
+                        generator.Add(g.GeneratedSequence, g.Generator);
                     }
                 }
-
-
-                var track = new GeneticMIDI.Representation.Track(g.Instrument, channel);
-                track.AddSequence(g.GeneratedSequence);
-
-                generated.Tracks.Add(track);
             }
 
-            SetupPlayPlot(generated);
         }
 
+        // Remove all
         private void clearBtn_Click(object sender, RoutedEventArgs e)
         {
             itemsBox.Items.Clear();
-            generated = new Composition();
+            generator.Clear();
         }
 
         private void itemsBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -553,22 +554,23 @@ namespace Visualizer
            
         }
 
+        
+        //Delete a specific track
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            ListBoxItem item = itemsBox.SelectedItem as ListBoxItem;
 
+            ListBoxItem item = itemsBox.SelectedItem as ListBoxItem;
+            int index = -1;
             try
             {
-                int index = itemsBox.Items.IndexOf(item);
-                generated.Tracks.RemoveAt(index);
+                index = itemsBox.Items.IndexOf(item);
+                generator.Remove(index);
             }
             catch
             {
 
             }
-            itemsBox.Items.Remove(item);
 
-            SetupPlayPlot(generated);
         }
     }
 }
