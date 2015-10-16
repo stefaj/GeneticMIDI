@@ -42,9 +42,89 @@ Use as fitness function
 
 Use HMM decode as fitness function GA*/
 
-           Databank db = new Databank("lib");
-            var cat = db.Load("Classical");        
+           /* Databank db = new Databank("lib");
+
+            List<MelodySequence> drumSeqs = new List<MelodySequence>();
+            var comps = new Composition[][] { db.Load("Classic Rock").Compositions, db.Load("Jazz").Compositions, Utils.LoadCompositionsParallel(@"D:\Sync\4th year\Midi\Library2\Drums") };
+
+            foreach(Composition[] catt in comps)
+            {
+                foreach(var c in catt)
+                {
+                    foreach(var t in c.Tracks)
+                    {
+                        if(t.Channel == 10)
+                        {
+                            drumSeqs.Add(t.GetMainSequence() as MelodySequence);
+                        }
+                    }
+                }
+            }
+
+            List<Composition> drums = new List<Composition>();
+            foreach(var m in drumSeqs)
+            {
+                Composition c = new Composition();
+                Track t = new Track(PatchNames.Acoustic_Grand, 10);
+                t.AddSequence(m);
+                c.Add(t);
+                drums.Add(c);
+            }
+
+            var catdrum = new CompositionCategory("Drums", "lib/Drums", drums.ToArray());
+            catdrum.Save("lib/Drums");
+            Console.ReadLine();
+            */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            var cat = CompositionCategory.LoadFromFile("lib/Drums", "Drums");
+
+            int count = 0;
+            int percus = 0;
+
+            var chain = new DotNetLearn.Markov.MarkovChain<Note>(3);
             
+            foreach(var c in cat.Compositions)
+            {
+                foreach(var t in c.Tracks)
+                {
+                    if (t.Channel == 10)
+                    {
+                        var mel = t.GetMainSequence() as MelodySequence;
+                        chain.Add(mel.ToArray());
+                        percus++;
+                    }
+                        
+                    count++;
+                }
+            }
+
+            MusicPlayer player = new MusicPlayer();
+
+            Random rand = new Random();
+
+            var gen_mel = new MelodySequence(chain.Chain(200, rand.Next()));
+
+
+            Track track = new Track(PatchNames.Acoustic_Grand, 10);
+            track.AddSequence(gen_mel);
+
+            player.Play(track);
+
+            Console.ReadLine();
 
 
             /*Composition comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\other\twinkle.mid");
@@ -53,65 +133,65 @@ Use HMM decode as fitness function GA*/
             MusicPlayer player = new MusicPlayer();
             player.Play(comp);
             Console.ReadLine();*/
+
+
+
+            /*  MusicPlayer player = new MusicPlayer();
             
-           
+              //db.LoadAll();
 
-          /*  MusicPlayer player = new MusicPlayer();
-            
-            //db.LoadAll();
+              AccompanyGeneratorMarkov genMark = new AccompanyGeneratorMarkov(cat);
+              var targetSeq = cat.Compositions[2].GetLongestTrack().GetMainSequence() as MelodySequence;
+              var seqTest = genMark.Generate(targetSeq,5);
 
-            AccompanyGeneratorMarkov genMark = new AccompanyGeneratorMarkov(cat);
-            var targetSeq = cat.Compositions[2].GetLongestTrack().GetMainSequence() as MelodySequence;
-            var seqTest = genMark.Generate(targetSeq,5);
+              Track trackTest = new Track(PatchNames.Orchestral_Strings, 2); trackTest.AddSequence(seqTest);
 
-            Track trackTest = new Track(PatchNames.Orchestral_Strings, 2); trackTest.AddSequence(seqTest);
+              Track targetTrack = new Track(PatchNames.Acoustic_Grand, 3); targetTrack.AddSequence(targetSeq);
 
-            Track targetTrack = new Track(PatchNames.Acoustic_Grand, 3); targetTrack.AddSequence(targetSeq);
+              Composition comp = new Composition(); 
+              comp.Add(trackTest);
+              comp.Add(targetTrack);
 
-            Composition comp = new Composition(); 
-            comp.Add(trackTest);
-            comp.Add(targetTrack);
-
-            player.Play(comp);
-
-            
-            return;*/
-
-
-
-
-                /*   Databank db = new Databank("lib");
-                   var cat = db.Load("Classical");
-                   //AccompanimentGenerator2 Test
-                   AccompanimentGenerator2 gen = new AccompanimentGenerator2(cat, PatchNames.Orchestral_Strings);
-                   gen.Train();
-                   //
-                   Composition comp = Composition.LoadFromMIDI(@"D:\Sync\4th year\Midi\Library2\Classical\Mixed\dvorak.mid");
-                   //var comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\ff7tifa.mid");
-                   gen.SetSequence(comp.Tracks[0].GetMainSequence() as MelodySequence);
+              player.Play(comp);
 
             
+              return;*/
 
-                   MusicPlayer player = new MusicPlayer();
+
+
+
+            /*   Databank db = new Databank("lib");
+               var cat = db.Load("Classical");
+               //AccompanimentGenerator2 Test
+               AccompanimentGenerator2 gen = new AccompanimentGenerator2(cat, PatchNames.Orchestral_Strings);
+               gen.Train();
+               //
+               Composition comp = Composition.LoadFromMIDI(@"D:\Sync\4th year\Midi\Library2\Classical\Mixed\dvorak.mid");
+               //var comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\ff7tifa.mid");
+               gen.SetSequence(comp.Tracks[0].GetMainSequence() as MelodySequence);
+
+            
+
+               MusicPlayer player = new MusicPlayer();
 
       
-                       Console.WriteLine("Press enter to listen");
-                       Console.ReadLine();
+                   Console.WriteLine("Press enter to listen");
+                   Console.ReadLine();
 
-                       var mel = gen.Generate();
-                       Composition newComp = new Composition();
-                       Track newTrack = new Track(PatchNames.Orchestral_Strings , 2);
-                       newTrack.AddSequence(mel);
-                       newComp.Add(newTrack);
-                       /*comp.Tracks[0].Instrument = PatchNames.Acoustic_Grand; (comp.Tracks[0].GetMainSequence() as MelodySequence).ScaleVelocity(0.8f);
-                       /* newComp.Tracks.Add(comp.Tracks[0]);
-
-
-                       player.Play(newComp);*/
+                   var mel = gen.Generate();
+                   Composition newComp = new Composition();
+                   Track newTrack = new Track(PatchNames.Orchestral_Strings , 2);
+                   newTrack.AddSequence(mel);
+                   newComp.Add(newTrack);
+                   /*comp.Tracks[0].Instrument = PatchNames.Acoustic_Grand; (comp.Tracks[0].GetMainSequence() as MelodySequence).ScaleVelocity(0.8f);
+                   /* newComp.Tracks.Add(comp.Tracks[0]);
 
 
+                   player.Play(newComp);*/
 
-                Console.ReadLine();
+
+
+            Console.ReadLine();
         }
 
         /// <summary>
@@ -327,7 +407,7 @@ Use HMM decode as fitness function GA*/
             Composition inputComp = cat.Compositions[6];
             MelodySequence inputSeq = inputComp.Tracks[0].GetMainSequence() as MelodySequence;
 
-            AccompanyGeneratorMarkov gen = new AccompanyGeneratorMarkov(cat);
+            AccompanyGeneratorMarkov gen = new AccompanyGeneratorMarkov(cat, PatchNames.Orchestral_Strings);
 
             var outMel = gen.Generate(inputSeq, 10);
 
@@ -335,7 +415,7 @@ Use HMM decode as fitness function GA*/
 
 
             Composition comp = new Composition();
-            Track t = new Track(PatchNames.Orchestral_Strings, 6);
+            Track t = new Track(gen.Instrument, 6);
             t.AddSequence(outMel);
             comp.Add(t);
             comp.Add(inputComp.Tracks[0]);
@@ -351,7 +431,7 @@ Use HMM decode as fitness function GA*/
 
 
             MetricSimilarity cosine = MetricSimilarity.GenerateMetricSimilarityMulti(cat.Compositions, new IMetric[] { new ChromaticToneDistance(), new MelodicInterval(), new ChromaticToneDuration(), new RhythmicBigram() });
-            GeneticGenerator gen = new GeneticGenerator(cosine, cat);
+            GeneticGenerator gen = new GeneticGenerator(cosine, PatchNames.Orchestral_Strings, cat);
             gen.OnPercentage += (sender, percentage, fitness) => { Console.WriteLine("{0}: {1}", percentage, fitness); };
             gen.MaxGenerations = 1000;
             var outMel = gen.Generate();
@@ -360,7 +440,7 @@ Use HMM decode as fitness function GA*/
             player.Play(outMel);
 
             Composition comp = new Composition();
-            Track t = new Track(PatchNames.Acoustic_Grand, 3);
+            Track t = new Track(gen.Instrument, 3);
             t.AddSequence(outMel);
             comp.Add(t);
             comp.WriteToMidi("genetic_cosine_all.mid");
