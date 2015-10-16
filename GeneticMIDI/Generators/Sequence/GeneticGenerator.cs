@@ -32,17 +32,20 @@ namespace GeneticMIDI.Generators
 
         public bool PrintProgress { get; set; }
 
-        public GeneticGenerator(IFitnessFunction fitnessFunction, CompositionCategory cat=null)
+        PatchNames instrument;
+
+        public GeneticGenerator(IFitnessFunction fitnessFunction, PatchNames instrument = PatchNames.Acoustic_Grand, CompositionCategory cat=null)
         {
             this.fitnessFunction = fitnessFunction;
             this.cat = cat;
             this.MaxGenerations = 1000;
             this.PrintProgress = true;
+            this.instrument = instrument;
 
             if (cat != null)
             {
                 // Markov generator
-                var mark = new MarkovChainGenerator(2);
+                var mark = new MarkovChainGenerator(instrument, 2);
 
                 // Allowed notes
                 HashSet<Durations> durs = new HashSet<Durations>();
@@ -182,6 +185,12 @@ namespace GeneticMIDI.Generators
         IPlayable IPlaybackGenerator.Next()
         {
             return Next();
+        }
+
+
+        public PatchNames Instrument
+        {
+            get { return instrument; }
         }
     }
 }

@@ -29,7 +29,7 @@ namespace GeneticMIDI.Generators.CompositionGenerator
                     Console.WriteLine("Generating track {0} with instrument {1}", i, instrument.ToString());
                     var melodySeq = composition.Tracks[i].GetMainSequence() as MelodySequence;
 
-                    MarkovChainGenerator chain = new MarkovChainGenerator(2, melodySeq.Length);
+                    MarkovChainGenerator chain = new MarkovChainGenerator(instrument,2, melodySeq.Length);
                     chain.AddMelody(melodySeq);
                     var notes = chain.Generate();
 

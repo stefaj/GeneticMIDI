@@ -12,11 +12,12 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators.Sequence
 {
-    public class HMMGenerator
+    public class HMMGenerator : INoteGenerator
     {
        
         PatchNames instrument;
         HiddenMarkovModel hmm;
+        MelodySequence sequence;
         Codebook<Note> book;
         public HMMGenerator(PatchNames instrument)
         {
@@ -100,6 +101,11 @@ namespace GeneticMIDI.Generators.Sequence
             return seqOut;
         }
 
+        public void SetSequence(MelodySequence seq)
+        {
+            this.sequence = seq;
+        }
+
 
         public void Train(CompositionCategory cat)
         {
@@ -140,6 +146,26 @@ namespace GeneticMIDI.Generators.Sequence
                 double ll = teacher.Run(outputSequences.ToArray(), inputSequences.ToArray());
                 Console.WriteLine("Error: {0}", ll);
  
+        }
+
+        public MelodySequence Generate()
+        {
+            return Generate(sequence);
+        }
+
+        public MelodySequence Next()
+        {
+            return Generate();
+        }
+
+        public bool HasNext
+        {
+            get { return true; }
+        }
+
+        public PatchNames Instrument
+        {
+            get { return instrument; }
         }
     }
 }

@@ -207,6 +207,11 @@ namespace GeneticMIDI.Generators.CompositionGenerator
             return GenerateInstrument(patch, randomSeed);
         }
 
+        public void SetInstrument(PatchNames instrument)
+        {
+            this.lastInstrument = instrument;
+        }
+
 
 
 
@@ -252,6 +257,12 @@ namespace GeneticMIDI.Generators.CompositionGenerator
         MelodySequence INoteGenerator.Next()
         {
             return Generate();
+        }
+
+
+        public PatchNames Instrument
+        {
+            get { return lastInstrument; }
         }
     }
 }

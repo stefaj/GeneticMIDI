@@ -16,11 +16,14 @@ namespace GeneticMIDI.Generators.NoteGenerators
 
         public event OnFitnessUpdate OnPercentage;
 
+        PatchNames instrument;
+
         int generatesNo = 0;
-        public MarkovChainGenerator(int order = 3, int length = 150)
+        public MarkovChainGenerator(PatchNames instrument, int order = 3, int length = 150)
         {
-            chain = new MarkovChain<Note>(order);
-            MaxLength = length;
+            this.instrument = instrument;
+            this.chain = new MarkovChain<Note>(order);
+            this.MaxLength = length;
         }
 
         public void AddMelody(string path)
@@ -81,6 +84,12 @@ namespace GeneticMIDI.Generators.NoteGenerators
         IPlayable IPlaybackGenerator.Next()
         {
             return Next();
+        }
+
+
+        public PatchNames Instrument
+        {
+            get { return instrument; }
         }
     }
 }

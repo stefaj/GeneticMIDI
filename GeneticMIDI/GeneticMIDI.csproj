@@ -107,6 +107,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="FitnessFunctions\MetricSimilarity.cs" />
     <Compile Include="FitnessFunctions\CrossCorrelation.cs" />
+    <Compile Include="Generators\CompositionGenerator\CompositionRandomizer.cs" />
     <Compile Include="Random\BrownNoiseGenerator.cs" />
     <Compile Include="Random\DiceCounter.cs" />
     <Compile Include="Random\DiceUtil.cs" />
@@ -160,7 +161,7 @@
   <ItemGroup>
     <Content Include="Resources\Entypo-license.txt" />
     <Content Include="Resources\WindowsIcons-license.txt" />
-    <Content Include="TextFile1.txt" />
+    <Content Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Resources\Icons.xaml">

@@ -14,5 +14,7 @@ namespace GeneticMIDI.Generators
         MelodySequence Next();
 
         bool HasNext { get; }
+
+        PatchNames Instrument { get; }
     }
 }

@@ -20,8 +20,11 @@ namespace GeneticMIDI.Generators
         int max_length = 0;
         int[][] pitches;
 
-        public MarkovGenerator(MelodySequence[] seqs)
+        PatchNames instrument;
+
+        public MarkovGenerator(MelodySequence[] seqs, PatchNames instrument = PatchNames.Acoustic_Grand)
         {
+            this.instrument = instrument;
 
             int count = seqs.Length;
             note_map = new Dictionary<Note, int>();
@@ -86,12 +89,18 @@ namespace GeneticMIDI.Generators
 
         public MelodySequence Next()
         {
-            throw new NotImplementedException();
+            return Generate();
         }
 
         public bool HasNext
         {
-            get { throw new NotImplementedException(); }
+            get { return true; }
+        }
+
+
+        public PatchNames Instrument
+        {
+            get { return instrument; }
         }
     }
 }

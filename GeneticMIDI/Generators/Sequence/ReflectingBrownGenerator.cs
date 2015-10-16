@@ -13,15 +13,18 @@ namespace GeneticMIDI.Generators.Sequence
         public int MaxNotes { get; set; }
         Random gen;
 
+        PatchNames instrument;
+
         public ReflectingBrownNoteGenerator(
                 NoteRangeRestrictor nrr, Random randGen,
                 int lowestPitchChange, int highestPitchChange,
-                int lowestLengthStep, int highestLengthStep)
+                int lowestLengthStep, int highestLengthStep, PatchNames instrument = PatchNames.Acoustic_Grand)
             : base(
                 nrr, lowestPitchChange, highestPitchChange,
                 lowestLengthStep, highestLengthStep
                 )
         {
+            this.instrument = instrument;
             this.MaxNotes = 200;
             gen = randGen;
         }
@@ -66,6 +69,12 @@ namespace GeneticMIDI.Generators.Sequence
         public bool HasNext
         {
             get { return true; }
+        }
+
+
+        public PatchNames Instrument
+        {
+            get { return instrument; }
         }
     }
 

@@ -139,5 +139,11 @@ namespace GeneticMIDI.Generators
         {
             get { return true; }
         }
+
+
+        public PatchNames Instrument
+        {
+            get { return PatchNames.Acoustic_Grand; }
+        }
     }
 }

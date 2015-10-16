@@ -14,9 +14,13 @@ namespace GeneticMIDI.Generators.Sequence
         const int SYNC_AFTER_NOTES = 20;
         MarkovTable<Note> table;
         MelodySequence sequence;
-        public AccompanyGeneratorMarkov(CompositionCategory cat)
+
+        PatchNames instrument;
+        public AccompanyGeneratorMarkov(CompositionCategory cat, PatchNames instrument)
         {
+            this.instrument = instrument;
             Add(cat);
+            
         }
 
         MelodySequence NormalizeSequence(MelodySequence seq)
@@ -110,6 +114,12 @@ namespace GeneticMIDI.Generators.Sequence
         public bool HasNext
         {
             get { return true; }
+        }
+
+
+        public PatchNames Instrument
+        {
+            get { return instrument; }
         }
     }
 

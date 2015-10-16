@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace GeneticMIDI.Generators.Sequence
 {
-    public class AccompanimentGeneratorANNFF
+    public class AccompanimentGeneratorANNFF : INoteGenerator
     {
         
         PatchNames instrument;
@@ -372,11 +372,25 @@ namespace GeneticMIDI.Generators.Sequence
 
 
 
-        public Representation.MelodySequence Generate()
+        public MelodySequence Generate()
         {
-            return new MelodySequence(GenerateMelody(sequence));
+            return new MelodySequence(GenerateMelody(this.sequence));
         }
 
 
+        public MelodySequence Next()
+        {
+            return Generate();
+        }
+
+        public bool HasNext
+        {
+            get { return true; }
+        }
+
+        public PatchNames Instrument
+        {
+            get { return instrument; }
+        }
     }
 }
