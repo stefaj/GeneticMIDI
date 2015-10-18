@@ -4,7 +4,7 @@
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls" 
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:Visualizer="clr-namespace:DotNetMusic.WPF;assembly=WPFMusicSheet"
-        Title="Ancestral Tunes" Height="739" Width="934" Closing="MetroWindow_Closing">
+        Title="Mizik" Height="739" Width="934" Closing="MetroWindow_Closing">
     <Grid>
         <TabControl Margin="10">
             <TabItem Header="Play">
