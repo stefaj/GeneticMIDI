@@ -1,10 +1,13 @@
 ﻿using Accord.MachineLearning.Bayes;
 using Accord.Neuro.Learning;
+using Accord.Statistics.Models.Markov;
 using Accord.Statistics.Models.Markov.Learning;
 using AForge;
 using AForge.Genetic;
 using AForge.Neuro;
 using AForge.Neuro.Learning;
+using DotNetLearn.Data;
+using DotNetLearn.Markov;
 using GeneticMIDI.FitnessFunctions;
 using GeneticMIDI.Fractal;
 using GeneticMIDI.Generators;
@@ -80,53 +83,6 @@ Use HMM decode as fitness function GA*/
 
 
 
-
-
-
-
-
-
-
-
-
-
-            var cat = CompositionCategory.LoadFromFile("lib/Drums", "Drums");
-
-            int count = 0;
-            int percus = 0;
-
-            var chain = new DotNetLearn.Markov.MarkovChain<Note>(3);
-            
-            foreach(var c in cat.Compositions)
-            {
-                foreach(var t in c.Tracks)
-                {
-                    if (t.Channel == 10)
-                    {
-                        var mel = t.GetMainSequence() as MelodySequence;
-                        chain.Add(mel.ToArray());
-                        percus++;
-                    }
-                        
-                    count++;
-                }
-            }
-
-            MusicPlayer player = new MusicPlayer();
-
-            Random rand = new Random();
-
-            var gen_mel = new MelodySequence(chain.Chain(200, rand.Next()));
-
-
-            Track track = new Track(PatchNames.Acoustic_Grand, 10);
-            track.AddSequence(gen_mel);
-
-            player.Play(track);
-
-            Console.ReadLine();
-
-
             /*Composition comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\other\twinkle.mid");
             float time = Note.ToRealDuration(comp.GetLongestTrack().Duration);
             Console.WriteLine("Total time: {0}", time);
@@ -136,62 +92,91 @@ Use HMM decode as fitness function GA*/
 
 
 
-            /*  MusicPlayer player = new MusicPlayer();
-            
-              //db.LoadAll();
 
-              AccompanyGeneratorMarkov genMark = new AccompanyGeneratorMarkov(cat);
-              var targetSeq = cat.Compositions[2].GetLongestTrack().GetMainSequence() as MelodySequence;
-              var seqTest = genMark.Generate(targetSeq,5);
+            Databank db = new Databank("lib");
+            var cat = db.Load("Classical");
 
-              Track trackTest = new Track(PatchNames.Orchestral_Strings, 2); trackTest.AddSequence(seqTest);
-
-              Track targetTrack = new Track(PatchNames.Acoustic_Grand, 3); targetTrack.AddSequence(targetSeq);
-
-              Composition comp = new Composition(); 
-              comp.Add(trackTest);
-              comp.Add(targetTrack);
-
-              player.Play(comp);
+            var gen = new SamplingWithReplacement(cat, PatchNames.Acoustic_Grand);
 
             
-              return;*/
+            var mel = gen.Generate();
+
+
+            Console.WriteLine(mel.ToString());
+            MusicPlayer player = new MusicPlayer();
+            player.Play(mel);
+
+
+            Console.WriteLine("Press enter to save");
+            Console.ReadLine();
+            WriteMelodyToFile(gen.OriginalSequence, "sampling_in.mid");
+            WriteMelodyToFile(mel, "sampling_out.mid");
 
 
 
 
-            /*   Databank db = new Databank("lib");
-               var cat = db.Load("Classical");
-               //AccompanimentGenerator2 Test
-               AccompanimentGenerator2 gen = new AccompanimentGenerator2(cat, PatchNames.Orchestral_Strings);
-               gen.Train();
-               //
-               Composition comp = Composition.LoadFromMIDI(@"D:\Sync\4th year\Midi\Library2\Classical\Mixed\dvorak.mid");
-               //var comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\ff7tifa.mid");
-               gen.SetSequence(comp.Tracks[0].GetMainSequence() as MelodySequence);
+
+
+
+
+
+
+                /*  MusicPlayer player = new MusicPlayer();
+            
+                  //db.LoadAll();
+
+                  AccompanyGeneratorMarkov genMark = new AccompanyGeneratorMarkov(cat);
+                  var targetSeq = cat.Compositions[2].GetLongestTrack().GetMainSequence() as MelodySequence;
+                  var seqTest = genMark.Generate(targetSeq,5);
+
+                  Track trackTest = new Track(PatchNames.Orchestral_Strings, 2); trackTest.AddSequence(seqTest);
+
+                  Track targetTrack = new Track(PatchNames.Acoustic_Grand, 3); targetTrack.AddSequence(targetSeq);
+
+                  Composition comp = new Composition(); 
+                  comp.Add(trackTest);
+                  comp.Add(targetTrack);
+
+                  player.Play(comp);
+
+            
+                  return;*/
+
+
+
+
+                /*   Databank db = new Databank("lib");
+                   var cat = db.Load("Classical");
+                   //AccompanimentGenerator2 Test
+                   AccompanimentGenerator2 gen = new AccompanimentGenerator2(cat, PatchNames.Orchestral_Strings);
+                   gen.Train();
+                   //
+                   Composition comp = Composition.LoadFromMIDI(@"D:\Sync\4th year\Midi\Library2\Classical\Mixed\dvorak.mid");
+                   //var comp = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\ff7tifa.mid");
+                   gen.SetSequence(comp.Tracks[0].GetMainSequence() as MelodySequence);
 
             
 
-               MusicPlayer player = new MusicPlayer();
+                   MusicPlayer player = new MusicPlayer();
 
       
-                   Console.WriteLine("Press enter to listen");
-                   Console.ReadLine();
+                       Console.WriteLine("Press enter to listen");
+                       Console.ReadLine();
 
-                   var mel = gen.Generate();
-                   Composition newComp = new Composition();
-                   Track newTrack = new Track(PatchNames.Orchestral_Strings , 2);
-                   newTrack.AddSequence(mel);
-                   newComp.Add(newTrack);
-                   /*comp.Tracks[0].Instrument = PatchNames.Acoustic_Grand; (comp.Tracks[0].GetMainSequence() as MelodySequence).ScaleVelocity(0.8f);
-                   /* newComp.Tracks.Add(comp.Tracks[0]);
-
-
-                   player.Play(newComp);*/
+                       var mel = gen.Generate();
+                       Composition newComp = new Composition();
+                       Track newTrack = new Track(PatchNames.Orchestral_Strings , 2);
+                       newTrack.AddSequence(mel);
+                       newComp.Add(newTrack);
+                       /*comp.Tracks[0].Instrument = PatchNames.Acoustic_Grand; (comp.Tracks[0].GetMainSequence() as MelodySequence).ScaleVelocity(0.8f);
+                       /* newComp.Tracks.Add(comp.Tracks[0]);
 
 
+                       player.Play(newComp);*/
 
-            Console.ReadLine();
+
+
+                Console.ReadLine();
         }
 
         /// <summary>
@@ -201,6 +186,15 @@ Use HMM decode as fitness function GA*/
         static void GenerateCategories()
         {
             Databank.GenerateCategories(@"D:\Sync\4th year\Midi\Library2", "lib");
+        }
+
+        static void WriteMelodyToFile(MelodySequence seq, string filename)
+        {
+            Composition comp = new Composition();
+            Track track = new Track(PatchNames.Acoustic_Grand, 1);
+            track.AddSequence(seq);
+            comp.Add(track);
+            comp.WriteToMidi(filename);
         }
 
         static void MetricTimingTest()
