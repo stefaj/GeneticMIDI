@@ -94,10 +94,12 @@ namespace Visualizer
             randomInstrument.Items.Clear(); 
             var popularInstruments = new PatchNames[]{PatchNames.Acoustic_Grand,PatchNames.String_Ensemble_1,
                 PatchNames.Acoustic_Bass,PatchNames.Trumpet,PatchNames.Violin,PatchNames.Electric_Grand,
-                PatchNames.French_Horn,PatchNames.Flute,PatchNames.Trombone,PatchNames.Acoustic_Guitarnylon};
+                PatchNames.French_Horn,PatchNames.Flute,PatchNames.Trombone,PatchNames.Acoustic_Guitarnylon, PatchNames.Orchestral_Strings};
             foreach (var d in popularInstruments)
+            {
+                loadInstrument.Items.Add(d);
                 randomInstrument.Items.Add(d);
-            
+            }
             
             
             
@@ -133,10 +135,10 @@ namespace Visualizer
             if (index == 0)
             {
 
+                SetupLinePlot(fitnessPlot, "Average Fitness");
                 (fitnessPlot.Model.Series[0] as LineSeries).Points.Clear();
                 fitnessPlot.Model.Series[0].Unselect();
                 fitnessPlot.Model.Series.Clear();
-                SetupLinePlot(fitnessPlot, "Average Fitness");
                 fitnessPlot.ResetAllAxes();
                 fitnessPlot.InvalidatePlot();
 
@@ -305,6 +307,39 @@ namespace Visualizer
                 
 
             }
+            if(index == 3)
+            {
+                //stochasticLogPlot.Model.Series.Clear();
+                stochasticLogPlot.ResetAllAxes();
+                SetupLinePlot(stochasticLogPlot, "Log Likelihood");
+                (stochasticLogPlot.Model.Series[0] as LineSeries).Points.Clear();
+                stochasticLogPlot.Model.Series[0].Unselect();
+                stochasticLogPlot.InvalidatePlot();
+                
+                if (loadInstrument.SelectedItem == null)
+                    return;
+                Instrument = (PatchNames)(loadInstrument.SelectedItem);
+
+                SamplingWithReplacement swr = new SamplingWithReplacement(category, Instrument);
+                swr.OnProgressChange += swr_OnProgressChange;
+                swr.MaxIterations = (int)loadGenerationsSlider.Value;
+                
+                Generator = swr;
+
+                new Thread(() =>
+                {
+                    StartSpinner();
+                    GeneratedSequence = swr.Generate();
+                    StopSpinner();
+                    progressGenSlider.Dispatcher.Invoke(() =>
+                    {
+                        progressGenSlider.Maximum = 100;
+                        progressGenSlider.Value = 100;
+                    });
+
+                }).Start();
+
+            }
             if(index == 4)
             {
                 if (randomInstrument.SelectedItem == null)
@@ -344,6 +379,20 @@ namespace Visualizer
 
                 Console.ReadLine();
             }
+        }
+
+        void swr_OnProgressChange(int curIndex, int maxIndex, double fitness)
+        {
+            progressGenSlider.Dispatcher.Invoke(() =>
+            {
+                progressGenSlider.Maximum = maxIndex;
+                progressGenSlider.Value = curIndex;
+            });
+            fitnessPlot.Dispatcher.Invoke(() =>
+            {
+                ((stochasticLogPlot.Model.Series[0] as LineSeries).ItemsSource as List<DataPoint>).Add(new DataPoint(curIndex, fitness));
+                stochasticLogPlot.InvalidatePlot();
+            });
         }
 
         void StartSpinner()
@@ -492,6 +541,11 @@ namespace Visualizer
             accompInstruBox.Items.Add(PatchNames.Orchestral_Strings);
             accompInstruBox.Items.Add(PatchNames.Flute);
             accompInstruBox.Items.Add(PatchNames.Music_Box);
+        }
+
+        private void randomScale_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 

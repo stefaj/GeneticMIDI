@@ -5,89 +5,101 @@
         Title="Track Generator" Height="719" Width="588">
     <Grid>
 
-        <TabControl x:Name="optionsTab" Margin="10,10,10,124" SelectedIndex="1" BorderThickness="1">
+        <TabControl x:Name="optionsTab" Margin="10,10,10,124" SelectedIndex="0" BorderThickness="1">
             <TabItem x:Name="tabGA" Header="Genetic" Custom:ControlsHelper.HeaderFontSize="16">
                 <Grid Margin="0,0,18,12">
-                    <Label Content="Metrics:" HorizontalAlignment="Left" Margin="10,42,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricChromaticTone" Content="Chromatic Tone" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top" IsChecked="True"/>
-                    <CheckBox x:Name="metricChromaticToneDistance" Content="Chromatic Tone Distance" HorizontalAlignment="Left" Margin="202,73,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricChromaticToneDuration" Content="Chromatic Tone Duration" HorizontalAlignment="Left" Margin="10,96,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricMelodicBigram" Content="Melodic Bigram" HorizontalAlignment="Left" Margin="202,96,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricMelodicInterval" Content="Melodic Interval" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricPitch" Content="Pitch" HorizontalAlignment="Left" Margin="202,119,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricPitchDistance" Content="Pitch Distance" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricRhythm" Content="Rhythm" HorizontalAlignment="Left" Margin="202,142,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricRhythmicBigram" Content="Rhymthic Bigram" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricRhythmicInterval" Content="Rhythmic Interval" HorizontalAlignment="Left" Margin="202,165,0,0" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="fitnessFuncCombo" HorizontalAlignment="Left" Margin="132,10,0,0" VerticalAlignment="Top" Width="196" SelectedIndex="0">
+                    <Label Content="Metrics:" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricChromaticTone" Content="Chromatic Tone" HorizontalAlignment="Left" Margin="10,108,0,0" VerticalAlignment="Top" IsChecked="True"/>
+                    <CheckBox x:Name="metricChromaticToneDistance" Content="Chromatic Tone Distance" HorizontalAlignment="Left" Margin="202,108,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricChromaticToneDuration" Content="Chromatic Tone Duration" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricMelodicBigram" Content="Melodic Bigram" HorizontalAlignment="Left" Margin="202,131,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricMelodicInterval" Content="Melodic Interval" HorizontalAlignment="Left" Margin="10,154,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricPitch" Content="Pitch" HorizontalAlignment="Left" Margin="202,154,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricPitchDistance" Content="Pitch Distance" HorizontalAlignment="Left" Margin="10,177,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricRhythm" Content="Rhythm" HorizontalAlignment="Left" Margin="202,177,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricRhythmicBigram" Content="Rhymthic Bigram" HorizontalAlignment="Left" Margin="10,200,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricRhythmicInterval" Content="Rhythmic Interval" HorizontalAlignment="Left" Margin="202,200,0,0" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="fitnessFuncCombo" HorizontalAlignment="Left" Margin="132,45,0,0" VerticalAlignment="Top" Width="196" SelectedIndex="0">
                         <ComboBoxItem Content="Cosine Similarity"/>
                         <ComboBoxItem Content="Euclidian Similarity"/>
                         <ComboBoxItem Content="Pearson Correlation"/>
                         <ComboBoxItem Content="Cross Correlation"/>
                         <ComboBoxItem Content="Normalized Compression Distance"/>
                     </ComboBox>
-                    <Label Content="Fitness Function&#xA;" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26"/>
-                    <Label Content="Average Fitness" HorizontalAlignment="Left" Margin="10,191,0,0" VerticalAlignment="Top" Height="26"/>
-                    <Label Content="Maximum Iterations" HorizontalAlignment="Left" Margin="10,250,0,0" VerticalAlignment="Top"/>
-                    <Slider x:Name="maxGenerationSlider" HorizontalAlignment="Left" Margin="15,281,0,0" VerticalAlignment="Top" Width="290" Minimum="500" Maximum="12000" Value="2000"/>
+                    <Label Content="Fitness Function&#xA;" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Height="26"/>
+                    <Label Content="Average Fitness" HorizontalAlignment="Left" Margin="10,226,0,0" VerticalAlignment="Top" Height="26"/>
+                    <Label Content="Maximum Iterations" HorizontalAlignment="Left" Margin="10,285,0,0" VerticalAlignment="Top"/>
+                    <Slider x:Name="maxGenerationSlider" HorizontalAlignment="Left" Margin="15,316,0,0" VerticalAlignment="Top" Width="290" Minimum="500" Maximum="12000" Value="2000"/>
 
-                    <oxy:PlotView x:Name="fitnessPlot" Margin="10,333,220,0" Height="122" VerticalAlignment="Top"/>
+                    <oxy:PlotView x:Name="fitnessPlot" Margin="10,368,220,0" Height="122" VerticalAlignment="Top"/>
+                    <Label Content="Genetic Generation" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="202" FontSize="16" ToolTip="Generate a melody using a genetic algorithm"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="tabInstru" Header="Instrumental" Custom:ControlsHelper.HeaderFontSize="16">
                 <Grid>
                     <Label Content="Active Instruments" Margin="10,0,295,524"/>
                     <Label Content="Available instruments" Margin="262,0,36,524"/>
-                    <Button Content="Random" HorizontalAlignment="Left" Margin="262,40,0,0" VerticalAlignment="Top" Width="75"/>
-                    <Label Content="Instrument" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" Width="84"/>
-                    <ComboBox x:Name="instrBox" HorizontalAlignment="Left" Margin="99,40,0,0" VerticalAlignment="Top" Width="150"/>
-                    <Button Content="Populate" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Width="73" Click="Button_Click_2"/>
+                    <Label Content="Instrument" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top" Width="84"/>
+                    <ComboBox x:Name="instrBox" HorizontalAlignment="Left" Margin="99,56,0,0" VerticalAlignment="Top" Width="150"/>
+                    <Button Content="Load" HorizontalAlignment="Left" Margin="262,60,0,0" VerticalAlignment="Top" Width="73" Click="Button_Click_2"/>
+                    <Label Content="Instrumental generator" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="202" FontSize="16" ToolTip="Generate a melody in a specific instrument using markov chains"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="tabAccomp" Header="Accompaniment" Custom:ControlsHelper.HeaderFontSize="16" Margin="4,0,-4,0">
                 <Grid>
-                    <ComboBox x:Name="accompTrackBox" Margin="80,44,247,0" Height="26" VerticalAlignment="Top"/>
-                    <Label Content="Track" Margin="0,44,412,0" Height="28" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="accompInstruBox" Margin="80,77,247,0" Height="26" VerticalAlignment="Top"/>
-                    <Label Content="Instrument" Margin="0,77,412,0" Height="28" VerticalAlignment="Top"/>
-                    <Label Content="Method" Margin="0,11,492,0" Height="28" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="accompMethoBox" Margin="80,11,247,0" Height="26" VerticalAlignment="Top" SelectionChanged="accompMethoBox_SelectionChanged">
+                    <ComboBox x:Name="accompTrackBox" Margin="80,84,247,0" Height="26" VerticalAlignment="Top"/>
+                    <Label Content="Track" Margin="10,87,479,0" Height="28" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="accompInstruBox" Margin="80,117,247,0" Height="26" VerticalAlignment="Top"/>
+                    <Label Content="Instrument" Margin="10,120,474,0" Height="28" VerticalAlignment="Top"/>
+                    <Label Content="Method" Margin="10,54,482,0" Height="28" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="accompMethoBox" Margin="80,51,247,0" Height="26" VerticalAlignment="Top" SelectionChanged="accompMethoBox_SelectionChanged">
                         <ComboBoxItem>Hidden Markov Model</ComboBoxItem>
                         <ComboBoxItem>Neural Network</ComboBoxItem>
                     </ComboBox>
+                    <Label Content="Accompaniment generation" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="256" FontSize="16" ToolTip="Generate a melody to accompany an existing one"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="tabLoad" Header="Load" Custom:ControlsHelper.HeaderFontSize="16">
-                <Button Margin="196,0,195,4" VerticalAlignment="Bottom" Height="48" Click="Button_Click_3" >
-                    <Button.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform/>
-                            <SkewTransform/>
-                            <RotateTransform Angle="1.129"/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </Button.RenderTransform>
-                    <Image Width="16" Height="16" Source="Resources/glyphicons-145-folder-open.png"></Image>
-                </Button>
+                <Grid>
+
+                    <Label Content="Or load an existing melody" Margin="10,483,213,10"/>
+
+                    <Button Width="48" VerticalAlignment="Bottom" Height="48" Click="Button_Click_3" Margin="183,0,146,1" >
+
+                        <Image Width="16" Height="16" Source="Resources/glyphicons-145-folder-open.png"></Image>
+                    </Button>
+                    <Separator Height="100" Margin="0,369,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+                    <Label Content="Stochastic sampling" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="202" FontSize="16" ToolTip="Generate a melody by modifying an existing melody"/>
+                    <Slider x:Name="loadGenerationsSlider" HorizontalAlignment="Left" Margin="112,84,0,0" VerticalAlignment="Top" Width="170" Maximum="500" Minimum="49" Value="100" SmallChange="1"/>
+                    <Label Content="Similar" HorizontalAlignment="Left" Margin="10,76,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Novel" HorizontalAlignment="Left" Margin="324,76,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Time:" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="loadInstrument" HorizontalAlignment="Left" Margin="112,111,0,0" VerticalAlignment="Top" Width="170"/>
+                    <Label Content="Instrument" HorizontalAlignment="Left" Margin="10,111,0,0" VerticalAlignment="Top"/>
+
+                    <oxy:PlotView x:Name="stochasticLogPlot" Margin="10,160,10,0" Height="122" VerticalAlignment="Top"/>
+                </Grid>
             </TabItem>
             <TabItem x:Name="tabRandom" Header="Random" Custom:ControlsHelper.HeaderFontSize="16">
                 <Grid>
-                    <ComboBox x:Name="randomScale" Margin="112,10,280,485">
+                    <ComboBox x:Name="randomScale" Margin="112,50,280,445" SelectionChanged="randomScale_SelectionChanged">
                         <Label Content="Label"/>
                     </ComboBox>
-                    <Label Content="Scale" HorizontalAlignment="Left" Margin="10,12,0,0" VerticalAlignment="Top"/>
-                    <Custom:RangeSlider x:Name="randomDurationRange" Margin="112,60,272,444" Minimum="1" Maximum="6" MinRangeWidth="1" LowerValue="2" UpperValue="4"></Custom:RangeSlider>
-                    <Label Content="Duration" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top"/>
-                    <Slider x:Name="randomPitchVar" HorizontalAlignment="Left" Height="26" Margin="112,95,0,0" VerticalAlignment="Top" Width="170" Minimum="1" Maximum="36" Value="12"/>
-                    <Label Content="Pitch variation" HorizontalAlignment="Left" Margin="9,95,0,0" VerticalAlignment="Top"/>
-                    <Label Content="Center octave" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top"/>
-                    <Custom:NumericUpDown x:Name="randomOctave" Margin="112,142,272,355" Maximum="11" Minimum="1" Value="4"/>
-                    <ComboBox x:Name="randomInstrument" HorizontalAlignment="Left" Margin="112,187,0,0" VerticalAlignment="Top" Width="170"/>
-                    <Label Content="Instrument" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top"/>
-                    <Label Content="Length" HorizontalAlignment="Left" Margin="9,234,0,0" VerticalAlignment="Top"/>
-                    <Slider x:Name="randomLength" HorizontalAlignment="Left" Margin="112,234,0,0" VerticalAlignment="Top" Width="162" Minimum="50" Maximum="400" Value="200"/>
+                    <Label Content="Scale" HorizontalAlignment="Left" Margin="10,52,0,0" VerticalAlignment="Top"/>
+                    <Custom:RangeSlider x:Name="randomDurationRange" Margin="112,100,272,404" Minimum="1" Maximum="6" MinRangeWidth="1" LowerValue="2" UpperValue="4"></Custom:RangeSlider>
+                    <Label Content="Duration" HorizontalAlignment="Left" Margin="10,100,0,0" VerticalAlignment="Top"/>
+                    <Slider x:Name="randomPitchVar" HorizontalAlignment="Left" Height="26" Margin="112,135,0,0" VerticalAlignment="Top" Width="170" Minimum="1" Maximum="36" Value="12"/>
+                    <Label Content="Pitch variation" HorizontalAlignment="Left" Margin="8,135,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Center octave" HorizontalAlignment="Left" Margin="10,182,0,0" VerticalAlignment="Top"/>
+                    <Custom:NumericUpDown x:Name="randomOctave" Margin="112,182,272,315" Maximum="11" Minimum="1" Value="4"/>
+                    <ComboBox x:Name="randomInstrument" HorizontalAlignment="Left" Margin="112,227,0,0" VerticalAlignment="Top" Width="170"/>
+                    <Label Content="Instrument" HorizontalAlignment="Left" Margin="10,227,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Length" HorizontalAlignment="Left" Margin="9,274,0,0" VerticalAlignment="Top"/>
+                    <Slider x:Name="randomLength" HorizontalAlignment="Left" Margin="112,274,0,0" VerticalAlignment="Top" Width="162" Minimum="50" Maximum="400" Value="200"/>
+                    <Label Content="Random generation" HorizontalAlignment="Left" Margin="9,10,0,0" VerticalAlignment="Top" Width="202" FontSize="16" ToolTip="Generate a random melody in a certain scale"/>
                 </Grid>
             </TabItem>
+
 
 
 
