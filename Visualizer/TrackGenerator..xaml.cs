@@ -149,8 +149,8 @@ namespace Visualizer
 
                 //Options
                 List<IMetric> activeMetrics = new List<IMetric>();
-                if (metricChromaticTone.IsChecked == true)
-                    activeMetrics.Add(new ChromaticTone());
+              //  if (metricChromaticTone.IsChecked == true)
+              //      activeMetrics.Add(new ChromaticTone());
                 if (metricChromaticToneDistance.IsChecked == true)
                     activeMetrics.Add(new ChromaticToneDistance());
                 if (metricChromaticToneDuration.IsChecked == true)
@@ -159,12 +159,12 @@ namespace Visualizer
                     activeMetrics.Add(new MelodicBigram());
                 if (metricMelodicInterval.IsChecked == true)
                     activeMetrics.Add(new MelodicInterval());
-                if (metricPitch.IsChecked == true)
-                    activeMetrics.Add(new Pitch());
-                if (metricPitchDistance.IsChecked == true)
-                    activeMetrics.Add(new PitchDistance());
-                if (metricRhythm.IsChecked == true)
-                    activeMetrics.Add(new Rhythm());
+             //   if (metricPitch.IsChecked == true)
+             //       activeMetrics.Add(new Pitch());
+            //    if (metricPitchDistance.IsChecked == true)
+             //       activeMetrics.Add(new PitchDistance());
+            //    if (metricRhythm.IsChecked == true)
+            //        activeMetrics.Add(new Rhythm());
                 if (metricRhythmicBigram.IsChecked == true)
                     activeMetrics.Add(new RhythmicBigram());
                 if (metricRhythmicInterval.IsChecked == true)
