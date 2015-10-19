@@ -30,6 +30,8 @@ namespace GeneticMIDI.Generators.Sequence
 
         private PatchNames lastInstrument;
 
+        public int MaxNotes { get; set; }
+
         public IEnumerable<PatchNames> Instruments
         {
             get
@@ -50,11 +52,12 @@ namespace GeneticMIDI.Generators.Sequence
         public InstrumentalGenerator(CompositionCategory category)
         {
             this.category = category;
+            this.MaxNotes = 100;
         }
 
         public InstrumentalGenerator()
         {
-                
+            this.MaxNotes = 100;
         }
 
         public void AssignCategory(CompositionCategory category)
@@ -197,7 +200,7 @@ namespace GeneticMIDI.Generators.Sequence
         {
             lastInstrument = patch;
             var chain = instruments[patch];
-            return new MelodySequence(chain.Chain(100,seed));
+            return new MelodySequence(chain.Chain(MaxNotes,seed));
         }
 
         public MelodySequence GenerateInstrument(PatchNames patch)

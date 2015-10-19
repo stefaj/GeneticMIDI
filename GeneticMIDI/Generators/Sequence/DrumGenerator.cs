@@ -24,6 +24,8 @@ namespace GeneticMIDI.Generators.Sequence
 
         Random random = new Random();
 
+        public int MaxNotes { get; set; }
+
         private string SavePath
         {
             get
@@ -45,6 +47,7 @@ namespace GeneticMIDI.Generators.Sequence
         {
             IsInitialized = false;
             this.chain = new DotNetLearn.Markov.MarkovChain<Note>(4);
+            this.MaxNotes = 100;
         }
 
         public DrumGenerator(int order)
@@ -52,6 +55,8 @@ namespace GeneticMIDI.Generators.Sequence
             this.chain = new DotNetLearn.Markov.MarkovChain<Note>(order);
 
             IsInitialized = false;
+
+            this.MaxNotes = 100;
         }
 
         public void Initialize(Databank bank)
@@ -132,7 +137,7 @@ namespace GeneticMIDI.Generators.Sequence
         {
             int seed = random.Next();
 
-            var gen_mel = new MelodySequence(chain.Chain(200, seed));
+            var gen_mel = new MelodySequence(chain.Chain(MaxNotes, seed));
 
             return gen_mel;
         }
