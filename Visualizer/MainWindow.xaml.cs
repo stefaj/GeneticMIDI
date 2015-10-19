@@ -117,13 +117,16 @@ namespace Visualizer
 
         void SetupCategories()
         {
+            
             databank = new Databank(Visualizer.Properties.Settings.Default.LibraryPath);
-            foreach(var k in Databank.defaultPaths.Keys)
+
+            var selectedStyles = new string[] { "Classical", "Jazz", "Dance Techno", "Video Games" };
+
+            int i = 0;
+            foreach (var k in selectedStyles)
             {
-                ComboBoxItem cb = new ComboBoxItem();
-                cb.Content = k;
+                ComboBoxItem cb = guideCombo.Items[i++] as ComboBoxItem;
                 cb.Tag = k;
-                guideCombo.Items.Add(cb);
             }
 
         }

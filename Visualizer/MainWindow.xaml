@@ -46,11 +46,37 @@
                     <Button x:Name="clearBtn"  HorizontalAlignment="Left" Margin="63,0,0,10" VerticalAlignment="Bottom" Width="48" Height="48" Click="clearBtn_Click">
                         <Image Width="16" Height="16" Source="Resources/glyphicons-200-ban.png"></Image>
                     </Button>
-                    <ComboBox x:Name="guideCombo" HorizontalAlignment="Left" Margin="89,10,0,0" VerticalAlignment="Top" Width="214" SelectedIndex="2" SelectionChanged="guideCombo_SelectionChanged">
+                    <ComboBox x:Name="guideCombo" HorizontalAlignment="Left" Margin="89,26,0,0" VerticalAlignment="Top" Width="214" SelectionChanged="guideCombo_SelectionChanged" Height="32">
+                        <ComboBox.Items>
+                            <ComboBoxItem>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="24" Height="24" Source="Resources/piano6.png"></Image>
+                                <Label>Classical</Label>
+                            </StackPanel>
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="24" Height="24"  Source="Resources/musicalinstrument5.png"></Image>
+                                <Label>Jazz</Label>
+                            </StackPanel>
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="24" Height="24"  Source="Resources/dancer5.png"></Image>
+                                <Label>Dance Techno</Label>
+                            </StackPanel>
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="24" Height="24"  Source="Resources/pacman2.png"></Image>
+                                <Label>Video Games</Label>
+                            </StackPanel>
+                            </ComboBoxItem>
+                        </ComboBox.Items>
+
 
                     </ComboBox>
-                    <Label Content="Guide" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top"/>
-                    <ListBox x:Name="itemsBox" Margin="10,60,10,73" SelectionChanged="itemsBox_SelectionChanged">
+                    <ListBox x:Name="itemsBox" Margin="10,79,10,73" SelectionChanged="itemsBox_SelectionChanged">
                         <ListBox.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Delete" Click="MenuItem_Click">
@@ -71,6 +97,7 @@
                             </ContextMenu>
                         </ListBox.ContextMenu>
                     </ListBox>
+                    <Image HorizontalAlignment="Left" Height="64" Margin="10,10,0,0" VerticalAlignment="Top" Width="64" Source="Resources/quaver11.png"/>
                 </Grid>
 
             </TabItem>
