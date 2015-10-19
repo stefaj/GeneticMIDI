@@ -47,6 +47,8 @@ namespace GeneticMIDI.FitnessFunctions
             List<Note> notes = new List<Note>();
             foreach(var comp in comps)
             {
+                if (comp.Tracks.Count < 1)
+                    continue;
                 var seq = comp.Tracks[0].GetMainSequence() as MelodySequence;
                 foreach (var n in seq.Notes)
                     notes.Add(n);

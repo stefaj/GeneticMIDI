@@ -529,6 +529,12 @@ namespace Visualizer
         // New track
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            if (selectedCategory == null)
+            {
+                return;
+            }
+
+
             TrackGenerator g = new TrackGenerator(selectedCategory, Generated);
 
             if (g.ShowDialog() == true)

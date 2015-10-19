@@ -53,6 +53,8 @@ namespace GeneticMIDI.Generators
 
                 foreach(var c in cat.Compositions)
                 {
+                    if (c.Tracks.Count < 1)
+                        continue;
                     var cloneMel = (c.Tracks[0].GetMainSequence() as MelodySequence).Clone() as MelodySequence;
                     
                     cloneMel.StandardizeDuration();
