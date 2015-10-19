@@ -99,18 +99,19 @@ namespace Visualizer
             if (comp == null)
                 return;
             playPanel.Children.Clear();
+            int track_index = 0;
             foreach(var t in comp.Tracks)
             {
                 MelodySequence seq = t.GetMainSequence() as MelodySequence;
                 DotNetMusic.WPF.MusicSheet sheet = new DotNetMusic.WPF.MusicSheet();
                 sheet.Height = 200;
-                sheet.SetNotes(seq.ToArray());
+                sheet.SetNotes(t);
                 sheet.HorizontalAlignment = System.Windows.HorizontalAlignment.Left; sheet.VerticalAlignment = System.Windows.VerticalAlignment.Top;
                 
 
-                playPanel.Children.Add(sheet);            
+                playPanel.Children.Add(sheet);
 
-
+                track_index++;
             }
         }
 
@@ -247,7 +248,8 @@ namespace Visualizer
                             var sheet = (playPanel.Children[j] as DotNetMusic.WPF.MusicSheet);
                             sheet.Dispatcher.Invoke(() =>
                             {
-                                sheet.SetHighlightIndex(i);
+                                // TODO
+                                // sheet.SetHighlightIndex(i);
                             });
                         });
                         lastIndex[j] = i;
@@ -268,11 +270,12 @@ namespace Visualizer
                 {
                     foreach (DotNetMusic.WPF.MusicSheet sheet in playPanel.Children)
                     {
-                        if (sheet.GetHighlightedWidth() > maxHighlightedWidth)
+                        //TODO
+                      /*  if (sheet.GetHighlightedWidth() > maxHighlightedWidth)
                         {
                             maxHighlightedWidth = sheet.GetHighlightedWidth();
                             maxHighlight = sheet;
-                        }
+                        }*/
                     }
                     double dreamOffset = maxHighlightedWidth - this.Width / 2.0;
                     double currentOffset = playScroll.HorizontalOffset;
@@ -459,7 +462,9 @@ namespace Visualizer
 
             DotNetMusic.WPF.MusicSheet sheet = new DotNetMusic.WPF.MusicSheet();
             sheet.Height = 200;
-            sheet.SetNotes(seq.ToArray());
+
+            var t = new GeneticMIDI.Representation.Track(instr, 1); t.AddSequence(seq);
+            sheet.SetNotes(t);
             sheet.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             ListBoxItem listBoxItem = new ListBoxItem();
             listBoxItem.Content = sheet;
