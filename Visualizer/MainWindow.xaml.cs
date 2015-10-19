@@ -65,7 +65,6 @@ namespace Visualizer
         Databank databank;
 
         CompositionCategory selectedCategory;
-        
 
         public MainWindow()
         {
@@ -84,6 +83,8 @@ namespace Visualizer
 
             generator = new CompositionRandomizer();
             generator.OnCompositionChange += generator_OnCompositionChange;
+
+
 
         }
 
@@ -242,6 +243,7 @@ namespace Visualizer
                 if (!lastIndex.ContainsKey(j))
                     lastIndex[j] = 0;
                 double time = 0;
+                if(j==0)
                 for(int i = 0; i < notes.Length; i++)
                 {
                     Note n = notes[i];
@@ -253,7 +255,7 @@ namespace Visualizer
                             var sheet = (playPanel.Children[j] as DotNetMusic.WPF.MusicSheet);
                             sheet.Dispatcher.Invoke(() =>
                             {
-                                // TODO
+                            
                                  sheet.SetHighlightIndex(i);
                             });
                         });
@@ -605,7 +607,7 @@ namespace Visualizer
         // Down octave
         private void MenuItem_ClickDown(object sender, RoutedEventArgs e)
         {
-
+           // flyout.IsOpen = true;
             ListBoxItem item = itemsBox.SelectedItem as ListBoxItem;
             try
             {
