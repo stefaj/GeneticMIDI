@@ -1,7 +1,1 @@
 ﻿Visualization of percussion
-
-.
-
-
-
-Decrease and Increase tempo
