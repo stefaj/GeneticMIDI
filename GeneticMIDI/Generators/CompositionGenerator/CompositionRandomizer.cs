@@ -96,12 +96,14 @@ namespace GeneticMIDI.Generators.CompositionGenerator
         {
             int index = ActiveComposition.Tracks.IndexOf(t);
             Remove(index);
+
         }
 
         public void Remove(int index)
         {
             ActiveComposition.Tracks.RemoveAt(index);
-            generators.RemoveAt(index);
+            if(generators.Count > index)
+                generators.RemoveAt(index);
 
             if (OnCompositionChange != null)
                 OnCompositionChange(this, new EventArgs());
