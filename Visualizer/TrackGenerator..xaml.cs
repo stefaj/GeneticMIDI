@@ -41,10 +41,7 @@ namespace Visualizer
         {
             this.category = category;
             InitializeComponent();
-
-
-            SetupLinePlot(fitnessPlot, "Average Fitness");
-
+ 
             // Load data for accompany instruments
             string path = "save/" + category.CategoryName;
             if(System.IO.Directory.Exists(path))
@@ -98,6 +95,7 @@ namespace Visualizer
             foreach (var d in popularInstruments)
             {
                 loadInstrument.Items.Add(d);
+                geneticInstrumentBox.Items.Add(d);
                 randomInstrument.Items.Add(d);
             }
             
@@ -110,7 +108,7 @@ namespace Visualizer
 
 
 
-
+            LoadInstrumentalData();
 
 
         }
@@ -134,18 +132,18 @@ namespace Visualizer
 
             if (index == 0)
             {
+                if (geneticInstrumentBox.SelectedItem == null)
+                    return;
 
+                fitnessPlot.ResetAllAxes();
                 SetupLinePlot(fitnessPlot, "Average Fitness");
                 (fitnessPlot.Model.Series[0] as LineSeries).Points.Clear();
                 fitnessPlot.Model.Series[0].Unselect();
-                fitnessPlot.Model.Series.Clear();
-                fitnessPlot.ResetAllAxes();
                 fitnessPlot.InvalidatePlot();
-
+                
+               
                 //GA    
                 IFitnessFunction fitness = null;
-
-                MelodySequence seq = category.GetRandomComposition().GetLongestTrack().GetMainSequence() as MelodySequence;
 
                 //Options
                 List<IMetric> activeMetrics = new List<IMetric>();
@@ -170,6 +168,9 @@ namespace Visualizer
                 if (metricRhythmicInterval.IsChecked == true)
                     activeMetrics.Add(new RhythmicInterval());
 
+
+                fitness = GeneticMIDI.FitnessFunctions.MetricSimilarity.GenerateMetricSimilarityMulti(category.Compositions, activeMetrics.ToArray(), GeneticMIDI.FitnessFunctions.SimilarityType.Cosine);
+                /*
                 if (fitnessFuncCombo.SelectedIndex == 0)
                     fitness = new GeneticMIDI.FitnessFunctions.MetricSimilarity(seq, activeMetrics.ToArray(), GeneticMIDI.FitnessFunctions.SimilarityType.Cosine);
                 if (fitnessFuncCombo.SelectedIndex == 1)
@@ -179,8 +180,12 @@ namespace Visualizer
                 if (fitnessFuncCombo.SelectedIndex == 3)
                     fitness = new GeneticMIDI.FitnessFunctions.CrossCorrelation(seq);
                 if (fitnessFuncCombo.SelectedIndex == 4)
-                    fitness = GeneticMIDI.FitnessFunctions.NCD.FromMelodies(category);
+                    fitness = GeneticMIDI.FitnessFunctions.NCD.FromMelodies(category);*/
 
+                
+                
+
+                Instrument = (PatchNames)geneticInstrumentBox.SelectedItem;
 
                 var gen = new GeneticGenerator(fitness, Instrument, category);
                 gen.OnPercentage += gen_OnPercentage;
@@ -191,8 +196,6 @@ namespace Visualizer
                 new Thread(() =>
                 {
                     var notes = gen.Generate();
-
-                    Instrument = PatchNames.Acoustic_Grand;
 
                     var mel = notes;
                     GeneratedSequence = mel;
@@ -424,8 +427,11 @@ namespace Visualizer
 
             fitnessPlot.Dispatcher.Invoke(() =>
             {
-                ((fitnessPlot.Model.Series[0] as LineSeries).ItemsSource as List<DataPoint>).Add(new DataPoint(percentage, fitness));
-                fitnessPlot.InvalidatePlot();
+                if (fitnessPlot != null && fitnessPlot.Model != null && fitnessPlot.Model.Series != null && fitnessPlot.Model.Series.Count > 0)
+                {
+                    ((fitnessPlot.Model.Series[0] as LineSeries).ItemsSource as List<DataPoint>).Add(new DataPoint(percentage, fitness));
+                    fitnessPlot.InvalidatePlot();
+                }
             });
         }
 
@@ -459,6 +465,12 @@ namespace Visualizer
         // Populate instrumental generator instruments
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
+            
+
+        }
+
+        void LoadInstrumentalData()
+        {
             Generator = new InstrumentalGenerator(category);
             new Thread(() =>
             {
@@ -468,13 +480,13 @@ namespace Visualizer
 
 
                 instrBox.Dispatcher.Invoke(() =>
-              {
-                  instrBox.Items.Clear();
-                  ListBoxItem boxItem = new ListBoxItem();
-                  boxItem.Content = "Drums";
-                  boxItem.Tag = -1;
-                  instrBox.Items.Add(boxItem);
-              });
+                {
+                    instrBox.Items.Clear();
+                    ListBoxItem boxItem = new ListBoxItem();
+                    boxItem.Content = "Drums";
+                    boxItem.Tag = -1;
+                    instrBox.Items.Add(boxItem);
+                });
 
 
 
@@ -494,7 +506,6 @@ namespace Visualizer
                 });
                 StopSpinner();
             }).Start();
-
         }
     
 

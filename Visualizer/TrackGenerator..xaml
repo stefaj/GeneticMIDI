@@ -9,28 +9,22 @@
             <TabItem x:Name="tabGA" Header="Genetic" Custom:ControlsHelper.HeaderFontSize="16">
                 <Grid Margin="0,0,0,12">
                     <Image HorizontalAlignment="Left" Height="128" Margin="416,9,0,0" VerticalAlignment="Top" Width="128" Source="Resources/dna17.png"/>
-                    <Label Content="Metrics:" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricChromaticToneDistance" Content="Chromatic Tone Distance" HorizontalAlignment="Left" Margin="202,106,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricChromaticToneDuration" Content="Chromatic Tone Duration" HorizontalAlignment="Left" Margin="10,106,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricMelodicBigram" Content="Melodic Bigram" HorizontalAlignment="Left" Margin="202,129,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricMelodicInterval" Content="Melodic Interval" HorizontalAlignment="Left" Margin="10,129,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricRhythmicBigram" Content="Rhymthic Bigram" HorizontalAlignment="Left" Margin="10,152,0,0" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="metricRhythmicInterval" Content="Rhythmic Interval" HorizontalAlignment="Left" Margin="202,152,0,0" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="fitnessFuncCombo" HorizontalAlignment="Left" Margin="132,45,0,0" VerticalAlignment="Top" Width="196" SelectedIndex="0">
-                        <ComboBoxItem Content="Cosine Similarity"/>
-                        <ComboBoxItem Content="Euclidian Similarity"/>
-                        <ComboBoxItem Content="Pearson Correlation"/>
-                        <ComboBoxItem Content="Cross Correlation"/>
-                        <ComboBoxItem Content="Normalized Compression Distance"/>
-                    </ComboBox>
-                    <Label Content="Fitness Function&#xA;" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Height="26"/>
-                    <Label Content="Average Fitness" HorizontalAlignment="Left" Margin="10,255,0,0" VerticalAlignment="Top" Height="26"/>
-                    <Label Content="Maximum Iterations" HorizontalAlignment="Left" Margin="5,191,0,0" VerticalAlignment="Top"/>
-                    <Slider x:Name="maxGenerationSlider" HorizontalAlignment="Left" Margin="10,222,0,0" VerticalAlignment="Top" Width="290" Minimum="500" Maximum="12000" Value="2000"/>
-                    <Border BorderThickness="1" Margin="10,286,220,102" BorderBrush="Black">
+                    <Label Content="Metrics:" HorizontalAlignment="Left" Margin="10,52,0,0" VerticalAlignment="Top" ToolTip="The genetic algorithm will try to match the frequency of these metrics"/>
+                    <CheckBox x:Name="metricChromaticToneDistance" Content="Chromatic Tone Distance" HorizontalAlignment="Left" Margin="202,81,0,0" VerticalAlignment="Top" ToolTip="Interval between repetition of chromatic tones"/>
+                    <CheckBox x:Name="metricChromaticToneDuration" Content="Chromatic Tone Duration" HorizontalAlignment="Left" Margin="10,81,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="metricMelodicBigram" Content="Melodic Bigram" HorizontalAlignment="Left" Margin="202,104,0,0" VerticalAlignment="Top" ToolTip="Pairs of melodic intervals"/>
+                    <CheckBox x:Name="metricMelodicInterval" Content="Melodic Interval" HorizontalAlignment="Left" Margin="10,104,0,0" VerticalAlignment="Top" ToolTip="Interval between current note and previous note"/>
+                    <CheckBox x:Name="metricRhythmicBigram" Content="Rhymthic Bigram" HorizontalAlignment="Left" Margin="10,127,0,0" VerticalAlignment="Top" ToolTip="Pairs of rhythmic intervals"/>
+                    <CheckBox x:Name="metricRhythmicInterval" Content="Rhythmic Interval" HorizontalAlignment="Left" Margin="202,127,0,0" VerticalAlignment="Top" ToolTip="relationship between adjacent note rhythms"/>
+                    <Label Content="Average Fitness" HorizontalAlignment="Left" Margin="10,258,0,0" VerticalAlignment="Top" Height="26"/>
+                    <Label Content="Maximum Iterations" HorizontalAlignment="Left" Margin="10,227,0,0" VerticalAlignment="Top" ToolTip="Maximum amount of time the algorithm should run for"/>
+                    <Slider x:Name="maxGenerationSlider" HorizontalAlignment="Left" Margin="135,231,0,0" VerticalAlignment="Top" Width="290" Minimum="500" Maximum="12000" Value="2000"/>
+                    <Border BorderThickness="1" Margin="10,290,10,82" BorderBrush="Black">
                         <oxy:PlotView x:Name="fitnessPlot" />
                     </Border>
                     <Label Content="Genetic Generation" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="202" FontSize="16" ToolTip="Generate a melody using a genetic algorithm"/>
+                    <ComboBox x:Name="geneticInstrumentBox" Margin="80,171,247,0" Height="26" VerticalAlignment="Top"/>
+                    <Label Content="Instrument" Margin="10,174,474,0" Height="28" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="tabInstru" Header="Instrumental" Custom:ControlsHelper.HeaderFontSize="16">
