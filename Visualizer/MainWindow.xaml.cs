@@ -222,6 +222,8 @@ namespace Visualizer
                 }
                 if (track == null)
                     return;
+                if (j != 0)
+                    return;
                 var seq = track.GetMainSequence() as MelodySequence;
                 var notes = seq.ToArray();
                 /*for(int i = last_index; i < notes.Length; i++)
@@ -243,7 +245,7 @@ namespace Visualizer
                 if (!lastIndex.ContainsKey(j))
                     lastIndex[j] = 0;
                 double time = 0;
-                if(j==0)
+              
                 for(int i = 0; i < notes.Length; i++)
                 {
                     Note n = notes[i];
