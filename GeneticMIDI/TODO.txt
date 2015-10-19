@@ -1,9 +1,7 @@
-﻿Visualization
+﻿Visualization of percussion
 
-Visualization of percussion
+.
 
-Only scroll to latest note if there was a change
 
-Only show chosen metrics
 
-Only show chosen music styles
+Decrease and Increase tempo

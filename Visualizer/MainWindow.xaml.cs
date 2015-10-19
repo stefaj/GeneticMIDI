@@ -177,7 +177,8 @@ namespace Visualizer
 
             //songModel.Axes[0].IsPanEnabled = false;
 
-            playScroll.ScrollToHorizontalOffset(playScroll.HorizontalOffset + increment);
+            if(autoScroll)
+                playScroll.ScrollToHorizontalOffset(playScroll.HorizontalOffset + increment);
             increment *= 0.95;
 
            // x_axes.Minimum = prevTime - 16;
@@ -198,6 +199,7 @@ namespace Visualizer
 
         Dictionary<int, int> lastIndex = new Dictionary<int, int>();
         double increment = 0;
+        bool autoScroll = true;
         void player_OnMessageSent(object sender, int key, PlaybackMessage msg)
         {
 
@@ -252,7 +254,7 @@ namespace Visualizer
                             sheet.Dispatcher.Invoke(() =>
                             {
                                 // TODO
-                                // sheet.SetHighlightIndex(i);
+                                 sheet.SetHighlightIndex(i);
                             });
                         });
                         lastIndex[j] = i;
@@ -267,12 +269,13 @@ namespace Visualizer
 
             }
 
-            int maxHighlightedWidth = 0;
+            double maxHighlightedPerc = 0;
             DotNetMusic.WPF.MusicSheet maxHighlight;
             playPanel.Dispatcher.Invoke(() =>
                 {
                     foreach (DotNetMusic.WPF.MusicSheet sheet in playPanel.Children)
                     {
+                        maxHighlightedPerc = progressSongSlider.Value / progressSongSlider.Maximum;
                         //TODO
                       /*  if (sheet.GetHighlightedWidth() > maxHighlightedWidth)
                         {
@@ -280,7 +283,7 @@ namespace Visualizer
                             maxHighlight = sheet;
                         }*/
                     }
-                    double dreamOffset = maxHighlightedWidth - this.Width / 2.0;
+                    double dreamOffset = maxHighlightedPerc * (playScroll.ExtentWidth);
                     double currentOffset = playScroll.HorizontalOffset;
                     increment = (dreamOffset - currentOffset) / 20.0;
                     
@@ -309,6 +312,7 @@ namespace Visualizer
         /// <param name="e"></param>
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            autoScroll = true;
             player.Stop();
             // Play button
 
@@ -342,6 +346,7 @@ namespace Visualizer
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
+            autoScroll = true;
             // Stop
             player.Stop();
         }
@@ -350,7 +355,7 @@ namespace Visualizer
         {
             if (generator == null)
                 return;
-
+            autoScroll = true;
             // Randomize
             generator.Next();
           
@@ -588,6 +593,7 @@ namespace Visualizer
             {
                 MelodySequence seq = item.Tag as MelodySequence;
                 seq.OctaveUp();
+                generator_OnCompositionChange(sender, e);
             }
             catch
             {
@@ -605,6 +611,7 @@ namespace Visualizer
             {
                 MelodySequence seq = item.Tag as MelodySequence;
                 seq.OctaveDown();
+                generator_OnCompositionChange(sender, e);
             }
             catch
             {
@@ -612,5 +619,87 @@ namespace Visualizer
             }
 
         }
+
+        // Increase TEmpo
+        private void MenuItem_ClickIT(object sender, RoutedEventArgs e)
+        {
+
+            ListBoxItem item = itemsBox.SelectedItem as ListBoxItem;
+            try
+            {
+                MelodySequence seq = item.Tag as MelodySequence;
+                seq.DoubleSpeed();
+                generator_OnCompositionChange(sender, e);
+            }
+            catch
+            {
+
+            }
+
+        }
+
+        // Increase TEmpo
+        private void MenuItem_ClickDT(object sender, RoutedEventArgs e)
+        {
+
+            ListBoxItem item = itemsBox.SelectedItem as ListBoxItem;
+            try
+            {
+                MelodySequence seq = item.Tag as MelodySequence;
+                seq.HalveSpeed();
+                generator_OnCompositionChange(sender, e);
+            }
+            catch
+            {
+
+            }
+
+        }
+
+        private void progressSongSlider_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+        
+        }
+
+        private void playScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            string a = "";
+
+        }
+
+        private void playScroll_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+        private parentItem FindVisualParent<parentItem>(DependencyObject obj) where parentItem : DependencyObject
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(obj);
+            while (parent != null && !parent.GetType().Equals(typeof(parentItem)))
+            {
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+            return parent as parentItem;
+        }
+
+        private void playScroll_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            object original = e.OriginalSource;
+
+            if (!original.GetType().Equals(typeof(ScrollViewer)))
+            {
+                if (original.GetType().Equals(typeof(Image)))
+                {
+                    Console.WriteLine("image is clicked");
+                }
+                else if (FindVisualParent<ScrollBar>(original as DependencyObject) != null)
+                {
+                    autoScroll = false;
+                }
+
+            }
+        }
+
+
     }
+
 }

@@ -228,6 +228,10 @@
     <Resource Include="Resources\graph21.png" />
     <Resource Include="Resources\people8.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\glyphicons-173-rewind.png" />
+    <Resource Include="Resources\glyphicons-177-forward.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
