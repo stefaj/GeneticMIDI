@@ -94,8 +94,51 @@ Use HMM decode as fitness function GA*/
 
 
             Databank db = new Databank("lib");
-            var cat = db.Load("Classical");
+            var cat = db.Load("Jazz");
 
+            Codebook<Note> book = new Codebook<Note>();
+
+            List<int[]> sequences = new List<int[]>();
+
+            foreach(var comp in cat.Compositions)
+            {
+                foreach(var track in comp.Tracks)
+                {
+                    if(track.Instrument == PatchNames.Trumpet)
+                    {
+                        var mel = track.GetMelodySequence();
+                        mel.Trim(80);
+                        mel.StandardizeDuration();
+                        
+                        book.Add(mel.Notes);
+                        sequences.Add(book.ToCodes(mel.Notes));
+                    }
+                }
+                if (sequences.Count > 10)
+                    break;
+            }
+
+            DotNetLearn.Markov.HiddenMarkovModel hmm = new DotNetLearn.Markov.HiddenMarkovModel(100, book.TotalUniqueSymbols);
+            hmm.UniformRandomPriors();
+            hmm.MaxIterations = 500;
+            hmm.Train(sequences.ToArray());
+
+
+            var o = hmm.PredictObservationSequence(80);
+            var newmel = new MelodySequence(book.Translate(o));
+
+            Track t = new Track(PatchNames.Trumpet, 2);
+            t.AddSequence(newmel);
+
+            Console.ReadLine();
+            MusicPlayer player = new MusicPlayer();
+            player.Play(t);
+
+            player.Stop();
+
+            Console.ReadLine();
+
+            /*
             var gen = new SamplingWithReplacement(cat, PatchNames.Acoustic_Grand);
 
             
@@ -111,7 +154,7 @@ Use HMM decode as fitness function GA*/
             Console.ReadLine();
             WriteMelodyToFile(gen.OriginalSequence, "sampling_in.mid");
             WriteMelodyToFile(mel, "sampling_out.mid");
-
+            */
 
 
 

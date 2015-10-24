@@ -1,1 +1,5 @@
 ﻿Visualization of percussion
+
+Regenerate composition categories
+
+Add note off for last note

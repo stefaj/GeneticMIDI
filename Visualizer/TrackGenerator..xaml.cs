@@ -52,18 +52,18 @@ namespace Visualizer
                     try
                     {
                         string filename = System.IO.Path.GetFileNameWithoutExtension(file);
-                        if (!filename.ToLower().Contains("accomp"))
+                        if (!filename.ToLower().Contains("accomp_ann_ff_"))
                             continue;
-                        var sub = filename.Substring(6);
+                        var sub = filename.Substring(14);
                     
                         PatchNames instrument = (PatchNames)(int.Parse(sub));
 
                         if(!accompInstruBox.Items.Contains(instrument))
                             accompInstruBox.Items.Add(instrument);
                     }
-                    catch
+                    catch(Exception E)
                     {
-
+                        Console.WriteLine(E);
                     }
                 }
             }
@@ -547,11 +547,11 @@ namespace Visualizer
 
         private void accompMethoBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            accompInstruBox.Items.Clear();
+            /*accompInstruBox.Items.Clear();
             accompInstruBox.Items.Add(PatchNames.Acoustic_Grand);
             accompInstruBox.Items.Add(PatchNames.Orchestral_Strings);
             accompInstruBox.Items.Add(PatchNames.Flute);
-            accompInstruBox.Items.Add(PatchNames.Music_Box);
+            accompInstruBox.Items.Add(PatchNames.Music_Box);*/
         }
 
         private void randomScale_SelectionChanged(object sender, SelectionChangedEventArgs e)

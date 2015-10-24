@@ -5,24 +5,7 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:Visualizer="clr-namespace:DotNetMusic.WPF;assembly=WPFMusicSheet"
         Title="Mizik" Height="739" Width="934" Closing="MetroWindow_Closing">
-    <Controls:MetroWindow.Flyouts>
-        <Controls:FlyoutsControl Name="floutCon">
-            <Controls:Flyout Header="Flyout" Position="Right" Width="200" Name="flyout"  Margin="100 0 0 0">
-                <Button>test</Button>
-            </Controls:Flyout>
 
-        </Controls:FlyoutsControl>
-    </Controls:MetroWindow.Flyouts>
-    <Controls:MetroWindow.RightWindowCommands>
-        <Controls:WindowCommands>
-            <Button FontFamily="Wingdings"
-                    FontSize="20"
-                    Content="B" />
-            <Button FontFamily="Wingdings"
-                    FontSize="20"
-                    Content="C" />
-        </Controls:WindowCommands>
-    </Controls:MetroWindow.RightWindowCommands>
     <Grid>
         
         <TabControl Margin="10">
