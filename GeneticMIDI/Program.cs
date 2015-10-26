@@ -91,6 +91,8 @@ Use HMM decode as fitness function GA*/
             Console.ReadLine();*/
 
 
+            var twink = Composition.LoadFromMIDI(@"C:\Users\1gn1t0r\Documents\git\GeneticMIDI\GeneticMIDI\bin\Debug\test\other\twinkle.mid");
+
 
 
             Databank db = new Databank("lib");
@@ -118,9 +120,9 @@ Use HMM decode as fitness function GA*/
                     break;
             }
 
-            DotNetLearn.Markov.HiddenMarkovModel hmm = new DotNetLearn.Markov.HiddenMarkovModel(100, book.TotalUniqueSymbols);
+            DotNetLearn.Markov.HiddenMarkovModel hmm = new DotNetLearn.Markov.HiddenMarkovModel(60, book.TotalUniqueSymbols);
             hmm.UniformRandomPriors();
-            hmm.MaxIterations = 500;
+            hmm.MaxIterations = 50;
             hmm.Train(sequences.ToArray());
 
 
