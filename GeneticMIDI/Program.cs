@@ -95,7 +95,7 @@ Use HMM decode as fitness function GA*/
 
 
 
-            Databank db = new Databank("lib");
+           Databank db = new Databank("lib");
             var cat = db.Load("Jazz");
 
             Codebook<Note> book = new Codebook<Note>();

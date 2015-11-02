@@ -127,7 +127,7 @@ namespace GeneticMIDI.Generators.Sequence
                     var mel = track.GetMainSequence() as MelodySequence;
                     if (!instruments.ContainsKey(track.Instrument))
                     {
-                        instruments[track.Instrument] = new MarkovChain<Note>(3);
+                        instruments[track.Instrument] = new MarkovChain<Note>(4);
                         instrument_tracker[track.Instrument] = 1;
                     }
                     lock (instruments[track.Instrument])
